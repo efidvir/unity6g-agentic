@@ -1,0 +1,203 @@
+# The complete descriptor of the link-assurance agent, guide Annex B, in its authoring form.
+# The values the guide abridges are completed here; the digests and the signature are placeholders
+# until the descriptor toolchain computes them (work item 0.5).
+descriptorVersion: "3.0"
+kind: LocalAgentDescriptor
+identity:
+  id: example.link-assurance
+  version: 1.4.0
+  name: Wireless link assurance
+  publisher: { org: example, support: noc@example.org }
+  functionalSpecification: { ref: "fs/link-assurance-fs-v7.xlsx", digest: "sha256:3d1f1ac55de970be84a23c2363cb34055d1e73b4d29eda4cebaf460b558e71ca" }
+  logicRelease: 2.3.0
+  labels: [transport, availability, forecasting]
+  license: Apache-2.0
+tuple:
+  ms:  { mode: full }
+  ae:  { mode: full }
+  de:  { mode: full }
+  act: { mode: full }
+objectives:
+  - kpi: catalog://kpi/link-availability@1.0.0
+    direction: holdAbove
+    target: { boundAt: instantiation }
+    window: PT15M
+    atRiskMargin: 0.002
+    rank: 1
+  - kpi: catalog://kpi/link-capacity-ratio@1.0.0
+    direction: holdAbove
+    target: { value: 0.6 }
+    window: PT15M
+    atRiskMargin: 0.05
+    rank: 2
+scope:
+  domain: transport
+  selectors: [region, site, technology]
+  observation:
+    objectClasses: [mw-link, mw-radio]
+    metrics:
+      - catalog://transport/metric/rsl@1.2.0
+      - catalog://transport/metric/mse@1.0.0
+      - catalog://transport/metric/modulation@1.0.0
+      - catalog://transport/metric/capacity@1.1.0
+      - catalog://transport/metric/errored-seconds@1.0.0
+      - catalog://transport/metric/link-state@1.0.0
+  control:
+    objectClasses: [mw-link]
+    parameters:
+      - catalog://transport/param/modulation-profile@1.0.0
+      - catalog://transport/param/tx-power@1.0.0
+  maxObjects: 200
+actionSpace:
+  - actionType: catalog://transport/action/set-modulation-profile@1.1.0
+    targets: { objectClass: mw-link }
+    bounds: { profile: { enum: [QPSK, 16QAM, 64QAM, 256QAM, 1024QAM] } }
+    rateLimit: { max: 4, per: PT1H }
+    stability: { minInterval: PT5M, minHoldBeforeReverse: PT15M, maxStep: 1 }
+    preconditions: [ { all: [ { metric: link-state, eq: up } ] } ]
+    verification: { method: msObservation, timing: inTransaction, timeout: PT20S }
+    idempotent: true
+    rollback: catalog
+    authorization: mediation
+  - actionType: catalog://transport/action/set-tx-power@1.0.0
+    targets: { objectClass: mw-link }
+    bounds: { powerDbm: { min: 5, max: 24, step: 1 } }
+    rateLimit: { max: 6, per: PT1H }
+    stability: { minInterval: PT2M, minHoldBeforeReverse: PT10M, maxStep: 3 }
+    preconditions: [ { all: [ { metric: link-state, eq: up } ] } ]
+    verification: { method: msObservation, timing: inTransaction, timeout: PT20S }
+    idempotent: true
+    rollback: catalog
+    authorization: mediation
+functions:
+  ms:
+    technique: deterministic
+    trigger: periodic
+    contract: catalog://transport/contract/link-observation@2.1.0
+    sources:
+      - { kind: catalog://transport/source/sdn-telemetry@1.0.0,
+          pattern: periodicStream, interval: PT1S }
+      - { kind: catalog://transport/source/radio-counters@1.3.0,
+          pattern: poll, interval: PT15S }
+    windows: { default: PT10S, errored-seconds: PT60S }
+  ae:
+    technique: classicalMl
+    trigger: onInput
+    insightTypes: [ { type: forecast, schema: catalog://transport/insight/link-fade-forecast@1.3.0 } ]
+    featureSet: { service: link-fade-v3, version: 3 }
+    serving: embedded
+    models: [link-fade-forecaster]
+    fallback: { declared: true, name: rsl-trend-threshold }
+  de:
+    technique: deterministic
+    trigger: onInput
+    consumes: [forecast]
+    minInputCoverage: 0.8
+    minConfidence: 0.6
+    interpretable: true
+    reasonCodes: [DEC-PREEMPT-FADE, DEC-RESTORE-CAPACITY, DEC-SAFE-DEGRADED-EVIDENCE]
+    constraints: [ { id: min-capacity, all: [ { metric: capacity, ge: { param: minCapacityMbps } } ] } ]
+    maxIntentValidity: PT60S
+    parameters: { risk_threshold: 0.25, minCapacityMbps: 400 }
+  act:
+    technique: deterministic
+    controllerBinding:
+      ref: catalog://transport/binding/tfs-nbi@2.0.0
+      pinned: "7.0"
+      accepted: ">=7.0 <8.0"
+    unresolvedAfter: PT30S
+    maxConcurrentTargets: 8
+interfaces:
+  flows:
+    - { id: obs-links, kind: observation, from: ms, to: ae, permitted: [localRuntime, dataContinuum],
+        maxRate: 50/s, freshness: PT2S, delivery: atMostOnce }
+    - { id: ins-forecast, kind: insight, from: ae, to: de, permitted: [localRuntime, direct],
+        maxRate: 5/s, freshness: PT5S, delivery: atLeastOnce }
+    - { id: int-actions, kind: intent, from: de, to: act, permitted: [localRuntime, direct],
+        maxRate: 1/s, freshness: PT5S, delivery: atLeastOnce }
+    - { id: out-feedback, kind: outcome, from: act, to: de, permitted: [localRuntime, direct],
+        delivery: atLeastOnce, publishOn: dataContinuum }
+  exposed:
+    - { flow: ins-forecast, pattern: publication, profile: link-forecast-v1,
+        trustDomains: [unity6g.example] }
+operations:
+  mode: eventDriven
+  latencyClass: nonRealTime
+  loopBudget: PT5S
+  capabilityLatencyP99: { ms: PT0.2S, ae: PT0.4S, de: PT0.2S, act: PT2S }
+  classPolicy: acceptLower
+deployment:
+  ms:  { tiers: [edge, regional], affinity: { source: sdn-telemetry }, replicas: 1, state: stateless,
+         resources: { cpu: "500m", memory: 512Mi },
+         artifact: "harbor.u6g.lab/example/link-assurance-ms@sha256:559dc715f0f4afda5520213bd4ac1c742b67e164a6107623ab6f4a2da57c6903" }
+  ae:  { tiers: [regional, edge], replicas: 1, state: stateful,
+         resources: { cpu: "1", memory: 2Gi },
+         artifact: "harbor.u6g.lab/example/link-assurance-ae@sha256:67521ecb7fe5a2df78ec0e29c6213e0a92ff80997a7fa8878f7e0f2191f2ad14" }
+  de:  { tiers: [regional], replicas: 1, state: statefulRetained,
+         resources: { cpu: "500m", memory: 512Mi },
+         artifact: "harbor.u6g.lab/example/link-assurance-de@sha256:caaa01b3743cf3cb43ed7a0165c5cc716bb7dce194a56cc45f852d6720feb741" }
+  act: { tiers: [regional], affinity: { controller: tfs }, replicas: 1, state: stateless,
+         resources: { cpu: "250m", memory: 256Mi },
+         artifact: "harbor.u6g.lab/example/link-assurance-act@sha256:ae6ccca6f0f6c1ce85bc48f3e1f76de9d22cf04fb6a8db344567c004dec69fc9" }
+  groups: [ [ms, ae] ]
+  migration: { allowed: true, within: tiers }
+policies:
+  authorityMode: autoExecute
+  conflictPolicy: { kind: priority }
+  priorityBand: { requested: standard, urgencyLevels: 3 }
+  requestedEnvelopes: []
+failurePolicy:
+  ms:  { sourceLoss: gapIndicator, stalenessThreshold: PT5S, partialScope: publishWithCoverage,
+         healthCadence: PT10S }
+  ae:  { staleInput: noInsight, minInputCoverage: 0.6, outsideValidity: publishFlagged,
+         modelUnavailable: fallback, drift: signalAndFallback }
+  de:  { lowConfidence: noAction, degradedEvidence: safeIntent, unavailableInsight: noAction,
+         unresolvedConflict: defer,
+         failedActuation: { behavior: decideAgain, maxRedecisions: 3, window: PT1H },
+         safeIntent: { actionType: catalog://transport/action/set-modulation-profile@1.1.0, step: -1 } }
+  act: { retry: { maxAttempts: 2, window: PT2M, backoff: PT10S, precondition: readBack },
+         unresolved: readBackAndDecide, unverified: retryWithReadBack, terminal: rollback,
+         escalation: dmo-operations }
+modelHooks:
+  - id: link-fade-forecaster
+    registry: mlflow://aiml-1/link-fade-forecaster
+    version: "7"
+    digest: "sha256:9b1ec76c91a3cfea2ad8b620dee021c7576a7df723dcfaaeb3756a9d0c0d47e8"
+    serving: embedded
+    featureSet: { service: link-fade-v3, version: 3 }
+    approvedUse: transport-link-forecasting
+    provenance: { trainingRun: "run-5f2a8c31", evaluationReport: "rep-77c0e4d2" }
+    validity:
+      all: [ { feature: rain-rate-mm-h, lt: 80 }, { feature: rsl-dbm-mean-10s, between: [-75, -25] } ]
+    update:
+      replaceWhileRunning: true
+      gates: [offline, twin, shadow, approval]
+      rollback: previous
+      adaptation: none
+    signals: [drift, health]
+    fallback: baselineRules
+serviceTree:
+  services:
+    - { kind: subscription, capability: ms, contract: catalog://transport/source/sdn-telemetry@1.0.0 }
+    - { kind: subscription, capability: ms, contract: catalog://transport/source/radio-counters@1.3.0 }
+    - { kind: controllerBinding, capability: act, contract: catalog://transport/binding/tfs-nbi@2.0.0 }
+    - { kind: platformService, capability: de, contract: catalog://platform/fabric-registration@1.0.0 }
+  bindings: [obs-links, ins-forecast, int-actions, out-feedback]
+  operationalTimeout: PT2M
+ownership:
+  accountable: example
+  stakeholderRole: infrastructureOperator
+  trustDomain: unity6g.example
+  dataAccess: domain-operations
+  contact: noc@example.org
+integrity:
+  contentHash: "sha256:981ae2466d976f5860037a1673e6a82856c99a8fd2b8b392adf12a24b470e9e9"
+  signature: "eyJhbGciOiJFZERTQSIsImtpZCI6ImV4YW1wbGUtcHVibGlzaGVyIn0..m2t0B_DHJf-ayJtJX9p0GU327_BQCXIBV7koXSiD_KRwxkqJIBZyU-0iaikiSbgoP0CBMhnrhQJRMYQDCkgi8y"
+  sbom:
+    - { artifact: link-assurance-ms, ref: "sha256:559dc715f0f4afda5520213bd4ac1c742b67e164a6107623ab6f4a2da57c6903" }
+    - { artifact: link-assurance-ae, ref: "sha256:67521ecb7fe5a2df78ec0e29c6213e0a92ff80997a7fa8878f7e0f2191f2ad14" }
+    - { artifact: link-assurance-de, ref: "sha256:caaa01b3743cf3cb43ed7a0165c5cc716bb7dce194a56cc45f852d6720feb741" }
+    - { artifact: link-assurance-act, ref: "sha256:ae6ccca6f0f6c1ce85bc48f3e1f76de9d22cf04fb6a8db344567c004dec69fc9" }
+  requires:
+    - { service: platform/runtime, minVersion: 1.0.0 }
+    - { service: platform/fabric, minVersion: 1.0.0 }

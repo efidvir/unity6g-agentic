@@ -1,0 +1,235 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "Provisional: the reference definition of the implementation guide (Section 7.11) stands in for [IMPL] Annex A until it arrives; work item D.3 replaces it.",
+  "title": "Intent",
+  "description": "One intent with its envelope, as it leaves the Decision Engine for the Actuator. The logic supplies the action type, the targets, the parameters, the urgency, the confidence and the rationale; the fields marked readOnly are computed by the platform, the verdict, the token and the correlation after mediation. An intent carries no controller commands.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "envelope",
+    "actionType",
+    "targets",
+    "parameters",
+    "candidates"
+  ],
+  "properties": {
+    "envelope": {
+      "$ref": "#/$defs/IntentEnvelope"
+    },
+    "actionType": {
+      "$ref": "../common/defs.schema.json#/$defs/CatalogRef"
+    },
+    "targets": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "../common/defs.schema.json#/$defs/ObjectId"
+      }
+    },
+    "parameters": {
+      "description": "The parameters of the action, within the bounds of the action space.",
+      "type": "object"
+    },
+    "candidates": {
+      "description": "Alternatives that meet the same objective, in order of preference; empty when there are none.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/IntentCandidate"
+      }
+    },
+    "explanation": {
+      "description": "The explanation of the decision, where the logic is declared interpretable.",
+      "type": "object"
+    }
+  },
+  "$defs": {
+    "IntentEnvelope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "producer",
+        "generation",
+        "contract",
+        "formed",
+        "validUntil",
+        "urgency",
+        "rationale"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "../common/defs.schema.json#/$defs/IntentId",
+          "readOnly": true
+        },
+        "producer": {
+          "$ref": "../common/defs.schema.json#/$defs/InstanceId",
+          "readOnly": true
+        },
+        "generation": {
+          "$ref": "../common/defs.schema.json#/$defs/Generation",
+          "readOnly": true
+        },
+        "contract": {
+          "$ref": "../common/defs.schema.json#/$defs/CatalogRef",
+          "readOnly": true
+        },
+        "formed": {
+          "$ref": "../common/defs.schema.json#/$defs/Timestamp",
+          "readOnly": true
+        },
+        "validUntil": {
+          "description": "The end of the validity window: the time of formation plus the validity the logic proposed, within the declared maximum.",
+          "$ref": "../common/defs.schema.json#/$defs/Timestamp",
+          "readOnly": true
+        },
+        "objective": {
+          "description": "The objective the intent pursues.",
+          "$ref": "../common/defs.schema.json#/$defs/Name",
+          "readOnly": true
+        },
+        "urgency": {
+          "description": "Orders the agent's own intents within its priority band.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "confidence": {
+          "$ref": "../common/defs.schema.json#/$defs/Ratio"
+        },
+        "inputQuality": {
+          "$ref": "../common/defs.schema.json#/$defs/InputQuality",
+          "readOnly": true
+        },
+        "rationale": {
+          "$ref": "#/$defs/Rationale"
+        },
+        "redecision": {
+          "$ref": "#/$defs/RedecisionBudget",
+          "readOnly": true
+        },
+        "verdict": {
+          "$ref": "#/$defs/VerdictRef",
+          "readOnly": true
+        },
+        "correlation": {
+          "$ref": "../common/defs.schema.json#/$defs/CorrelationId",
+          "readOnly": true
+        },
+        "traceparent": {
+          "$ref": "../common/defs.schema.json#/$defs/TraceParent",
+          "readOnly": true
+        }
+      }
+    },
+    "Rationale": {
+      "description": "The structured rationale: the insights consumed, the objectives pursued, the constraints applied and a reason code the descriptor declares.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "insights",
+        "objectives",
+        "constraints",
+        "reasonCode"
+      ],
+      "properties": {
+        "insights": {
+          "type": "array",
+          "items": {
+            "$ref": "../common/defs.schema.json#/$defs/EvidenceId"
+          }
+        },
+        "objectives": {
+          "type": "array",
+          "items": {
+            "$ref": "../common/defs.schema.json#/$defs/Name"
+          }
+        },
+        "constraints": {
+          "type": "array",
+          "items": {
+            "$ref": "../common/defs.schema.json#/$defs/Name"
+          }
+        },
+        "reasonCode": {
+          "$ref": "../common/defs.schema.json#/$defs/ReasonCode"
+        }
+      }
+    },
+    "RedecisionBudget": {
+      "description": "The re-decision budget of the objective: the re-decisions used and the maximum within the window.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "objective",
+        "used",
+        "max",
+        "window"
+      ],
+      "properties": {
+        "objective": {
+          "$ref": "../common/defs.schema.json#/$defs/Name"
+        },
+        "used": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "max": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "window": {
+          "$ref": "../common/defs.schema.json#/$defs/Duration"
+        }
+      }
+    },
+    "VerdictRef": {
+      "description": "The verdict of mediation: its kind, its reference and, for allow and modify, the token the Actuator presents at the last mile.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "ref"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "allow",
+            "modify",
+            "defer",
+            "deny"
+          ]
+        },
+        "ref": {
+          "$ref": "../common/defs.schema.json#/$defs/VerdictId"
+        },
+        "token": {
+          "$ref": "../common/defs.schema.json#/$defs/CompactJws"
+        }
+      }
+    },
+    "IntentCandidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "actionType",
+        "targets",
+        "parameters"
+      ],
+      "properties": {
+        "actionType": {
+          "$ref": "../common/defs.schema.json#/$defs/CatalogRef"
+        },
+        "targets": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "../common/defs.schema.json#/$defs/ObjectId"
+          }
+        },
+        "parameters": {
+          "type": "object"
+        }
+      }
+    }
+  }
+}

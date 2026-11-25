@@ -1,0 +1,326 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "Provisional: the reference definitions of the implementation guide (Annex F and Sections 4.3, 5.4, 6.6, 7.11 and 8.8) stand in for [IMPL] Annex A until it arrives; work item D.3 replaces them. STATE.md lists this file under the provisional contracts.",
+  "title": "Common definitions",
+  "description": "The types that the descriptor, the envelopes and the runtime configuration share.",
+  "$defs": {
+    "CatalogRef": {
+      "description": "A reference to an entry of the type catalog with its version, as descriptors and envelopes write it (guide Annex F.9).",
+      "type": "string",
+      "pattern": "^catalog://[a-z0-9]+(?:[./-][a-z0-9]+)*@(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)$"
+    },
+    "KindPathRef": {
+      "description": "A reference to an entry of the type catalog with its version, as catalog entries, tokens and runtime configurations write it.",
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:[./-][a-z0-9]+)*@(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)$"
+    },
+    "SemVer": {
+      "description": "A semantic version.",
+      "type": "string",
+      "pattern": "^(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$"
+    },
+    "Duration": {
+      "description": "A duration in the ISO 8601 form, for example PT15M or PT0.2S.",
+      "type": "string",
+      "minLength": 3,
+      "pattern": "^P(?:[0-9]+[YMWD])*(?:T(?:[0-9]+(?:\\.[0-9]+)?[HMS])+)?$"
+    },
+    "Timestamp": {
+      "description": "An instant in UTC, in the RFC 3339 form.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "Digest": {
+      "description": "A SHA-256 digest, over the canonical JSON form of RFC 8785 where the object is a JSON document.",
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "Name": {
+      "description": "A lower-case name made of words joined by hyphens: object classes, KPI names, flows, hooks and bindings.",
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "CamelName": {
+      "description": "A value of an enumeration written in lower camel case; the catalog or [IMPL] lists the values.",
+      "type": "string",
+      "pattern": "^[a-z][A-Za-z0-9]*$"
+    },
+    "ObjectId": {
+      "description": "The identity of a managed object.",
+      "type": "string",
+      "minLength": 1
+    },
+    "InstanceId": {
+      "description": "The identity of an agent instance: <domain>/<descriptor-id>/<local-id> (guide Annex F.9).",
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*/[a-z0-9]+(?:[.-][a-z0-9]+)*/[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "Generation": {
+      "description": "The generation of the producing instance.",
+      "type": "integer",
+      "minimum": 1
+    },
+    "Ratio": {
+      "description": "A fraction between 0 and 1.",
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "ReasonCode": {
+      "description": "A reason code of the catalog, made of a family prefix and its words (guide Annex F.10).",
+      "type": "string",
+      "pattern": "^[A-Z]+(?:-[A-Z0-9]+)+$"
+    },
+    "ObservationId": {
+      "type": "string",
+      "pattern": "^obs-[0-9a-z]+(?:-[0-9a-z]+)*$"
+    },
+    "InsightId": {
+      "type": "string",
+      "pattern": "^ins-[0-9a-z]+(?:-[0-9a-z]+)*$"
+    },
+    "IntentId": {
+      "type": "string",
+      "pattern": "^int-[0-9a-z]+(?:-[0-9a-z]+)*$"
+    },
+    "TransactionId": {
+      "type": "string",
+      "pattern": "^txn-[0-9a-z]+(?:-[0-9a-z]+)*$"
+    },
+    "CorrelationId": {
+      "type": "string",
+      "pattern": "^cor-[0-9a-z]+(?:-[0-9a-z]+)*$"
+    },
+    "VerdictId": {
+      "type": "string",
+      "pattern": "^vrd-[0-9a-z]+(?:-[0-9a-z]+)*$"
+    },
+    "EvidenceId": {
+      "description": "The identity of an observation or an insight used as evidence.",
+      "type": "string",
+      "pattern": "^(?:obs|ins)-[0-9a-z]+(?:-[0-9a-z]+)*$"
+    },
+    "TraceParent": {
+      "description": "The W3C trace context of the cycle.",
+      "type": "string",
+      "pattern": "^[0-9a-f]{2}-[0-9a-f]{32}-[0-9a-f]{16}-[0-9a-f]{2}$"
+    },
+    "CompactJws": {
+      "description": "A JSON Web Signature in the compact form; the payload part is empty when detached.",
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]*\\.[A-Za-z0-9_-]+$"
+    },
+    "Capability": {
+      "description": "One of the four capabilities of a tuple.",
+      "type": "string",
+      "enum": [
+        "ms",
+        "ae",
+        "de",
+        "act"
+      ]
+    },
+    "FlowKind": {
+      "description": "One of the four logical flows of a tuple.",
+      "type": "string",
+      "enum": [
+        "observation",
+        "insight",
+        "intent",
+        "outcome"
+      ]
+    },
+    "LatencyClass": {
+      "description": "The latency class of an agent (guide Section 3.8).",
+      "type": "string",
+      "enum": [
+        "offline",
+        "nonRealTime",
+        "nearRealTime",
+        "realTime"
+      ]
+    },
+    "Scope": {
+      "description": "The scope of a message: the version of the resolved view, the domain and the values of the scope tags, pseudonymized across trust boundaries.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tags"
+      ],
+      "properties": {
+        "view": {
+          "description": "The version of the resolved view of the scope that the message used.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "domain": {
+          "$ref": "#/$defs/Name"
+        },
+        "tags": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "InputQuality": {
+      "description": "The quality of the inputs a capability consumed: the lowest coverage and the greatest staleness among them, whether the input was degraded, and the inputs used.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "minCoverage",
+        "degraded",
+        "contributing"
+      ],
+      "properties": {
+        "minCoverage": {
+          "$ref": "#/$defs/Ratio"
+        },
+        "maxStalenessS": {
+          "type": "number",
+          "minimum": 0
+        },
+        "degraded": {
+          "type": "boolean"
+        },
+        "contributing": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/EvidenceId"
+          }
+        }
+      }
+    },
+    "FeatureSetRef": {
+      "description": "A feature service of the feature store and its version.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "service",
+        "version"
+      ],
+      "properties": {
+        "service": {
+          "$ref": "#/$defs/Name"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "Condition": {
+      "description": "A condition in the fixed structure of [FW]: a group (all, any, not) over conditions, or a comparison of one named operand. The condition evaluator checks the structure, the declared operands and the depth (work item 0.3); a constraint names itself with id.",
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/Name"
+        },
+        "all": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/Condition"
+          }
+        },
+        "any": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/Condition"
+          }
+        },
+        "not": {
+          "$ref": "#/$defs/Condition"
+        },
+        "metric": {
+          "type": "string",
+          "minLength": 1
+        },
+        "feature": {
+          "type": "string",
+          "minLength": 1
+        },
+        "param": {
+          "type": "string",
+          "minLength": 1
+        },
+        "attribute": {
+          "type": "string",
+          "minLength": 1
+        },
+        "eq": {
+          "$ref": "#/$defs/Operand"
+        },
+        "ne": {
+          "$ref": "#/$defs/Operand"
+        },
+        "lt": {
+          "$ref": "#/$defs/Operand"
+        },
+        "le": {
+          "$ref": "#/$defs/Operand"
+        },
+        "gt": {
+          "$ref": "#/$defs/Operand"
+        },
+        "ge": {
+          "$ref": "#/$defs/Operand"
+        },
+        "between": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "$ref": "#/$defs/Operand"
+          }
+        },
+        "in": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/Operand"
+          }
+        }
+      }
+    },
+    "Operand": {
+      "description": "A literal, or a reference to a parameter, a metric or a feature named in the descriptor.",
+      "anyOf": [
+        {
+          "type": [
+            "number",
+            "string",
+            "boolean"
+          ]
+        },
+        {
+          "$ref": "#/$defs/OperandRef"
+        }
+      ]
+    },
+    "OperandRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "maxProperties": 1,
+      "properties": {
+        "param": {
+          "type": "string",
+          "minLength": 1
+        },
+        "metric": {
+          "type": "string",
+          "minLength": 1
+        },
+        "feature": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

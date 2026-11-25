@@ -1,0 +1,28 @@
+# The runtime configuration of a Decision Engine, guide Annex F.11, with the abridged digests
+# completed. Written by the agent host at /etc/u6g/runtime.yaml, one per capability and generation.
+instance: tx-1/example.link-assurance/i-0042
+capability: de
+generation: 4
+latencyClass: nonRealTime
+deadline: PT2S                                   # Section 10.4
+authority: { address: agenthost.u6g-system.svc:8443, lease: PT5S }
+fabric: { address: mediator.u6g-system.svc:8443, mediationDeadline: PT0.5S }
+state: { url: "rediss://valkey.u6g-system.svc:6379/0", prefix: "u6g:tx-1:tx-1-link-assurance-i-0042:" }
+descriptor: { digest: "sha256:5c0db00cb44b9afa5ec18f93e4129724cc6537ffb241c651524b4bf3ad757609", parameters: { risk_threshold: 0.2 } }
+logic: { image: "sha256:9a1ff92645765a9768795753c61a23d67c3ab0986774b3c00cd0d769ead4391e", statePolicy: retained }
+inputs:
+  - { binding: b-0042-ae-de, flow: insight, schema: "transport/contract/link-forecast@1.3.0" }
+outputs:
+  - { binding: b-0042-de-act, flow: intent, delivery: atLeastOnce }
+gates:
+  degradedEvidence: { minCoverage: 0.9, behavior: safeIntent }
+  lowConfidence: { threshold: 0.7, behavior: noAction }
+  redecisionBudget: { max: 3, window: PT10M }
+stability:
+  - action: transport/action/set-modulation-profile@1.1.0
+    cooldown: PT30S
+    reversalHold: PT5M
+    maxStep: 1
+    ratePerTarget: { max: 4, period: PT1H }
+reasonCodes: [DEC-PREEMPT-FADE, DEC-SAFE-DEGRADED-EVIDENCE]
+telemetry: { endpoint: "http://otel-collector.u6g-system.svc:4317", sampling: 0.1 }

@@ -6,11 +6,19 @@ requires-python = ">=3.12"
 
 [dependency-groups]
 dev = [
+    "datamodel-code-generator>=0.102",
+    "grpcio-tools>=1.85.4",
     "hypothesis>=6.100",
+    "jsonschema[format-nongpl]>=4.25",
     "mypy>=1.15",
+    "mypy-protobuf>=5.1",
     "pre-commit>=4.0",
     "pytest>=8.3",
     "ruff>=0.11",
+    "types-grpcio>=1.0",
+    "types-jsonschema>=4.25",
+    "types-protobuf>=6.30",
+    "types-pyyaml>=6.0",
 ]
 
 [tool.uv.workspace]
@@ -19,7 +27,13 @@ members = ["runtime/python", "services/*", "adapters/*", "cli", "conformance"]
 [tool.ruff]
 line-length = 110
 target-version = "py312"
-extend-exclude = ["runtime/python/u6g/generated"]
+extend-exclude = [
+    "runtime/python/u6g/generated",
+    "*_pb2.py",
+    "*_pb2.pyi",
+    "*_pb2_grpc.py",
+    "*_pb2_grpc.pyi",
+]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP", "S", "ASYNC", "RUF"]
@@ -31,7 +45,18 @@ select = ["E", "F", "W", "I", "B", "UP", "S", "ASYNC", "RUF"]
 [tool.mypy]
 strict = true
 python_version = "3.12"
-exclude = ['^\.venv/', '/generated/', '^runtime/rust/']
+plugins = ["pydantic.mypy"]
+exclude = ['^\.venv/', '/generated/', '^runtime/rust/', '_pb2(_grpc)?\.pyi?$']
+
+# Generated code: its types are used, its own style is the generator's.
+[[tool.mypy.overrides]]
+module = ["u6g.generated.*", "u6g.common.*", "u6g.logic.*", "u6g.fabric.*", "u6g.impl.*"]
+ignore_errors = true
+
+# grpcio-tools publishes no type information.
+[[tool.mypy.overrides]]
+module = ["grpc_tools", "grpc_tools.*"]
+ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 addopts = "-q --strict-markers"

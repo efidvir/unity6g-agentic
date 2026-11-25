@@ -3,7 +3,12 @@ name = "u6g"
 version = "0.1.0"
 description = "The capability runtime of the UNITY-6G agentic framework, its development kit and shared libraries"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "grpcio>=1.85.4",
+    "protobuf>=7.35.1,<8",
+    "pydantic>=2.11",
+    "pyyaml>=6.0",
+]
 
 [build-system]
 requires = ["hatchling>=1.27"]

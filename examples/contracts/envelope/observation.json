@@ -1,0 +1,49 @@
+{
+  "envelope": {
+    "id": "obs-7f3c9a52",
+    "producer": "tx-1/example.link-assurance/i-0042",
+    "contract": "catalog://transport/contract/link-observation@2.1.0",
+    "generation": 4,
+    "times": {
+      "event": "2026-11-21T10:15:20Z",
+      "windowStart": "2026-11-21T10:15:10Z",
+      "windowEnd": "2026-11-21T10:15:20Z",
+      "ingest": "2026-11-21T10:15:20.087Z"
+    },
+    "scope": {
+      "view": 37,
+      "tags": {
+        "region": "north",
+        "site": "site-a",
+        "technology": "mw"
+      }
+    },
+    "quality": {
+      "coverage": {
+        "inScope": 3,
+        "observed": 2,
+        "missing": [
+          "link-0057"
+        ]
+      },
+      "loss": 0.0,
+      "latencyMs": {
+        "p50": 61,
+        "p99": 84,
+        "max": 97
+      },
+      "jitterMs": 23,
+      "flags": []
+    },
+    "sources": [
+      "sdn-telemetry"
+    ],
+    "pattern": "periodicStream"
+  },
+  "object": "link-0041",
+  "metric": "catalog://transport/metric/rsl@1.2.0",
+  "kind": "gauge",
+  "unit": "dBm",
+  "aggregation": "mean",
+  "value": -41.7
+}

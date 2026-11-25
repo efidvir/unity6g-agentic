@@ -15,7 +15,6 @@ FILES = [
     "pyproject.toml",
     "rust-toolchain.toml",
     "buf.yaml",
-    "buf.gen.yaml",
     ".pre-commit-config.yaml",
     ".github/workflows/ci.yml",
     "runtime/rust/Cargo.toml",

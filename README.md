@@ -23,7 +23,7 @@ the next item.
 
 ```text
 make setup        # uv sync, cargo fetch, buf dependencies, pre-commit hooks
-make gen          # regenerate code from schemas/ (check in the result)
+make gen          # regenerate code from schemas/ and proto/ (check in the result)
 make check        # lint, types, unit and property tests, regeneration check
 make dev-up       # local environment (work item 0.6)
 make it           # integration sequences on the local environment
@@ -38,8 +38,9 @@ The tools: Python 3.12 or later with uv, Rust 1.85 or later, buf, and make.
 ```text
 schemas/ proto/ openapi/ crds/   the contracts; code is generated from them
 catalog/                         the type catalog as code
-runtime/python/u6g/              runtime, sdk, ms, ae, de, act, cond, state, authority
-runtime/rust/                    u6g-runtime-rt (real-time core), u6g-types, u6g-typegen
+runtime/python/u6g/              runtime, sdk, ms, ae, de, act, cond, state, authority; contracts.py;
+                                 generated models in generated/, protobuf code in <service>/v1/
+runtime/rust/                    u6g-runtime-rt (real-time core), u6g-types (generated), u6g-typegen
 services/                        admission, registry, catalog, eval, agenthost, idmo-ext, mediator, dt,
                                  mockctl, mockorch
 adapters/                        sources, southbound, ran, idmo
@@ -48,8 +49,11 @@ conformance/                     the conformance suite, fault injection, hostile
 deploy/                          dev, lab, testbed
 observability/                   Collector configurations, rules, dashboards
 examples/agents/                 reference tuples, link assurance first
+examples/contracts/              the guide's examples of the contracts, complete, for the tests
 docs/                            the documentation site, design notes in docs/design/
 tests/                           checks of the repository itself
 ```
+
+The contracts and how code is generated from them: `docs/design/contracts-and-generation.md`.
 
 Coding agents read `AGENTS.md` first.

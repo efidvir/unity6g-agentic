@@ -1,0 +1,220 @@
+// proto/u6g/logic/v1/logic.proto
+// Provisional: the reference definition of the implementation guide, Annex F.1, until [IMPL] or a
+// design note settles it; work item D.3 keeps the two aligned.
+syntax = "proto3";
+package u6g.logic.v1;
+
+import "google/protobuf/duration.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+import "u6g/common/v1/common.proto";
+import "u6g/impl/v1/semantic.proto";           // generated from [IMPL]: Observation, Insight, …
+
+// Served by the logic on /run/u6g/logic.sock; called by the runtime alone.
+service LogicService {
+  rpc Collect   (CollectRequest)   returns (CollectResponse);    // Monitoring System
+  rpc Analyze   (AnalyzeRequest)   returns (AnalyzeResponse);    // Analytics Engine
+  rpc Decide    (DecideRequest)    returns (DecideResponse);     // Decision Engine
+  rpc Translate (TranslateRequest) returns (TranslateResponse);  // Actuator: intent -> commands
+  rpc Describe  (DescribeRequest)  returns (DescribeResponse);   // logic build identity, for the gate
+}
+
+message Invocation {                           // what every call tells the logic about itself
+  string invocation_id = 1;                    // unique per call; quoted in issues and logs
+  uint64 generation = 2;
+  google.protobuf.Timestamp deadline = 3;      // the instant at which the call ends
+  string traceparent = 4;                      // W3C trace context of the cycle
+}
+
+// Monitoring System
+message CollectRequest {
+  Invocation call = 1;
+  common.v1.Window window = 2;                 // the window being filled
+  common.v1.ScopeView scope = 3;               // the granted observation scope
+  repeated string sources = 4;                 // the declared sources the logic may query
+  repeated RawBatch pushed = 5;                // records of subscriptions since the last call
+  google.protobuf.Struct parameters = 6;       // the descriptor's parameter block, uninterpreted
+}
+message CollectResponse {
+  repeated Record records = 1;
+  google.protobuf.Duration next_poll = 2;      // within the declared bounds, or clamped to them
+  repeated LogicIssue issues = 3;
+}
+message Record {                               // a shaped record; the runtime makes observations
+  string source = 1;
+  string object = 2;                           // managed object identity
+  string metric = 3;                           // catalog reference
+  google.protobuf.Value value = 4;
+  google.protobuf.Timestamp event_time = 5;    // absent: stamped at acquisition, with a flag
+  string source_ref = 6;                       // position of the record in its raw batch
+}
+
+// Analytics Engine
+message AnalyzeRequest {
+  Invocation call = 1;
+  repeated impl.v1.Observation observations = 2;   // the windows the pre-gate admitted
+  repeated impl.v1.Insight insights = 3;           // of a delegated provider, where declared
+  repeated ProductItem products = 4;               // data products of the Data Continuum
+  repeated FeatureValue features = 5;              // from the feature gateway, with envelopes
+  bool use_fallback = 6;                           // set by the runtime alone (Section 6.7)
+  google.protobuf.Struct parameters = 7;
+}
+message AnalyzeResponse {
+  repeated ProducedInsight insights = 1;
+  google.protobuf.Duration model_time = 2;     // the share of the call spent in the model
+  repeated LogicIssue issues = 3;
+}
+message ProducedInsight {
+  string insight_type = 1;                     // catalog reference among the declared types
+  string subject = 2;                          // managed object or service concerned
+  google.protobuf.Struct payload = 3;          // validated against the insight schema
+  double confidence = 4;
+  repeated string used_inputs = 5;             // the inputs used; empty: every input supplied
+}
+message ProductItem {                          // an item of a data product, dc://…
+  string ref = 1;
+  bytes envelope = 2;
+  bytes data = 3;
+}
+
+// Decision Engine (field numbers 1 to 6 as in Section 3.3)
+message DecideRequest {
+  repeated impl.v1.Insight insights = 1;       // or observations, without an Analytics Engine
+  repeated common.v1.ObjectiveStatus objectives = 2;
+  repeated common.v1.ObjectState controlled_objects = 3;
+  common.v1.ActionSpaceView action_space = 4;  // bounds as narrowed by the grant and the state
+  repeated common.v1.Grant live_grants = 5;    // action envelopes and distributed policies held
+  google.protobuf.Struct parameters = 6;       // the descriptor's parameter block, uninterpreted
+  Invocation call = 7;
+  repeated impl.v1.Observation observations = 8;
+  repeated impl.v1.ExecutionFeedback feedback = 9;   // outcomes of the agent's earlier intents
+}
+message DecideResponse {
+  repeated ProposedIntent proposals = 1;       // empty means no action, which is always permitted
+  repeated LogicIssue issues = 2;
+}
+message ProposedIntent {
+  string action_type = 1;                      // within the action space view
+  repeated string targets = 2;                 // within the granted control scope
+  google.protobuf.Struct parameters = 3;       // within the bounds of the view
+  google.protobuf.Duration validity = 4;
+  uint32 urgency = 5;                          // orders the agent's own intents within its band
+  double confidence = 6;
+  Rationale rationale = 7;                     // required: an intent without one is rejected
+  repeated ProposedIntent candidates = 8;      // alternatives meeting the same objective
+  google.protobuf.Struct explanation = 9;      // where the logic is declared interpretable
+}
+message Rationale {
+  repeated string insights = 1;
+  repeated string objectives = 2;
+  repeated string constraints = 3;
+  string reason_code = 4;                      // among the reason codes the descriptor declares
+}
+
+// Actuator
+message TranslateRequest {
+  Invocation call = 1;
+  bytes intent_envelope = 2;                   // the intent as allowed or modified
+  repeated common.v1.ObjectState target_state = 3;   // the state read for the rollback snapshot
+  string controller_binding = 4;               // catalog reference
+  string controller_version = 5;               // the interface version the adapter read
+  repeated string permitted_operations = 6;    // the operations the catalog entry declares
+  google.protobuf.Struct parameters = 7;
+}
+message TranslateResponse {
+  repeated Command commands = 1;               // each maps to a permitted operation
+  repeated LogicIssue issues = 2;
+}
+message Command {
+  string operation = 1;                        // for example device.config.set
+  string target = 2;
+  google.protobuf.Struct body = 3;             // the payload of the operation, for the adapter
+  uint32 order = 4;                            // the order of submission within the transaction
+}
+
+// Every capability: the build identity, which the gate compares with the descriptor (Section 10.5)
+message DescribeRequest {}
+message DescribeResponse {
+  string image_digest = 1;
+  string source_revision = 2;
+  string parameters_digest = 3;                // of the parameter block the logic loaded
+  string sdk_version = 4;
+  repeated ModelInUse models = 5;              // the embedded artifacts loaded, by digest
+  bool fallback_active = 6;                    // the path the last Analyze call took
+}
+message ModelInUse { string hook = 1; string digest = 2; }
+
+message LogicIssue {                           // an error the logic reports on its own work
+  enum Severity { SEVERITY_UNSPECIFIED = 0; INFO = 1; WARNING = 2; ERROR = 3; }
+  Severity severity = 1;
+  string code = 2;
+  string message = 3;
+  string input_ref = 4;                        // the input concerned, where there is one
+}
+
+// Served by the runtime on /run/u6g/runtime.sock: the logic's only route out of its container.
+service RuntimeGateway {
+  rpc ReadSource  (SourceQuery)      returns (stream RawBatch);    // source gateway
+  rpc Infer       (InferRequest)     returns (InferResponse);      // model gateway
+  rpc GetFeatures (FeatureRequest)   returns (FeatureResponse);    // feature gateway
+  rpc ListTools   (ListToolsRequest) returns (ListToolsResponse);  // tool gateway
+  rpc CallTool    (ToolCall)         returns (ToolResult);
+  rpc GetState    (StateKey)         returns (StateValue);         // the logic's own key space
+  rpc PutState    (StateEntry)       returns (StateAck);
+}
+message SourceQuery {
+  string source = 1;                           // a declared source
+  google.protobuf.Struct query = 2;            // within the query schema of the source kind
+  common.v1.Window window = 3;
+}
+message RawBatch {
+  string source = 1;
+  string content_type = 2;
+  bytes data = 3;
+  google.protobuf.Timestamp acquired = 4;      // stamped by the runtime
+}
+message InferRequest {
+  string hook = 1;                             // a model hook of the descriptor
+  oneof input {
+    bytes tensors = 2;                         // a request of the Open Inference Protocol
+    GenerateRequest generate = 3;              // a language model served on vLLM
+  }
+}
+message GenerateRequest {                      // the runtime adds the output schema (Section 7.8)
+  repeated ChatMessage messages = 1;
+  uint32 max_tokens = 2;
+}
+message ChatMessage { string role = 1; string content = 2; }
+message InferResponse {
+  oneof output { bytes tensors = 1; string text = 2; }
+  string model_digest = 3;                     // checked by the runtime against the pinned digest
+  google.protobuf.Duration latency = 4;        // measured by the runtime
+}
+message FeatureRequest { string feature_service = 1; repeated string entities = 2; }
+message FeatureResponse { repeated FeatureValue values = 1; }
+message FeatureValue {
+  string feature = 1;
+  string entity = 2;
+  google.protobuf.Value value = 3;
+  bytes envelope = 4;                          // counts toward input quality
+}
+message ListToolsRequest {}
+message ListToolsResponse { repeated ToolSpec tools = 1; }
+message ToolSpec {
+  string name = 1;
+  string description = 2;
+  google.protobuf.Struct input_schema = 3;
+}
+message ToolCall { string name = 1; google.protobuf.Struct arguments = 2; }
+message ToolResult {
+  google.protobuf.Struct result = 1;
+  bool simulated = 2;                          // set on answers of the digital twin
+}
+message StateKey { string key = 1; }
+message StateValue { bool found = 1; bytes value = 2; uint64 version = 3; }
+message StateEntry {
+  string key = 1;
+  bytes value = 2;
+  uint64 expected_version = 3;                 // 0 creates; another value must match
+}
+message StateAck { uint64 version = 1; }

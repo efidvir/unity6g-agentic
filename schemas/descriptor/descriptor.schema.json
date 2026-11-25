@@ -1,0 +1,1478 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "Provisional: the reference definition of the implementation guide (Section 4.3 and Annex B) stands in for the descriptor schema of [IMPL] Annex A until it arrives; work item D.3 replaces it. This is the first layer of validation; the validity rules of guide Table 4-1 form the second (work item 0.5).",
+  "title": "AgentDescriptor",
+  "description": "The descriptor of a local or global agent, in its admitted JSON form; descriptors are authored in YAML.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "descriptorVersion",
+    "kind",
+    "identity",
+    "tuple",
+    "scope",
+    "operations",
+    "policies",
+    "failurePolicy"
+  ],
+  "properties": {
+    "descriptorVersion": {
+      "description": "The version of the descriptor structure.",
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+$"
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "LocalAgentDescriptor",
+        "GlobalAgentDescriptor"
+      ]
+    },
+    "identity": {
+      "$ref": "#/$defs/Identity"
+    },
+    "tuple": {
+      "$ref": "#/$defs/Tuple"
+    },
+    "objectives": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Objective"
+      }
+    },
+    "scope": {
+      "$ref": "#/$defs/AgentScope"
+    },
+    "actionSpace": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ActionSpec"
+      }
+    },
+    "functions": {
+      "$ref": "#/$defs/Functions"
+    },
+    "interfaces": {
+      "$ref": "#/$defs/Interfaces"
+    },
+    "operations": {
+      "$ref": "#/$defs/Operations"
+    },
+    "deployment": {
+      "$ref": "#/$defs/Deployment"
+    },
+    "policies": {
+      "$ref": "#/$defs/Policies"
+    },
+    "failurePolicy": {
+      "$ref": "#/$defs/FailurePolicy"
+    },
+    "modelHooks": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ModelHook"
+      }
+    },
+    "serviceTree": {
+      "$ref": "#/$defs/ServiceTree"
+    },
+    "ownership": {
+      "$ref": "#/$defs/Ownership"
+    },
+    "integrity": {
+      "$ref": "#/$defs/Integrity"
+    }
+  },
+  "$defs": {
+    "Identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "version",
+        "name",
+        "publisher"
+      ],
+      "properties": {
+        "id": {
+          "description": "The identity of the descriptor, stable across its versions.",
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+        },
+        "version": {
+          "$ref": "../common/defs.schema.json#/$defs/SemVer"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "publisher": {
+          "$ref": "#/$defs/Publisher"
+        },
+        "functionalSpecification": {
+          "$ref": "#/$defs/DocumentRef"
+        },
+        "logicRelease": {
+          "$ref": "../common/defs.schema.json#/$defs/SemVer"
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "$ref": "../common/defs.schema.json#/$defs/Name"
+          }
+        },
+        "license": {
+          "description": "The license of the contributed logic, as an SPDX expression.",
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "Publisher": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "org"
+      ],
+      "properties": {
+        "org": {
+          "$ref": "../common/defs.schema.json#/$defs/Name"
+        },
+        "support": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "DocumentRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ref",
+        "digest"
+      ],
+      "properties": {
+        "ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "digest": {
+          "$ref": "../common/defs.schema.json#/$defs/Digest"
+        }
+      }
+    },
+    "Tuple": {
+      "description": "The mode of each of the four capabilities.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ms",
+        "ae",
+        "de",
+        "act"
+      ],
+      "properties": {
+        "ms": {
+          "$ref": "#/$defs/CapabilityMode"
+        },
+        "ae": {
+          "$ref": "#/$defs/CapabilityMode"
+        },
+        "de": {
+          "$ref": "#/$defs/CapabilityMode"
+        },
+        "act": {
+          "$ref": "#/$defs/CapabilityMode"
+        }
+      }
+    },
+    "CapabilityMode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode"
+      ],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": [
+            "full",
+            "partial",
+            "delegated",
+            "none"
+          ]
+        },
+        "subset": {
+          "description": "For a partial capability: the listed subset of the observation scope, the insight types, the action space or the action types.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "provider": {
+          "$ref": "#/$defs/Provider"
+        }
+      }
+    },
+    "Provider": {
+      "description": "For a delegated capability: the provider, its pinned interface and the accepted range of its versions.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ref",
+        "interface"
+      ],
+      "properties": {
+        "ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "interface": {
+          "$ref": "../common/defs.schema.json#/$defs/CatalogRef"
+        },
+        "accepted": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "Objective": {
+      "description": "An objective as a template over a KPI of the catalog, bound to a target at instantiation or given one here.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kpi",
+        "direction",
+        "target",
+        "window"
+      ],
+      "properties": {
+        "kpi": {
+          "$ref": "../common/defs.schema.json#/$defs/CatalogRef"
+        },
+        "direction": {
+          "type": "string",
+          "enum": [
+            "maximize",
+            "minimize",
+            "holdBelow",
+            "holdAbove",
+            "holdWithin"
+          ]
+        },
+        "target": {
+          "$ref": "#/$defs/ObjectiveTarget"
+        },
+        "window": {
+          "$ref": "../common/defs.schema.json#/$defs/Duration"
+        },
+        "atRiskMargin": {
+          "type": "number",
+          "minimum": 0
+        },
+        "rank": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "ObjectiveTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "boundAt": {
+          "description": "When the target is bound, for example instantiation.",
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        },
+        "value": {
+          "type": "number"
+        },
+        "min": {
+          "type": "number"
+        },
+        "max": {
+          "type": "number"
+        }
+      }
+    },
+    "AgentScope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "domain",
+        "selectors",
+        "observation"
+      ],
+      "properties": {
+        "domain": {
+          "$ref": "../common/defs.schema.json#/$defs/Name"
+        },
+        "selectors": {
+          "description": "The scope tags that select the objects: region, site, technology; tenant and slice as pseudonyms.",
+          "type": "array",
+          "items": {
+            "$ref": "../common/defs.schema.json#/$defs/Name"
+          }
+        },
+        "observation": {
+          "$ref": "#/$defs/ObservationScope"
+        },
+        "control": {
+          "$ref": "#/$defs/ControlScope"
+        },
+        "maxObjects": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "ObservationScope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "objectClasses",
+        "metrics"
+      ],
+      "properties": {
+        "objectClasses": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "../common/defs.schema.json#/$defs/Name"
+          }
+        },
+        "metrics": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "../common/defs.schema.json#/$defs/CatalogRef"
+          }
+        }
+      }
+    },
+    "ControlScope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "objectClasses",
+        "parameters"
+      ],
+      "properties": {
+        "objectClasses": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "../common/defs.schema.json#/$defs/Name"
+          }
+        },
+        "parameters": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "../common/defs.schema.json#/$defs/CatalogRef"
+          }
+        }
+      }
+    },
+    "ActionSpec": {
+      "description": "An action type of the action space with every attribute [FW] makes mandatory.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "actionType",
+        "targets",
+        "bounds",
+        "rateLimit",
+        "stability",
+        "verification",
+        "idempotent",
+        "rollback",
+        "authorization"
+      ],
+      "properties": {
+        "actionType": {
+          "$ref": "../common/defs.schema.json#/$defs/CatalogRef"
+        },
+        "targets": {
+          "$ref": "#/$defs/TargetSelector"
+        },
+        "bounds": {
+          "description": "The bounds of each parameter of the action, by parameter name.",
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/ParameterBounds"
+          }
+        },
+        "rateLimit": {
+          "$ref": "#/$defs/RateLimit"
+        },
+        "stability": {
+          "$ref": "#/$defs/Stability"
+        },
+        "preconditions": {
+          "type": "array",
+          "items": {
+            "$ref": "../common/defs.schema.json#/$defs/Condition"
+          }
+        },
+        "verification": {
+          "$ref": "#/$defs/VerificationSpec"
+        },
+        "idempotent": {
+          "type": "boolean"
+        },
+        "rollback": {
+          "description": "Where the rollback of the action comes from, for example catalog.",
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        },
+        "authorization": {
+          "description": "How each execution is authorized: mediation, envelope or policy.",
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        }
+      }
+    },
+    "TargetSelector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "objectClass"
+      ],
+      "properties": {
+        "objectClass": {
+          "$ref": "../common/defs.schema.json#/$defs/Name"
+        }
+      }
+    },
+    "ParameterBounds": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "enum": {
+          "description": "The values of a discrete parameter.",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": [
+              "string",
+              "number"
+            ]
+          }
+        },
+        "min": {
+          "type": "number"
+        },
+        "max": {
+          "type": "number"
+        },
+        "step": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "RateLimit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "max",
+        "per"
+      ],
+      "properties": {
+        "max": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "per": {
+          "$ref": "../common/defs.schema.json#/$defs/Duration"
+        }
+      }
+    },
+    "Stability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "minInterval",
+        "minHoldBeforeReverse",
+        "maxStep"
+      ],
+      "properties": {
+        "minInterval": {
+          "$ref": "../common/defs.schema.json#/$defs/Duration"
+        },
+        "minHoldBeforeReverse": {
+          "$ref": "../common/defs.schema.json#/$defs/Duration"
+        },
+        "maxStep": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "VerificationSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "timing",
+        "timeout"
+      ],
+      "properties": {
+        "method": {
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        },
+        "timing": {
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        },
+        "timeout": {
+          "$ref": "../common/defs.schema.json#/$defs/Duration"
+        }
+      }
+    },
+    "Functions": {
+      "description": "The function of each capability present.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ms": {
+          "$ref": "#/$defs/MsFunction"
+        },
+        "ae": {
+          "$ref": "#/$defs/AeFunction"
+        },
+        "de": {
+          "$ref": "#/$defs/DeFunction"
+        },
+        "act": {
+          "$ref": "#/$defs/ActFunction"
+        }
+      }
+    },
+    "MsFunction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "technique",
+        "trigger",
+        "contract",
+        "sources"
+      ],
+      "properties": {
+        "technique": {
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        },
+        "trigger": {
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        },
+        "contract": {
+          "$ref": "../common/defs.schema.json#/$defs/CatalogRef"
+        },
+        "sources": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/SourceSpec"
+          }
+        },
+        "windows": {
+          "description": "The window of each metric by metric name, with default for the others.",
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "../common/defs.schema.json#/$defs/Duration"
+          }
+        }
+      }
+    },
+    "SourceSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "pattern"
+      ],
+      "properties": {
+        "kind": {
+          "$ref": "../common/defs.schema.json#/$defs/CatalogRef"
+        },
+        "pattern": {
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        },
+        "interval": {
+          "$ref": "../common/defs.schema.json#/$defs/Duration"
+        }
+      }
+    },
+    "AeFunction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "technique",
+        "trigger",
+        "insightTypes"
+      ],
+      "properties": {
+        "technique": {
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        },
+        "trigger": {
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        },
+        "insightTypes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/InsightTypeSpec"
+          }
+        },
+        "featureSet": {
+          "$ref": "../common/defs.schema.json#/$defs/FeatureSetRef"
+        },
+        "serving": {
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        },
+        "models": {
+          "description": "The model hooks the capability uses.",
+          "type": "array",
+          "items": {
+            "$ref": "../common/defs.schema.json#/$defs/Name"
+          }
+        },
+        "fallback": {
+          "$ref": "#/$defs/FallbackSpec"
+        }
+      }
+    },
+    "InsightTypeSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "schema"
+      ],
+      "properties": {
+        "type": {
+          "$ref": "../common/defs.schema.json#/$defs/Name"
+        },
+        "schema": {
+          "$ref": "../common/defs.schema.json#/$defs/CatalogRef"
+        }
+      }
+    },
+    "FallbackSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "declared"
+      ],
+      "properties": {
+        "declared": {
+          "type": "boolean"
+        },
+        "name": {
+          "$ref": "../common/defs.schema.json#/$defs/Name"
+        }
+      }
+    },
+    "DeFunction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "technique",
+        "trigger",
+        "reasonCodes"
+      ],
+      "properties": {
+        "technique": {
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        },
+        "trigger": {
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        },
+        "consumes": {
+          "description": "The insight types the capability consumes.",
+          "type": "array",
+          "items": {
+            "$ref": "../common/defs.schema.json#/$defs/Name"
+          }
+        },
+        "minInputCoverage": {
+          "$ref": "../common/defs.schema.json#/$defs/Ratio"
+        },
+        "minConfidence": {
+          "$ref": "../common/defs.schema.json#/$defs/Ratio"
+        },
+        "interpretable": {
+          "type": "boolean"
+        },
+        "reasonCodes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "../common/defs.schema.json#/$defs/ReasonCode"
+          }
+        },
+        "constraints": {
+          "description": "The structured constraints the agent holds itself to, each named with id.",
+          "type": "array",
+          "items": {
+            "$ref": "../common/defs.schema.json#/$defs/Condition"
+          }
+        },
+        "tools": {
+          "description": "The read-only tools of a generative Decision Engine, as catalog entries.",
+          "type": "array",
+          "items": {
+            "$ref": "../common/defs.schema.json#/$defs/CatalogRef"
+          }
+        },
+        "maxIntentValidity": {
+          "$ref": "../common/defs.schema.json#/$defs/Duration"
+        },
+        "parameters": {
+          "description": "The parameter block, passed to the logic uninterpreted.",
+          "type": "object"
+        }
+      }
+    },
+    "ActFunction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "technique",
+        "controllerBinding"
+      ],
+      "properties": {
+        "technique": {
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        },
+        "controllerBinding": {
+          "$ref": "#/$defs/ControllerBinding"
+        },
+        "unresolvedAfter": {
+          "$ref": "../common/defs.schema.json#/$defs/Duration"
+        },
+        "maxConcurrentTargets": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "ControllerBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ref",
+        "pinned"
+      ],
+      "properties": {
+        "ref": {
+          "$ref": "../common/defs.schema.json#/$defs/CatalogRef"
+        },
+        "pinned": {
+          "description": "The interface version of the controller the binding is pinned to.",
+          "type": "string",
+          "minLength": 1
+        },
+        "accepted": {
+          "description": "The range of interface versions accepted, for example >=7.0 <8.0.",
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "Interfaces": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "flows"
+      ],
+      "properties": {
+        "flows": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/FlowSpec"
+          }
+        },
+        "exposed": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ExposedFlow"
+          }
+        }
+      }
+    },
+    "FlowSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "from",
+        "to",
+        "permitted",
+        "delivery"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "../common/defs.schema.json#/$defs/Name"
+        },
+        "kind": {
+          "$ref": "../common/defs.schema.json#/$defs/FlowKind"
+        },
+        "from": {
+          "$ref": "../common/defs.schema.json#/$defs/Capability"
+        },
+        "to": {
+          "$ref": "../common/defs.schema.json#/$defs/Capability"
+        },
+        "permitted": {
+          "description": "The binding kinds permitted for the flow: localRuntime, direct or dataContinuum.",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "../common/defs.schema.json#/$defs/CamelName"
+          }
+        },
+        "maxRate": {
+          "description": "The maximum rate of messages, for example 50/s.",
+          "type": "string",
+          "pattern": "^[0-9]+(?:\\.[0-9]+)?/(?:s|min|h)$"
+        },
+        "freshness": {
+          "$ref": "../common/defs.schema.json#/$defs/Duration"
+        },
+        "delivery": {
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        },
+        "publishOn": {
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        }
+      }
+    },
+    "ExposedFlow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "flow",
+        "pattern"
+      ],
+      "properties": {
+        "flow": {
+          "$ref": "../common/defs.schema.json#/$defs/Name"
+        },
+        "pattern": {
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        },
+        "profile": {
+          "$ref": "../common/defs.schema.json#/$defs/Name"
+        },
+        "trustDomains": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "Operations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "latencyClass",
+        "loopBudget"
+      ],
+      "properties": {
+        "mode": {
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        },
+        "latencyClass": {
+          "$ref": "../common/defs.schema.json#/$defs/LatencyClass"
+        },
+        "loopBudget": {
+          "$ref": "../common/defs.schema.json#/$defs/Duration"
+        },
+        "capabilityLatencyP99": {
+          "$ref": "#/$defs/CapabilityDurations"
+        },
+        "classPolicy": {
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        }
+      }
+    },
+    "CapabilityDurations": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ms": {
+          "$ref": "../common/defs.schema.json#/$defs/Duration"
+        },
+        "ae": {
+          "$ref": "../common/defs.schema.json#/$defs/Duration"
+        },
+        "de": {
+          "$ref": "../common/defs.schema.json#/$defs/Duration"
+        },
+        "act": {
+          "$ref": "../common/defs.schema.json#/$defs/Duration"
+        }
+      }
+    },
+    "Deployment": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ms": {
+          "$ref": "#/$defs/CapabilityDeployment"
+        },
+        "ae": {
+          "$ref": "#/$defs/CapabilityDeployment"
+        },
+        "de": {
+          "$ref": "#/$defs/CapabilityDeployment"
+        },
+        "act": {
+          "$ref": "#/$defs/CapabilityDeployment"
+        },
+        "groups": {
+          "description": "Capabilities placed together in one pod.",
+          "type": "array",
+          "items": {
+            "type": "array",
+            "minItems": 2,
+            "items": {
+              "$ref": "../common/defs.schema.json#/$defs/Capability"
+            }
+          }
+        },
+        "migration": {
+          "$ref": "#/$defs/Migration"
+        }
+      }
+    },
+    "CapabilityDeployment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tiers",
+        "replicas",
+        "state"
+      ],
+      "properties": {
+        "tiers": {
+          "description": "The tiers where the capability may run, in order of preference.",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "../common/defs.schema.json#/$defs/Name"
+          }
+        },
+        "affinity": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "replicas": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "state": {
+          "description": "stateless, stateful or statefulRetained.",
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        },
+        "resources": {
+          "$ref": "#/$defs/Resources"
+        },
+        "artifact": {
+          "description": "The image of the contributed logic, pinned by digest.",
+          "type": "string",
+          "pattern": "^[^@\\s]+@sha256:[0-9a-f]{64}$"
+        }
+      }
+    },
+    "Resources": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "cpu": {
+          "type": "string",
+          "pattern": "^[0-9]+(?:\\.[0-9]+)?m?$"
+        },
+        "memory": {
+          "type": "string",
+          "pattern": "^[0-9]+(?:\\.[0-9]+)?(?:[KMGT]i?)?$"
+        }
+      }
+    },
+    "Migration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "allowed"
+      ],
+      "properties": {
+        "allowed": {
+          "type": "boolean"
+        },
+        "within": {
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        }
+      }
+    },
+    "Policies": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "authorityMode",
+        "conflictPolicy",
+        "priorityBand"
+      ],
+      "properties": {
+        "authorityMode": {
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        },
+        "conflictPolicy": {
+          "$ref": "#/$defs/ConflictPolicy"
+        },
+        "priorityBand": {
+          "$ref": "#/$defs/PriorityBandRequest"
+        },
+        "requestedEnvelopes": {
+          "description": "The action envelopes requested at registration.",
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "ConflictPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "priority",
+            "arbitration",
+            "negotiation",
+            "hierarchical"
+          ]
+        }
+      }
+    },
+    "PriorityBandRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requested"
+      ],
+      "properties": {
+        "requested": {
+          "$ref": "../common/defs.schema.json#/$defs/Name"
+        },
+        "urgencyLevels": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "FailurePolicy": {
+      "description": "The declared behavior of each capability present in each situation [FW] makes mandatory.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ms": {
+          "$ref": "#/$defs/MsFailurePolicy"
+        },
+        "ae": {
+          "$ref": "#/$defs/AeFailurePolicy"
+        },
+        "de": {
+          "$ref": "#/$defs/DeFailurePolicy"
+        },
+        "act": {
+          "$ref": "#/$defs/ActFailurePolicy"
+        }
+      }
+    },
+    "MsFailurePolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "sourceLoss": {
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        },
+        "stalenessThreshold": {
+          "$ref": "../common/defs.schema.json#/$defs/Duration"
+        },
+        "partialScope": {
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        },
+        "healthCadence": {
+          "$ref": "../common/defs.schema.json#/$defs/Duration"
+        }
+      }
+    },
+    "AeFailurePolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "staleInput": {
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        },
+        "minInputCoverage": {
+          "$ref": "../common/defs.schema.json#/$defs/Ratio"
+        },
+        "outsideValidity": {
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        },
+        "modelUnavailable": {
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        },
+        "drift": {
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        }
+      }
+    },
+    "DeFailurePolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "lowConfidence": {
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        },
+        "degradedEvidence": {
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        },
+        "unavailableInsight": {
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        },
+        "unresolvedConflict": {
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        },
+        "failedActuation": {
+          "$ref": "#/$defs/FailedActuation"
+        },
+        "safeIntent": {
+          "$ref": "#/$defs/SafeIntent"
+        }
+      }
+    },
+    "FailedActuation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "behavior"
+      ],
+      "properties": {
+        "behavior": {
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        },
+        "maxRedecisions": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "window": {
+          "$ref": "../common/defs.schema.json#/$defs/Duration"
+        }
+      }
+    },
+    "SafeIntent": {
+      "description": "The intent the runtime forms where the failure policy selects a safe intent.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "actionType"
+      ],
+      "properties": {
+        "actionType": {
+          "$ref": "../common/defs.schema.json#/$defs/CatalogRef"
+        },
+        "step": {
+          "description": "A relative step of the parameter, for example -1 for one level down.",
+          "type": "number"
+        },
+        "parameters": {
+          "type": "object"
+        }
+      }
+    },
+    "ActFailurePolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "retry": {
+          "$ref": "#/$defs/RetryPolicy"
+        },
+        "unresolved": {
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        },
+        "unverified": {
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        },
+        "terminal": {
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        },
+        "escalation": {
+          "$ref": "../common/defs.schema.json#/$defs/Name"
+        }
+      }
+    },
+    "RetryPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "maxAttempts"
+      ],
+      "properties": {
+        "maxAttempts": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "window": {
+          "$ref": "../common/defs.schema.json#/$defs/Duration"
+        },
+        "backoff": {
+          "$ref": "../common/defs.schema.json#/$defs/Duration"
+        },
+        "precondition": {
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        }
+      }
+    },
+    "ModelHook": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "registry",
+        "version",
+        "digest",
+        "serving"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "../common/defs.schema.json#/$defs/Name"
+        },
+        "registry": {
+          "description": "The model in the model registry of an AI/ML domain, for example mlflow://aiml-1/link-fade-forecaster.",
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9+.-]*://\\S+$"
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "digest": {
+          "$ref": "../common/defs.schema.json#/$defs/Digest"
+        },
+        "serving": {
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        },
+        "featureSet": {
+          "$ref": "../common/defs.schema.json#/$defs/FeatureSetRef"
+        },
+        "approvedUse": {
+          "$ref": "../common/defs.schema.json#/$defs/Name"
+        },
+        "provenance": {
+          "$ref": "#/$defs/ModelProvenance"
+        },
+        "validity": {
+          "description": "The conditions under which the output of the model is valid, over observable input features.",
+          "$ref": "../common/defs.schema.json#/$defs/Condition"
+        },
+        "update": {
+          "$ref": "#/$defs/ModelUpdate"
+        },
+        "signals": {
+          "type": "array",
+          "items": {
+            "$ref": "../common/defs.schema.json#/$defs/CamelName"
+          }
+        },
+        "fallback": {
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        }
+      }
+    },
+    "ModelProvenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "trainingRun": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evaluationReport": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "ModelUpdate": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "replaceWhileRunning": {
+          "type": "boolean"
+        },
+        "gates": {
+          "description": "The promotion gates: offline, twin, shadow, canary, approval.",
+          "type": "array",
+          "items": {
+            "$ref": "../common/defs.schema.json#/$defs/CamelName"
+          }
+        },
+        "rollback": {
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        },
+        "adaptation": {
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        }
+      }
+    },
+    "ServiceTree": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "services"
+      ],
+      "properties": {
+        "services": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ServiceDependency"
+          }
+        },
+        "bindings": {
+          "description": "The flows the realization binds.",
+          "type": "array",
+          "items": {
+            "$ref": "../common/defs.schema.json#/$defs/Name"
+          }
+        },
+        "operationalTimeout": {
+          "$ref": "../common/defs.schema.json#/$defs/Duration"
+        }
+      }
+    },
+    "ServiceDependency": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "capability",
+        "contract"
+      ],
+      "properties": {
+        "kind": {
+          "description": "subscription, controllerBinding or platformService.",
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        },
+        "capability": {
+          "$ref": "../common/defs.schema.json#/$defs/Capability"
+        },
+        "contract": {
+          "$ref": "../common/defs.schema.json#/$defs/CatalogRef"
+        }
+      }
+    },
+    "Ownership": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "accountable"
+      ],
+      "properties": {
+        "accountable": {
+          "$ref": "../common/defs.schema.json#/$defs/Name"
+        },
+        "stakeholderRole": {
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        },
+        "trustDomain": {
+          "type": "string",
+          "minLength": 1
+        },
+        "dataAccess": {
+          "$ref": "../common/defs.schema.json#/$defs/Name"
+        },
+        "contact": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "Integrity": {
+      "description": "The content hash over the canonical JSON form, the signature of the publisher, the bills of materials and the platform services required.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contentHash",
+        "signature"
+      ],
+      "properties": {
+        "contentHash": {
+          "$ref": "../common/defs.schema.json#/$defs/Digest"
+        },
+        "signature": {
+          "$ref": "../common/defs.schema.json#/$defs/CompactJws"
+        },
+        "sbom": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SbomRef"
+          }
+        },
+        "requires": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ServiceRequirement"
+          }
+        }
+      }
+    },
+    "SbomRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifact",
+        "ref"
+      ],
+      "properties": {
+        "artifact": {
+          "$ref": "../common/defs.schema.json#/$defs/Name"
+        },
+        "ref": {
+          "$ref": "../common/defs.schema.json#/$defs/Digest"
+        }
+      }
+    },
+    "ServiceRequirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "service",
+        "minVersion"
+      ],
+      "properties": {
+        "service": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+/[a-z0-9-]+$"
+        },
+        "minVersion": {
+          "$ref": "../common/defs.schema.json#/$defs/SemVer"
+        }
+      }
+    }
+  }
+}

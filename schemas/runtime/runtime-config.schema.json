@@ -1,0 +1,342 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "Provisional: the reference definition of the implementation guide (Annex F.11) until [IMPL] or a design note settles it; work item D.3 keeps them aligned.",
+  "title": "RuntimeConfig",
+  "description": "The configuration of one capability runtime, written by the agent host at realization and replaced with every generation; mounted read-only at /etc/u6g/runtime.yaml.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "instance",
+    "capability",
+    "generation",
+    "latencyClass",
+    "deadline",
+    "authority",
+    "state",
+    "descriptor",
+    "logic",
+    "inputs",
+    "outputs",
+    "telemetry"
+  ],
+  "properties": {
+    "instance": {
+      "$ref": "../common/defs.schema.json#/$defs/InstanceId"
+    },
+    "capability": {
+      "$ref": "../common/defs.schema.json#/$defs/Capability"
+    },
+    "generation": {
+      "$ref": "../common/defs.schema.json#/$defs/Generation"
+    },
+    "latencyClass": {
+      "$ref": "../common/defs.schema.json#/$defs/LatencyClass"
+    },
+    "deadline": {
+      "description": "The deadline of each call to the logic (guide Section 10.4).",
+      "$ref": "../common/defs.schema.json#/$defs/Duration"
+    },
+    "authority": {
+      "$ref": "#/$defs/AuthorityEndpoint"
+    },
+    "fabric": {
+      "$ref": "#/$defs/FabricEndpoint"
+    },
+    "state": {
+      "$ref": "#/$defs/StateStore"
+    },
+    "descriptor": {
+      "$ref": "#/$defs/DescriptorPin"
+    },
+    "logic": {
+      "$ref": "#/$defs/LogicPin"
+    },
+    "inputs": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/InputBinding"
+      }
+    },
+    "outputs": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/OutputBinding"
+      }
+    },
+    "gates": {
+      "$ref": "#/$defs/Gates"
+    },
+    "stability": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/StabilityControl"
+      }
+    },
+    "reasonCodes": {
+      "type": "array",
+      "items": {
+        "$ref": "../common/defs.schema.json#/$defs/ReasonCode"
+      }
+    },
+    "telemetry": {
+      "$ref": "#/$defs/Telemetry"
+    }
+  },
+  "$defs": {
+    "AuthorityEndpoint": {
+      "description": "The authority service of the agent host and the lease of the enforced copy.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "address",
+        "lease"
+      ],
+      "properties": {
+        "address": {
+          "type": "string",
+          "minLength": 1
+        },
+        "lease": {
+          "$ref": "../common/defs.schema.json#/$defs/Duration"
+        }
+      }
+    },
+    "FabricEndpoint": {
+      "description": "The fabric endpoint of the domain, for a Decision Engine.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "address",
+        "mediationDeadline"
+      ],
+      "properties": {
+        "address": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mediationDeadline": {
+          "$ref": "../common/defs.schema.json#/$defs/Duration"
+        }
+      }
+    },
+    "StateStore": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "url",
+        "prefix"
+      ],
+      "properties": {
+        "url": {
+          "type": "string",
+          "minLength": 1
+        },
+        "prefix": {
+          "description": "The key prefix of the instance in the state store (guide Annex F.8).",
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "DescriptorPin": {
+      "description": "The digest of the admitted descriptor and the parameter block of the capability, passed to the logic uninterpreted.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "digest",
+        "parameters"
+      ],
+      "properties": {
+        "digest": {
+          "$ref": "../common/defs.schema.json#/$defs/Digest"
+        },
+        "parameters": {
+          "type": "object",
+          "description": "The parameter block of the capability; empty when it has none."
+        }
+      }
+    },
+    "LogicPin": {
+      "description": "The digest of the logic image the descriptor pins, which the gate compares with the answer of Describe.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "image"
+      ],
+      "properties": {
+        "image": {
+          "$ref": "../common/defs.schema.json#/$defs/Digest"
+        },
+        "statePolicy": {
+          "description": "What happens to the logic's state across generations: retained or reset.",
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        }
+      }
+    },
+    "InputBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "binding",
+        "flow",
+        "schema"
+      ],
+      "properties": {
+        "binding": {
+          "$ref": "../common/defs.schema.json#/$defs/Name"
+        },
+        "flow": {
+          "$ref": "../common/defs.schema.json#/$defs/FlowKind"
+        },
+        "schema": {
+          "description": "The contract of the flow, as a subject of the schema registry.",
+          "$ref": "../common/defs.schema.json#/$defs/KindPathRef"
+        }
+      }
+    },
+    "OutputBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "binding",
+        "flow"
+      ],
+      "properties": {
+        "binding": {
+          "$ref": "../common/defs.schema.json#/$defs/Name"
+        },
+        "flow": {
+          "$ref": "../common/defs.schema.json#/$defs/FlowKind"
+        },
+        "delivery": {
+          "description": "The delivery guarantee: atMostOnce or atLeastOnce.",
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        }
+      }
+    },
+    "Gates": {
+      "description": "The thresholds of the pre-gate of a Decision Engine.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "degradedEvidence": {
+          "$ref": "#/$defs/CoverageGate"
+        },
+        "lowConfidence": {
+          "$ref": "#/$defs/ConfidenceGate"
+        },
+        "redecisionBudget": {
+          "$ref": "#/$defs/Budget"
+        }
+      }
+    },
+    "CoverageGate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "minCoverage",
+        "behavior"
+      ],
+      "properties": {
+        "minCoverage": {
+          "$ref": "../common/defs.schema.json#/$defs/Ratio"
+        },
+        "behavior": {
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        }
+      }
+    },
+    "ConfidenceGate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "threshold",
+        "behavior"
+      ],
+      "properties": {
+        "threshold": {
+          "$ref": "../common/defs.schema.json#/$defs/Ratio"
+        },
+        "behavior": {
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        }
+      }
+    },
+    "Budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "max",
+        "window"
+      ],
+      "properties": {
+        "max": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "window": {
+          "$ref": "../common/defs.schema.json#/$defs/Duration"
+        }
+      }
+    },
+    "StabilityControl": {
+      "description": "The stability controls the runtime enforces on one action type.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "action"
+      ],
+      "properties": {
+        "action": {
+          "$ref": "../common/defs.schema.json#/$defs/KindPathRef"
+        },
+        "cooldown": {
+          "$ref": "../common/defs.schema.json#/$defs/Duration"
+        },
+        "reversalHold": {
+          "$ref": "../common/defs.schema.json#/$defs/Duration"
+        },
+        "maxStep": {
+          "type": "number",
+          "minimum": 0
+        },
+        "ratePerTarget": {
+          "$ref": "#/$defs/Rate"
+        }
+      }
+    },
+    "Rate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "max",
+        "period"
+      ],
+      "properties": {
+        "max": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "period": {
+          "$ref": "../common/defs.schema.json#/$defs/Duration"
+        }
+      }
+    },
+    "Telemetry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "endpoint"
+      ],
+      "properties": {
+        "endpoint": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sampling": {
+          "$ref": "../common/defs.schema.json#/$defs/Ratio"
+        }
+      }
+    }
+  }
+}

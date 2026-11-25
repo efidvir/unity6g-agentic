@@ -1,4 +1,6 @@
 # ruff, buf lint, end-of-file and size checks (guide Section 26.1); mypy runs in make check
+# Generated code is checked by the regeneration check of make check, so the hooks leave it alone.
+exclude: ^(runtime/python/u6g/generated/|runtime/python/u6g/(common|logic|fabric|impl)/v[0-9]+/|runtime/rust/u6g-types/src/(contracts\.rs|proto/))
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.17.6
@@ -17,6 +19,9 @@ repos:
         args: [--allow-multiple-documents]
       - id: check-toml
       - id: check-merge-conflict
+      - id: pretty-format-json
+        args: [--autofix, --no-sort-keys, --indent=2, --no-ensure-ascii]
+        files: ^(schemas|examples|proto)/.*\.json$
   - repo: local
     hooks:
       - id: buf-lint

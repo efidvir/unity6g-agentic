@@ -1,0 +1,80 @@
+// proto/u6g/common/v1/common.proto: types shared by the logic, authority and fabric services
+// Provisional: the reference definition of the implementation guide, Annex F.1, until [IMPL] or a
+// design note settles it; work item D.3 keeps the two aligned.
+syntax = "proto3";
+package u6g.common.v1;
+
+import "google/protobuf/duration.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+
+enum AuthorityState {                          // the seven states of [FW] Section 3.4.7
+  AUTHORITY_STATE_UNSPECIFIED = 0;             // handled as unknown: no decision is emitted
+  ADMITTED_NOT_ACTIVE = 1;
+  MONITORING_ONLY = 2;
+  ADVISORY = 3;
+  CLOSED_LOOP_REDUCED = 4;
+  CLOSED_LOOP_FULL = 5;
+  SUSPENDED = 6;
+  TERMINATED = 7;
+}
+
+message Window {                               // aligned to UTC (Section 5.3)
+  google.protobuf.Timestamp start = 1;
+  google.protobuf.Duration length = 2;
+}
+
+message ScopeView {                            // a scope bound to concrete identities
+  uint64 version = 1;                          // the version of the resolved view
+  map<string, string> selectors = 2;           // region, site; tenant and slice as pseudonyms
+  map<string, ObjectList> objects = 3;         // object class -> managed object identities
+}
+message ObjectList { repeated string ids = 1; }
+
+message ActionSpaceView {                      // the action space of one cycle (Section 7.2)
+  repeated ActionBounds actions = 1;
+}
+message ActionBounds {
+  string action_type = 1;                      // catalog reference
+  repeated string targets = 2;                 // within the granted control scope
+  repeated ParameterBound parameters = 3;      // narrowed by the grant and the authority state
+}
+message ParameterBound {
+  string parameter = 1;                        // catalog reference
+  google.protobuf.Value min = 2;
+  google.protobuf.Value max = 3;
+  google.protobuf.Value step = 4;              // the largest change per execution
+  repeated google.protobuf.Value allowed = 5;  // the values of a discrete parameter
+}
+
+message Grant {                                // an action envelope or a distributed policy
+  string id = 1;                               // grt-…
+  enum Kind { KIND_UNSPECIFIED = 0; ACTION_ENVELOPE = 1; DISTRIBUTED_POLICY = 2; }
+  Kind kind = 2;
+  ActionSpaceView bounds = 3;                  // action types, targets and parameter bounds
+  uint32 max_executions = 4;                   // the rate: executions per period
+  google.protobuf.Duration period = 5;
+  google.protobuf.Timestamp valid_until = 6;
+  string policy_bundle = 7;                    // OCI reference of the signed bundle (a policy)
+  uint64 policy_version = 8;
+  string issuer = 9;                           // fabric://<domain> or fabric://<aiml-domain>
+}
+
+message PriorityBand {                         // assigned at admission from the service tier
+  string name = 1;
+  uint32 rank = 2;                             // orders the bands; ranks are deployment values
+}
+
+message ObjectState {                          // the last known state of a controlled object
+  string object = 1;
+  google.protobuf.Struct attributes = 2;
+  google.protobuf.Timestamp observed = 3;
+}
+
+message ObjectiveStatus {                      // the rule of [FW] Section 3.5.6
+  string objective = 1;
+  enum Status { STATUS_UNSPECIFIED = 0; MET = 1; AT_RISK = 2; NOT_MET = 3; }
+  Status status = 2;
+  double kpi_value = 3;
+  google.protobuf.Timestamp evaluated = 4;
+}

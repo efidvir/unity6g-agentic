@@ -1,0 +1,243 @@
+{
+  "package": "u6g.impl.v1",
+  "messages": {
+    "Attempt": {
+      "fields": {
+        "n": 1,
+        "max": 2
+      },
+      "reserved": {}
+    },
+    "Coverage": {
+      "fields": {
+        "inScope": 1,
+        "observed": 2,
+        "missing": 3
+      },
+      "reserved": {}
+    },
+    "DeliveryLatency": {
+      "fields": {
+        "p50": 1,
+        "p99": 2,
+        "max": 3
+      },
+      "reserved": {}
+    },
+    "ExecutionEnvelope": {
+      "fields": {
+        "id": 1,
+        "producer": 2,
+        "generation": 3,
+        "correlation": 4,
+        "intent": 5,
+        "traceparent": 6,
+        "times": 7
+      },
+      "reserved": {}
+    },
+    "ExecutionFeedback": {
+      "fields": {
+        "envelope": 1,
+        "actionType": 2,
+        "targets": 3,
+        "outcome": 4,
+        "final": 5,
+        "applied": 6,
+        "verification": 7,
+        "attempt": 8,
+        "reasonCode": 9
+      },
+      "reserved": {}
+    },
+    "ExecutionTimes": {
+      "fields": {
+        "submitted": 1,
+        "outcome": 2
+      },
+      "reserved": {}
+    },
+    "FeatureSetRef": {
+      "fields": {
+        "service": 1,
+        "version": 2
+      },
+      "reserved": {}
+    },
+    "InputQuality": {
+      "fields": {
+        "minCoverage": 1,
+        "maxStalenessS": 2,
+        "degraded": 3,
+        "contributing": 4
+      },
+      "reserved": {}
+    },
+    "Insight": {
+      "fields": {
+        "envelope": 1,
+        "type": 2,
+        "subject": 3,
+        "payload": 4,
+        "confidence": 5
+      },
+      "reserved": {}
+    },
+    "InsightEnvelope": {
+      "fields": {
+        "id": 1,
+        "producer": 2,
+        "contract": 3,
+        "generation": 4,
+        "times": 5,
+        "model": 6,
+        "featureSet": 7,
+        "inputQuality": 8,
+        "validity": 9,
+        "fallback": 10,
+        "inferenceLatencyMs": 11
+      },
+      "reserved": {}
+    },
+    "InsightTimes": {
+      "fields": {
+        "event": 1,
+        "produced": 2
+      },
+      "reserved": {}
+    },
+    "Intent": {
+      "fields": {
+        "envelope": 1,
+        "actionType": 2,
+        "targets": 3,
+        "parameters": 4,
+        "candidates": 5,
+        "explanation": 6
+      },
+      "reserved": {}
+    },
+    "IntentCandidate": {
+      "fields": {
+        "actionType": 1,
+        "targets": 2,
+        "parameters": 3
+      },
+      "reserved": {}
+    },
+    "IntentEnvelope": {
+      "fields": {
+        "id": 1,
+        "producer": 2,
+        "generation": 3,
+        "contract": 4,
+        "formed": 5,
+        "validUntil": 6,
+        "objective": 7,
+        "urgency": 8,
+        "confidence": 9,
+        "inputQuality": 10,
+        "rationale": 11,
+        "redecision": 12,
+        "verdict": 13,
+        "correlation": 14,
+        "traceparent": 15
+      },
+      "reserved": {}
+    },
+    "ModelRef": {
+      "fields": {
+        "hook": 1,
+        "version": 2,
+        "digest": 3
+      },
+      "reserved": {}
+    },
+    "Observation": {
+      "fields": {
+        "envelope": 1,
+        "object": 2,
+        "metric": 3,
+        "kind": 4,
+        "unit": 5,
+        "aggregation": 6,
+        "value": 7
+      },
+      "reserved": {}
+    },
+    "ObservationEnvelope": {
+      "fields": {
+        "id": 1,
+        "producer": 2,
+        "contract": 3,
+        "generation": 4,
+        "times": 5,
+        "scope": 6,
+        "quality": 7,
+        "sources": 8,
+        "pattern": 9
+      },
+      "reserved": {}
+    },
+    "ObservationQuality": {
+      "fields": {
+        "coverage": 1,
+        "loss": 2,
+        "latencyMs": 3,
+        "jitterMs": 4,
+        "flags": 5
+      },
+      "reserved": {}
+    },
+    "ObservationTimes": {
+      "fields": {
+        "event": 1,
+        "windowStart": 2,
+        "windowEnd": 3,
+        "ingest": 4
+      },
+      "reserved": {}
+    },
+    "Rationale": {
+      "fields": {
+        "insights": 1,
+        "objectives": 2,
+        "constraints": 3,
+        "reasonCode": 4
+      },
+      "reserved": {}
+    },
+    "RedecisionBudget": {
+      "fields": {
+        "objective": 1,
+        "used": 2,
+        "max": 3,
+        "window": 4
+      },
+      "reserved": {}
+    },
+    "Scope": {
+      "fields": {
+        "view": 1,
+        "domain": 2,
+        "tags": 3
+      },
+      "reserved": {}
+    },
+    "VerdictRef": {
+      "fields": {
+        "kind": 1,
+        "ref": 2,
+        "token": 3
+      },
+      "reserved": {}
+    },
+    "Verification": {
+      "fields": {
+        "method": 1,
+        "evidence": 2
+      },
+      "reserved": {}
+    }
+  }
+}
