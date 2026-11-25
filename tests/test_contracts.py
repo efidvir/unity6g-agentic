@@ -181,3 +181,51 @@ def test_platform_fields_follow_the_readonly_marks() -> None:
     assert platform_fields(Insight) == ["/envelope"]
     execution = json.loads((SCHEMAS / "envelope/execution.schema.json").read_text())
     assert set(platform_fields(ExecutionFeedback)) == {f"/{name}" for name in execution["properties"]}
+
+
+def required_paths(
+    node: Any, data: Any, resolver: Any, path: tuple[str | int, ...] = ()
+) -> list[tuple[str | int, ...]]:
+    """The paths of the required members of a document, read from the schema where the document has them."""
+    while "$ref" in node:
+        resolved = resolver.lookup(node["$ref"])
+        node, resolver = resolved.contents, resolved.resolver
+    found: list[tuple[str | int, ...]] = []
+    if isinstance(data, dict):
+        found.extend((*path, key) for key in node.get("required", []))
+        for key, sub in node.get("properties", {}).items():
+            if key in data:
+                found.extend(required_paths(sub, data[key], resolver, (*path, key)))
+    elif isinstance(data, list) and isinstance(node.get("items"), dict):
+        for i, item in enumerate(data):
+            found.extend(required_paths(node["items"], item, resolver, (*path, i)))
+    return found
+
+
+MISSING = [
+    (schema, example, path)
+    for schema, example, _ in CASES
+    for path in required_paths(
+        json.loads((SCHEMAS / schema).read_text()),
+        load(example),
+        REGISTRY.resolver(base_uri=(SCHEMAS / schema).resolve().as_uri()),
+    )
+]
+
+
+@pytest.mark.property
+@pytest.mark.parametrize(
+    ("schema", "example", "path"),
+    MISSING,
+    ids=lambda v: "/".join(map(str, v)) if isinstance(v, tuple) else str(v),
+)
+def test_a_message_missing_a_mandatory_structure_is_rejected(
+    schema: str, example: str, path: tuple[str | int, ...]
+) -> None:
+    """[FW] 3.3.2 and 3.3.4: a message that lacks a mandatory structure is rejected at the boundary where it
+    arrives; the schema and the model refuse each required member of the examples when it is removed."""
+    model = next(m for s, _, m in CASES if s == schema)
+    data = mutate(load(example), path, DELETE)
+    assert list(validator(schema).iter_errors(data)), "the schema accepts the removal"
+    with pytest.raises(ValidationError):
+        model.model_validate(data)
