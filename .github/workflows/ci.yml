@@ -1,0 +1,16 @@
+# The checks of every push and pull request (guide Section 26.5). The build stage (images, bills of
+# materials, signatures, publication) arrives with work item 0.8, and the integration stage with work item
+# 0.6 and the lab's runners.
+name: ci
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - uses: bufbuild/buf-action@v1
+        with: { setup_only: true }
+      - run: make setup && make check

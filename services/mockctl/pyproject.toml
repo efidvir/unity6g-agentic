@@ -1,0 +1,18 @@
+[project]
+name = "u6g-mockctl"
+version = "0.1.0"
+description = "The mock controller: a simulated transport northbound interface and E2 node"
+requires-python = ">=3.12"
+dependencies = [
+    "u6g",
+]
+
+[tool.uv.sources]
+u6g = { workspace = true }
+
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["u6g_mockctl"]

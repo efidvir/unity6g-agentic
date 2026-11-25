@@ -1,0 +1,27 @@
+# ruff, buf lint, end-of-file and size checks (guide Section 26.1); mypy runs in make check
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.17.6
+    hooks:
+      - id: ruff-check
+      - id: ruff-format
+        args: [--check]
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: check-added-large-files
+        args: [--maxkb=500]
+      - id: check-yaml
+        args: [--allow-multiple-documents]
+      - id: check-toml
+      - id: check-merge-conflict
+  - repo: local
+    hooks:
+      - id: buf-lint
+        name: buf lint
+        entry: buf lint
+        language: system
+        files: ^proto/.*\.proto$
+        pass_filenames: false

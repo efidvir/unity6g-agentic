@@ -1,0 +1,13 @@
+[project]
+name = "u6g"
+version = "0.1.0"
+description = "The capability runtime of the UNITY-6G agentic framework, its development kit and shared libraries"
+requires-python = ">=3.12"
+dependencies = []
+
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["u6g"]

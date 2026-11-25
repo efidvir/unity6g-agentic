@@ -1,0 +1,39 @@
+# pyproject.toml (root of the uv workspace)
+[project]
+name = "unity6g-agentic"
+version = "0.1.0"
+requires-python = ">=3.12"
+
+[dependency-groups]
+dev = [
+    "hypothesis>=6.100",
+    "mypy>=1.15",
+    "pre-commit>=4.0",
+    "pytest>=8.3",
+    "ruff>=0.11",
+]
+
+[tool.uv.workspace]
+members = ["runtime/python", "services/*", "adapters/*", "cli", "conformance"]
+
+[tool.ruff]
+line-length = 110
+target-version = "py312"
+extend-exclude = ["runtime/python/u6g/generated"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "S", "ASYNC", "RUF"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101"]
+"**/tests/**" = ["S101"]
+
+[tool.mypy]
+strict = true
+python_version = "3.12"
+exclude = ['^\.venv/', '/generated/', '^runtime/rust/']
+
+[tool.pytest.ini_options]
+addopts = "-q --strict-markers"
+markers = ["property: guarantees of [FW]", "integration: needs make dev-up"]
+testpaths = ["tests"]
