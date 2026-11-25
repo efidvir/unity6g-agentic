@@ -9,7 +9,7 @@
 ## Items
 | ID | Status (open, in progress, done, blocked) | Evidence or blocker | Updated |
 |----|-------------------------------------------|---------------------|---------|
-| 0.1 | done | make setup and make check pass locally (Checks below) and in the pipeline: runs 45611947414 (push) and 45611973770 (pull request #1), both success | 2026-11-25 |
+| 0.1 | done | make setup and make check pass locally (Checks below) and in the pipeline: runs 45612680111 (push) and 45612688927 (pull request #1), both success | 2026-11-25 |
 | 0.2 | open | the tuple's contracts first; provisional from guide Annex F until [IMPL] 3.2 arrives | 2026-11-25 |
 | 0.3 | open | | 2026-11-25 |
 | 0.7 | open | the transport northbound subset first | 2026-11-25 |
@@ -32,6 +32,8 @@
   clean
 - Pipeline, workflow ci, job check -> success on the push of item-0.1-skeleton (run 45611947414) and on
   pull request #1 (run 45611973770)
+- Commits re-authored as the owner with their trees unchanged (git rev-parse of each tree), force-pushed with
+  lease -> pipeline success on the push (run 45612680111) and on pull request #1 (run 45612688927)
 
 ## Documents delivered
 - UNITY6G_Agentic_Implementation_Guide_v1.2.docx, version 1.2, 2026-11-25: the real, emulated and simulated
@@ -62,6 +64,9 @@
   generate runs when proto/ holds files; cargo commands take the manifest of runtime/rust; pre-commit runs
   through uv; make check also runs the Rust tests; the pipeline has the check stage until items 0.8 and 0.6;
   the LICENSE file waits on the owner's choice (source: finding)
+- 2026-11-25 Commits carry the owner's identity: Efi Dvir, with the address
+  22244452+efidvir@users.noreply.github.com that GitHub links to the account efidvir; a trailer names the AI
+  agent as co-author. Each session sets this identity in the git configuration of its clone (source: owner)
 
 ## Provisional contracts
 - None yet. Item 0.2 adds the reference definitions of guide Annex F for the tuple, marked provisional, until
