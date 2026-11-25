@@ -2,16 +2,16 @@
 
 ## Now
 - Date, session author: 2026-11-25, Claude (AI agent), for the owner of the framework
-- Working on: 0.2 Schemas and the generation of code, the tuple's contracts, done in pull request #2, stacked
-  on pull request #1; both await the owner's review
-- Next: 0.3 Condition evaluator u6g.cond
+- Working on: 0.3 Condition evaluator u6g.cond, done in pull request #3, stacked on pull request #2, itself
+  stacked on #1; all three await the owner's review
+- Next: 0.7 Mock controller, the transport northbound subset first
 
 ## Items
 | ID | Status (open, in progress, done, blocked) | Evidence or blocker | Updated |
 |----|-------------------------------------------|---------------------|---------|
 | 0.1 | done | make setup and make check pass locally (Checks below) and in the pipeline: runs 45612680111 (push) and 45612688927 (pull request #1), both success | 2026-11-25 |
 | 0.2 | in progress | the tuple's contracts are done and checked, provisional until [IMPL] 3.2 (pull request #2): make check passes locally (Checks below) and in the pipeline: runs 45619019112 (push) and 45619091662 (pull request #2), both success; the rest of Table 26-1 comes with the items that use it | 2026-11-25 |
-| 0.3 | open | | 2026-11-25 |
+| 0.3 | done | make check passes locally (Checks below); 26 tests, 8 of them property tests over generated condition trees: structure, declared operands, depth limit, results; the pipeline of pull request #3 | 2026-11-25 |
 | 0.7 | open | the transport northbound subset first | 2026-11-25 |
 | 0.4 | open | the transport entries first | 2026-11-25 |
 | 1.1 | open | | 2026-11-25 |
@@ -44,6 +44,10 @@
   cargo test 6 passed (5 new: the Rust types read and write the six examples); make gen twice, git diff clean
 - Pipeline, workflow ci, job check -> success on the push of item-0.2-contracts (run 45619019112) and on
   pull request #2 (run 45619091662)
+- Review against AGENTS.md: optional lists had empty defaults; now required, possibly empty, with no defaults
+  (commit "Contracts: arrays and maps of the semantic objects are required") -> make check exit 0
+- 2026-11-25, branch item-0.3-cond: make check -> exit 0; pytest 135 passed (26 new for u6g.cond, 8 property
+  tests with Hypothesis, 200 to 300 examples each); mypy strict, no issues in 45 source files
 
 ## Documents delivered
 - UNITY6G_Agentic_Implementation_Guide_v1.2.docx, version 1.2, 2026-11-25: the real, emulated and simulated
@@ -60,6 +64,8 @@
 - 2026-11-25 Whether the reference implementation of the IDMO and the DMOs runs in containers (question 12)
   -> open
 - 2026-11-25 Emulators in the lab for many UEs, radio units and radio channels (question 13) -> open
+- 2026-11-25 The permitted depth of conditions, which [FW] Section 3.5.18 leaves to [IMPL]: three levels of
+  groups assumed, a single comparison being depth 0 -> open
 - 2026-11-25 The protos of Annex F keep their names as written, and buf lint leaves out five naming rules of
   STANDARD; the alternative is the STANDARD names (prefixed enum values, ConflictFabricService, SubmitRequest)
   before contributors build on them -> open; kept as written
@@ -97,6 +103,11 @@
 - 2026-11-25 Arrays and maps of the semantic objects are required, possibly empty, and no schema gives an
   absent field a default, as AGENTS.md rules (source: review) [replaces: every optional array declares an
   empty default]
+- 2026-11-25 The condition evaluator uses the three-valued logic of Kleene: a missing value or values that
+  cannot be ordered make a comparison unknown, every caller acts only on a condition that holds, and a result
+  decided with values missing stays the same when they arrive (source: finding)
+- 2026-11-25 Conditions nest at most three levels of groups, a provisional value until [IMPL] sets the
+  permitted depth (source: finding)
 
 ## Provisional contracts
 - schemas/common/defs.schema.json, schemas/descriptor/descriptor.schema.json and
