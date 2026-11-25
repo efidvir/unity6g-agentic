@@ -2,14 +2,14 @@
 
 ## Now
 - Date, session author: 2026-11-25, Claude (AI agent), for the owner of the framework
-- Working on: 0.1 Repository, layout and tooling
+- Working on: 0.1 Repository, layout and tooling, done; pull request #1 awaits the owner's review
 - Next: 0.2 Schemas and the generation of code, limited to the tuple's contracts: the descriptor, the
   envelopes of observations, insights, intents and executions, the logic service and the verdicts
 
 ## Items
 | ID | Status (open, in progress, done, blocked) | Evidence or blocker | Updated |
 |----|-------------------------------------------|---------------------|---------|
-| 0.1 | in progress | make setup and make check pass locally (Checks below); the pipeline run waits on the first push | 2026-11-25 |
+| 0.1 | done | make setup and make check pass locally (Checks below) and in the pipeline: runs 45611947414 (push) and 45611973770 (pull request #1), both success | 2026-11-25 |
 | 0.2 | open | the tuple's contracts first; provisional from guide Annex F until [IMPL] 3.2 arrives | 2026-11-25 |
 | 0.3 | open | | 2026-11-25 |
 | 0.7 | open | the transport northbound subset first | 2026-11-25 |
@@ -30,6 +30,8 @@
 - make check -> exit 0: pre-commit all hooks passed (buf lint skipped, no .proto files yet); mypy strict, no
   issues in 30 source files; pytest 58 passed; cargo test 1 passed; make gen, nothing to generate; git diff
   clean
+- Pipeline, workflow ci, job check -> success on the push of item-0.1-skeleton (run 45611947414) and on
+  pull request #1 (run 45611973770)
 
 ## Documents delivered
 - UNITY6G_Agentic_Implementation_Guide_v1.2.docx, version 1.2, 2026-11-25: the real, emulated and simulated
