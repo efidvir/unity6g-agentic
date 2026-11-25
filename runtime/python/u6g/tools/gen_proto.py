@@ -12,8 +12,9 @@ keeps every JSON document whole:
   a string of format date-time becomes google.protobuf.Timestamp; enumerations stay strings;
 - an object without properties becomes google.protobuf.Struct, or map<string, string> when its values are
   strings; a choice of types becomes google.protobuf.Value;
-- an array becomes a repeated field. An empty list and an absent one are the same in Protocol Buffers, so an
-  optional array or map must declare an empty default; the tool refuses a schema that does not.
+- an array becomes a repeated field. An empty list and an absent one are the same in Protocol Buffers, and no
+  schema gives an absent field a default (AGENTS.md), so every array and map must be required, possibly empty;
+  the tool refuses an optional one.
 
 Field numbers are kept in semantic.lock.json beside the proto file. A new field takes the next free number,
 and a removed field leaves its number and name reserved (guide Annex F, compatibility), so that regeneration
@@ -145,14 +146,11 @@ class Mapper:
         required = set(node.get("required", []))
         for json_name, prop in node.get("properties", {}).items():
             ftype = self.field_type(prop, base, f"{name}.{json_name}")
-            optional = json_name not in required
-            if optional and ftype.label in ("repeated", "map"):
-                empty: Any = [] if ftype.label == "repeated" else {}
-                if prop.get("default") != empty:
-                    raise MappingError(
-                        f"{base}: {name}.{json_name} is an optional array or map without an empty default; "
-                        "declare the default so that the Protocol Buffers form keeps the document whole"
-                    )
+            if json_name not in required and ftype.label in ("repeated", "map"):
+                raise MappingError(
+                    f"{base}: {name}.{json_name} is an optional array or map; make it required, possibly "
+                    "empty, so that the Protocol Buffers form keeps the document whole"
+                )
             msg.fields.append(
                 Field(
                     json_name=json_name,

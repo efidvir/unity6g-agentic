@@ -187,7 +187,7 @@ class Intent(_message.Message):
 
     @_builtins.property
     def candidates(self) -> _containers.RepeatedCompositeFieldContainer[Global___IntentCandidate]:
-        """Alternatives that meet the same objective, in order of preference."""
+        """Alternatives that meet the same objective, in order of preference; empty when there are none."""
 
     @_builtins.property
     def explanation(self) -> _struct_pb2.Struct:

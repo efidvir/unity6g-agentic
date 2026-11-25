@@ -13,7 +13,8 @@ against them (work item 0.2).
 | `runtime/runtime-config.de.yaml` | Annex F.11, a Decision Engine | `schemas/runtime/runtime-config.schema.json` |
 
 The guide abridges some values with an ellipsis: identities of records, digests, the trace context, the token
-of a verdict and the signature of the descriptor. Here they are completed with values of the right form, kept
+of a verdict and the signature of the descriptor; and the intent omits its contributing inputs and its empty
+list of candidates, which the schemas require. Here they are completed with values of the right form, kept
 consistent across the files: the insight's model digest is the one the descriptor pins, the intent cites the
 insight, and the execution cites the intent and its correlation. The digests and the signature are placeholders
 until the descriptor toolchain computes them (work item 0.5).

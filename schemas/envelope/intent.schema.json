@@ -9,7 +9,8 @@
     "envelope",
     "actionType",
     "targets",
-    "parameters"
+    "parameters",
+    "candidates"
   ],
   "properties": {
     "envelope": {
@@ -30,12 +31,11 @@
       "type": "object"
     },
     "candidates": {
-      "description": "Alternatives that meet the same objective, in order of preference.",
+      "description": "Alternatives that meet the same objective, in order of preference; empty when there are none.",
       "type": "array",
       "items": {
         "$ref": "#/$defs/IntentCandidate"
-      },
-      "default": []
+      }
     },
     "explanation": {
       "description": "The explanation of the decision, where the logic is declared interpretable.",

@@ -135,9 +135,9 @@ class Intent(BaseModel):
     """
     The parameters of the action, within the bounds of the action space.
     """
-    candidates: Annotated[list[IntentCandidate], Field(validate_default=True)] = []
+    candidates: list[IntentCandidate]
     """
-    Alternatives that meet the same objective, in order of preference.
+    Alternatives that meet the same objective, in order of preference; empty when there are none.
     """
     explanation: dict[str, Any] | None = None
     """

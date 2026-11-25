@@ -60,7 +60,10 @@ class DescriptorPin(BaseModel):
         populate_by_name=True,
     )
     digest: defs_schema.Digest
-    parameters: dict[str, Any] = {}
+    parameters: dict[str, Any]
+    """
+    The parameter block of the capability; empty when it has none.
+    """
 
 
 class LogicPin(BaseModel):

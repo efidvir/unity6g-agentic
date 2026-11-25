@@ -10,7 +10,10 @@
     "urgency": 2,
     "inputQuality": {
       "minCoverage": 0.67,
-      "degraded": true
+      "degraded": true,
+      "contributing": [
+        "ins-51d2a7e0"
+      ]
     },
     "rationale": {
       "insights": [
@@ -44,5 +47,6 @@
   ],
   "parameters": {
     "profile": "64QAM"
-  }
+  },
+  "candidates": []
 }

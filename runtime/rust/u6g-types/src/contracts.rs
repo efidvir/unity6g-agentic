@@ -1471,7 +1471,7 @@ pub struct Deployment {
 #[serde(deny_unknown_fields)]
 pub struct DescriptorPin {
     pub digest: Digest,
-    #[serde(default, skip_serializing_if = "::serde_json::Map::is_empty")]
+    ///The parameter block of the capability; empty when it has none.
     pub parameters: ::serde_json::Map<::std::string::String, ::serde_json::Value>,
 }
 ///A SHA-256 digest, over the canonical JSON form of RFC 8785 where the object is a JSON document.
@@ -2360,7 +2360,6 @@ pub struct InputBinding {
 #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct InputQuality {
-    #[serde(default, skip_serializing_if = "::std::vec::Vec::is_empty")]
     pub contributing: ::std::vec::Vec<EvidenceId>,
     pub degraded: bool,
     #[serde(
@@ -2628,8 +2627,7 @@ pub struct Integrity {
 pub struct Intent {
     #[serde(rename = "actionType")]
     pub action_type: CatalogRef,
-    ///Alternatives that meet the same objective, in order of preference.
-    #[serde(default, skip_serializing_if = "::std::vec::Vec::is_empty")]
+    ///Alternatives that meet the same objective, in order of preference; empty when there are none.
     pub candidates: ::std::vec::Vec<IntentCandidate>,
     pub envelope: IntentEnvelope,
     ///The explanation of the decision, where the logic is declared interpretable.
@@ -5404,7 +5402,6 @@ impl ::std::convert::TryFrom<::std::string::String> for VerdictRefKind {
 #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct Verification {
-    #[serde(default, skip_serializing_if = "::std::vec::Vec::is_empty")]
     pub evidence: ::std::vec::Vec<ObservationId>,
     pub method: CamelName,
 }

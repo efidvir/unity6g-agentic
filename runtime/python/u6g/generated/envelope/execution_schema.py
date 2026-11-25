@@ -32,7 +32,7 @@ class Verification(BaseModel):
         populate_by_name=True,
     )
     method: defs_schema.CamelName
-    evidence: list[defs_schema.ObservationId] = []
+    evidence: list[defs_schema.ObservationId]
 
 
 class Attempt(BaseModel):

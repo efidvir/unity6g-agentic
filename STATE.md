@@ -94,6 +94,9 @@
   stay in u6g.generated; u6g.contracts is the entry point (source: finding)
 - 2026-11-25 Schemas mark the fields the platform computes with readOnly, and every optional array declares
   an empty default (source: finding)
+- 2026-11-25 Arrays and maps of the semantic objects are required, possibly empty, and no schema gives an
+  absent field a default, as AGENTS.md rules (source: review) [replaces: every optional array declares an
+  empty default]
 
 ## Provisional contracts
 - schemas/common/defs.schema.json, schemas/descriptor/descriptor.schema.json and

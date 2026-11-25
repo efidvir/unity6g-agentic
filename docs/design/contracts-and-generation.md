@@ -42,8 +42,9 @@ back with nothing lost:
 - `format: date-time` becomes `google.protobuf.Timestamp`; ISO 8601 durations stay strings;
 - free-form objects become `google.protobuf.Struct`, objects of strings `map<string, string>`, and a choice
   of types `google.protobuf.Value`;
-- an empty list and an absent one are the same in Protocol Buffers, so every optional array declares
-  `"default": []`; the generator refuses one that does not.
+- an empty list and an absent one are the same in Protocol Buffers, and no schema gives an absent field a
+  default (`AGENTS.md`), so every array and map of a semantic object is required, possibly empty; the
+  generator refuses an optional one.
 
 The JSON names of the messages are the property names of the schemas, so the proto3 JSON mapping is the
 conversion: `u6g.contracts.to_message()` and `from_message()` go through it, and the tests check that the four

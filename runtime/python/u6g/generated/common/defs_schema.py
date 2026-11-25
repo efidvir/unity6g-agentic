@@ -207,7 +207,7 @@ class InputQuality(BaseModel):
         None
     )
     degraded: bool
-    contributing: list[EvidenceId] = []
+    contributing: list[EvidenceId]
 
 
 class FeatureSetRef(BaseModel):

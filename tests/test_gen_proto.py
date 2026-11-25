@@ -33,11 +33,15 @@ def write_schema(tmp: Path, properties: dict[str, object], required: list[str]) 
     return Mapper(tmp)
 
 
-def test_an_optional_array_needs_an_empty_default(tmp_path: Path) -> None:
-    mapper = write_schema(tmp_path, {"tags": {"type": "array", "items": {"type": "string"}}}, [])
-    with pytest.raises(MappingError, match="empty default"):
-        mapper.message("Thing", mapper.load("thing.schema.json"), "thing.schema.json")
-    ok = write_schema(tmp_path, {"tags": {"type": "array", "items": {"type": "string"}, "default": []}}, [])
+def test_an_optional_array_or_map_is_refused(tmp_path: Path) -> None:
+    for prop in (
+        {"type": "array", "items": {"type": "string"}},
+        {"type": "object", "additionalProperties": {"type": "string"}},
+    ):
+        mapper = write_schema(tmp_path, {"tags": prop}, [])
+        with pytest.raises(MappingError, match="make it required"):
+            mapper.message("Thing", mapper.load("thing.schema.json"), "thing.schema.json")
+    ok = write_schema(tmp_path, {"tags": {"type": "array", "items": {"type": "string"}}}, ["tags"])
     ok.message("Thing", ok.load("thing.schema.json"), "thing.schema.json")
     assert ok.messages["Thing"].fields[0].type == FieldType("string", "repeated")
 

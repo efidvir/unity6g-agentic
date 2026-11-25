@@ -65,7 +65,7 @@ pub struct Intent {
     /// The parameters of the action, within the bounds of the action space.
     #[prost(message, optional, tag = "4")]
     pub parameters: ::core::option::Option<::prost_types::Struct>,
-    /// Alternatives that meet the same objective, in order of preference.
+    /// Alternatives that meet the same objective, in order of preference; empty when there are none.
     #[prost(message, repeated, tag = "5")]
     pub candidates: ::prost::alloc::vec::Vec<IntentCandidate>,
     /// The explanation of the decision, where the logic is declared interpretable.
