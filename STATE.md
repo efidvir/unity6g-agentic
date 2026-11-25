@@ -10,7 +10,7 @@
 | ID | Status (open, in progress, done, blocked) | Evidence or blocker | Updated |
 |----|-------------------------------------------|---------------------|---------|
 | 0.1 | done | make setup and make check pass locally (Checks below) and in the pipeline: runs 45612680111 (push) and 45612688927 (pull request #1), both success | 2026-11-25 |
-| 0.2 | in progress | the tuple's contracts are done and checked, provisional until [IMPL] 3.2 (pull request #2): make check passes locally (Checks below) and in the pipeline of pull request #2; the rest of Table 26-1 comes with the items that use it | 2026-11-25 |
+| 0.2 | in progress | the tuple's contracts are done and checked, provisional until [IMPL] 3.2 (pull request #2): make check passes locally (Checks below) and in the pipeline: runs 45619019112 (push) and 45619091662 (pull request #2), both success; the rest of Table 26-1 comes with the items that use it | 2026-11-25 |
 | 0.3 | open | | 2026-11-25 |
 | 0.7 | open | the transport northbound subset first | 2026-11-25 |
 | 0.4 | open | the transport entries first | 2026-11-25 |
@@ -42,6 +42,8 @@
   files; pytest 109 passed (52 new: schemas, models, 23 mutations refused by schema and model alike, the
   Protocol Buffers round trip of the four envelopes, the platform-computed fields, the field numbering);
   cargo test 6 passed (5 new: the Rust types read and write the six examples); make gen twice, git diff clean
+- Pipeline, workflow ci, job check -> success on the push of item-0.2-contracts (run 45619019112) and on
+  pull request #2 (run 45619091662)
 
 ## Documents delivered
 - UNITY6G_Agentic_Implementation_Guide_v1.2.docx, version 1.2, 2026-11-25: the real, emulated and simulated
