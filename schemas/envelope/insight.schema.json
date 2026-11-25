@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "Provisional: the reference definition of the implementation guide (Section 6.6) stands in for [IMPL] Annex A until it arrives; work item D.3 replaces it.",
+  "title": "Insight",
+  "description": "One insight of a declared type with its envelope, as the Analytics Engine runtime publishes it on the insight flow. The logic supplies the type, the subject, the payload and the confidence; the runtime computes the envelope. An insight carries no action content.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "envelope",
+    "type",
+    "subject",
+    "payload",
+    "confidence"
+  ],
+  "properties": {
+    "envelope": {
+      "$ref": "#/$defs/InsightEnvelope",
+      "readOnly": true
+    },
+    "type": {
+      "description": "One of the insight types the descriptor declares.",
+      "$ref": "../common/defs.schema.json#/$defs/Name"
+    },
+    "subject": {
+      "description": "The managed object or service concerned.",
+      "$ref": "../common/defs.schema.json#/$defs/ObjectId"
+    },
+    "payload": {
+      "description": "The content of the insight, validated against the schema of its type in the catalog.",
+      "type": "object"
+    },
+    "confidence": {
+      "$ref": "../common/defs.schema.json#/$defs/Ratio"
+    }
+  },
+  "$defs": {
+    "InsightEnvelope": {
+      "description": "The envelope of an insight. Every field is computed by the platform.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "producer",
+        "contract",
+        "generation",
+        "times",
+        "inputQuality",
+        "validity",
+        "fallback"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "../common/defs.schema.json#/$defs/InsightId"
+        },
+        "producer": {
+          "$ref": "../common/defs.schema.json#/$defs/InstanceId"
+        },
+        "contract": {
+          "$ref": "../common/defs.schema.json#/$defs/CatalogRef"
+        },
+        "generation": {
+          "$ref": "../common/defs.schema.json#/$defs/Generation"
+        },
+        "times": {
+          "$ref": "#/$defs/InsightTimes"
+        },
+        "model": {
+          "$ref": "#/$defs/ModelRef"
+        },
+        "featureSet": {
+          "$ref": "../common/defs.schema.json#/$defs/FeatureSetRef"
+        },
+        "inputQuality": {
+          "$ref": "../common/defs.schema.json#/$defs/InputQuality"
+        },
+        "validity": {
+          "description": "Whether the input lay inside or outside the validity conditions of the model.",
+          "type": "string",
+          "enum": [
+            "inside",
+            "outside"
+          ]
+        },
+        "fallback": {
+          "description": "Whether the declared fallback produced the insight.",
+          "type": "boolean"
+        },
+        "inferenceLatencyMs": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "InsightTimes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "event",
+        "produced"
+      ],
+      "properties": {
+        "event": {
+          "$ref": "../common/defs.schema.json#/$defs/Timestamp"
+        },
+        "produced": {
+          "$ref": "../common/defs.schema.json#/$defs/Timestamp"
+        }
+      }
+    },
+    "ModelRef": {
+      "description": "The model hook that produced the insight, with the version and digest of its model.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "hook",
+        "version",
+        "digest"
+      ],
+      "properties": {
+        "hook": {
+          "$ref": "../common/defs.schema.json#/$defs/Name"
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "digest": {
+          "$ref": "../common/defs.schema.json#/$defs/Digest"
+        }
+      }
+    }
+  }
+}

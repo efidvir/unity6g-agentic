@@ -3,5 +3,13 @@ modules:
   - path: proto
 lint:
   use: [STANDARD]
+  # The names of guide Annex F stand as written: values of nested enums without the enum's prefix, the
+  # services ConflictFabric and RuntimeGateway, and request and response types named for what they carry.
+  except:
+    - ENUM_VALUE_PREFIX
+    - SERVICE_SUFFIX
+    - RPC_REQUEST_STANDARD_NAME
+    - RPC_RESPONSE_STANDARD_NAME
+    - RPC_REQUEST_RESPONSE_UNIQUE
 breaking:
   use: [FILE]

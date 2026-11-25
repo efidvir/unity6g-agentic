@@ -3,16 +3,18 @@
 RUST := --manifest-path runtime/rust/Cargo.toml
 
 setup:
-	uv sync --all-packages
+	uv sync --all-packages --locked
 	cargo fetch $(RUST)
 	buf dep update
 	uv run pre-commit install
 
+# The semantic objects' proto form first, then the Python models, the Python protobuf and gRPC code, and the
+# Rust types; no step needs the network (docs/design/contracts-and-generation.md).
 gen:
-	@if [ -n "$$(find proto -name '*.proto' -print -quit)" ]; then buf generate; \
-	  else echo "buf: no .proto files under proto/; nothing to generate"; fi
+	uv run python -m u6g.tools.gen_proto schemas proto
 	uv run python -m u6g.tools.gen_models schemas runtime/python/u6g/generated
-	cargo run -q $(RUST) -p u6g-typegen -- schemas runtime/rust/u6g-types/src
+	uv run python -m u6g.tools.gen_grpc proto runtime/python
+	cargo run -q $(RUST) -p u6g-typegen -- schemas proto runtime/rust/u6g-types/src
 
 check:
 	uv run pre-commit run --all-files

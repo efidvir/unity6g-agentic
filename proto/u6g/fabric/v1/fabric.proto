@@ -1,0 +1,141 @@
+// proto/u6g/fabric/v1/fabric.proto
+// Provisional: the reference definition of the implementation guide, Annex F.4, until [IMPL] or a
+// design note settles it; work item D.3 keeps the two aligned.
+syntax = "proto3";
+package u6g.fabric.v1;
+
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+import "u6g/common/v1/common.proto";
+
+service ConflictFabric {
+  // Register is called by the platform only, from the admitted descriptor
+  rpc Register    (Registration)      returns (RegistrationResult);
+  rpc Submit      (Submission)        returns (Verdict);              // runtime of a Decision Engine
+  rpc Notify      (NotifyRequest)     returns (stream Notification);  // implicit conflicts, screening
+  rpc Screening   (ScreeningRequest)  returns (ScreeningBasis);       // current basis, version, lease
+  rpc Acknowledge (BasisAck)          returns (Empty);                // a new basis has been applied
+  rpc Health      (HealthRequest)     returns (HealthReply);          // used by the activation gate
+  // Called by the platform only: the end of a generation, and deregistration at termination
+  rpc Retire      (RetireRequest)     returns (RetireReply);
+  rpc Deregister  (DeregisterRequest) returns (Empty);
+}
+message Empty {}
+
+message Registration {
+  string instance = 1;
+  uint64 generation = 2;
+  string descriptor_digest = 3;
+  repeated ControlParameter control_parameters = 4;   // from the admitted descriptor
+  repeated ObjectiveKpi objective_kpis = 5;
+  Policy policy = 6;                           // the conflict-resolution policy it submits to
+  common.v1.PriorityBand band = 7;
+  repeated EnvelopeRequest requested_envelopes = 8;
+  bool distributed_policy_requested = 9;
+  string admitting_aiml_domain = 10;
+  enum Policy { POLICY_UNSPECIFIED = 0; PRIORITY = 1; ARBITRATION = 2; NEGOTIATION = 3;
+                HIERARCHICAL = 4; }
+}
+message ControlParameter {
+  string object = 1;                           // managed object identity
+  string parameter = 2;                        // catalog reference
+}
+message ObjectiveKpi {
+  string kpi = 1;                              // catalog reference
+  repeated string objects = 2;                 // where the KPI is measured
+  enum Direction { DIRECTION_UNSPECIFIED = 0; MAXIMIZE = 1; MINIMIZE = 2; HOLD_BELOW = 3;
+                   HOLD_ABOVE = 4; HOLD_WITHIN = 5; }
+  Direction direction = 3;
+}
+message EnvelopeRequest {
+  common.v1.ActionSpaceView bounds = 1;
+  uint32 max_executions = 2;
+  google.protobuf.Duration period = 3;
+  google.protobuf.Duration validity = 4;
+}
+message RegistrationResult {
+  string registration_id = 1;
+  enum Status { STATUS_UNSPECIFIED = 0; COMPLETE = 1; PENDING = 2; REJECTED = 3; }
+  Status status = 2;                           // pending while incumbents acknowledge (Section 13.8)
+  ScreeningBasis basis = 3;
+  repeated common.v1.Grant granted = 4;        // envelopes and policies granted at registration
+  string reason_code = 5;
+}
+
+message Submission {                           // field numbers as in Section 13.2
+  bytes intent_envelope = 1;                   // the intent's envelope, as formed (Section 7.11)
+  repeated Candidate candidates = 2;           // optional alternatives meeting the same objective
+  bool dry_run = 3;                            // activation gate: verdict without effect
+}
+message Candidate {
+  bytes intent_envelope = 1;
+  uint32 preference = 2;                       // 1 is the most preferred
+}
+message Verdict {                              // field numbers as in Section 13.2
+  enum Kind { KIND_UNSPECIFIED = 0; ALLOW = 1; MODIFY = 2; DEFER = 3; DENY = 4; }
+  Kind kind = 1;                               // unspecified is handled as an unresolved conflict
+  string verdict_id = 2;                       // vrd-…
+  string reason_code = 3;
+  string resolving_authority = 4;
+  bytes modified_intent = 5;                   // for MODIFY: the bounded alternative or candidate
+  google.protobuf.Timestamp retry_at = 6;      // for DEFER
+  string token = 7;                            // for ALLOW and MODIFY (Section 13.6)
+  common.v1.Grant bounded_approval = 8;        // optional: bounds with validity (an action envelope)
+  bool escalated = 9;                          // forwarded to the AI/ML endpoint (Section 13.3)
+  google.protobuf.Duration latency = 10;       // as measured by the mediator
+}
+
+message NotifyRequest {
+  string instance = 1;
+  uint64 generation = 2;
+  uint64 basis_version = 3;                    // the version the runtime holds
+}
+message Notification {
+  oneof event {
+    ScreeningBasis new_basis = 1;              // pushed on invalidation (Section 13.8)
+    ImplicitConflict implicit_conflict = 2;    // attributed after the fact (Section 13.4)
+    GrantWithdrawn grant_withdrawn = 3;
+    GenerationRetired generation_retired = 4;
+  }
+  google.protobuf.Timestamp at = 10;
+}
+message ImplicitConflict {
+  string kpi = 1;
+  repeated string intents = 2;                 // the intents applied to the cluster in the window
+  string attribution = 3;
+  string reason_code = 4;
+}
+message GrantWithdrawn { string grant_id = 1; string reason_code = 2; }
+message GenerationRetired { string instance = 1; uint64 generation = 2; }
+
+message ScreeningRequest { string instance = 1; uint64 generation = 2; }
+message ScreeningBasis {
+  string instance = 1;
+  uint64 version = 2;
+  google.protobuf.Timestamp lease_until = 3;   // used within the lease alone, then requested again
+  repeated ParameterScreen parameters = 4;
+  repeated KpiScreen kpis = 5;
+}
+message ParameterScreen {
+  string object = 1;
+  string parameter = 2;
+  bool exclusive = 3;                          // held by this agent alone
+  repeated string kpis = 4;                    // the KPIs the parameter moves
+  common.v1.ParameterBound free_bounds = 5;    // bounds within which no submission is needed
+}
+message KpiScreen {
+  string kpi = 1;
+  bool objective_of_another = 2;               // another agent registered it as an objective
+}
+message BasisAck { string instance = 1; uint64 generation = 2; uint64 version = 3; }
+
+message HealthRequest {}
+message HealthReply {
+  enum Status { STATUS_UNSPECIFIED = 0; SERVING = 1; DEGRADED = 2; NOT_SERVING = 3; }
+  Status status = 1;
+  string resolver = 2;                         // reference resolver or the adapter (Section 13.5)
+  map<string, google.protobuf.Duration> verdict_p99 = 3;   // per mode, for admission (Section 13.11)
+}
+message RetireRequest { string instance = 1; uint64 generation = 2; string reason_code = 3; }
+message RetireReply { uint32 grants_ended = 1; uint32 occupancies_released = 2; }
+message DeregisterRequest { string instance = 1; }

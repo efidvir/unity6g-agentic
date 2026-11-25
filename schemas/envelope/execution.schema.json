@@ -1,0 +1,151 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "Provisional: the reference definition of the implementation guide (Section 8.8) stands in for [IMPL] Annex A until it arrives; work item D.3 replaces it.",
+  "title": "ExecutionFeedback",
+  "description": "The execution envelope of one transaction, published when it closes: to the originating Decision Engine as evidence for re-decision, and to the outcome stream of the domain. Every field is computed by the platform.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "envelope",
+    "actionType",
+    "targets",
+    "outcome",
+    "reasonCode"
+  ],
+  "properties": {
+    "envelope": {
+      "$ref": "#/$defs/ExecutionEnvelope",
+      "readOnly": true
+    },
+    "actionType": {
+      "$ref": "../common/defs.schema.json#/$defs/CatalogRef",
+      "readOnly": true
+    },
+    "targets": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "../common/defs.schema.json#/$defs/ObjectId"
+      },
+      "readOnly": true
+    },
+    "outcome": {
+      "description": "Which of the results of [FW] the actuation reached, for example acknowledgedVerified.",
+      "$ref": "../common/defs.schema.json#/$defs/CamelName",
+      "readOnly": true
+    },
+    "final": {
+      "description": "Whether the outcome is final; false while it is provisional.",
+      "type": "boolean",
+      "readOnly": true
+    },
+    "applied": {
+      "description": "The configuration applied, where it is known.",
+      "type": "object",
+      "readOnly": true
+    },
+    "verification": {
+      "$ref": "#/$defs/Verification",
+      "readOnly": true
+    },
+    "attempt": {
+      "$ref": "#/$defs/Attempt",
+      "readOnly": true
+    },
+    "reasonCode": {
+      "$ref": "../common/defs.schema.json#/$defs/ReasonCode",
+      "readOnly": true
+    }
+  },
+  "$defs": {
+    "ExecutionEnvelope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "producer",
+        "generation",
+        "correlation",
+        "intent",
+        "times"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "../common/defs.schema.json#/$defs/TransactionId"
+        },
+        "producer": {
+          "$ref": "../common/defs.schema.json#/$defs/InstanceId"
+        },
+        "generation": {
+          "$ref": "../common/defs.schema.json#/$defs/Generation"
+        },
+        "correlation": {
+          "$ref": "../common/defs.schema.json#/$defs/CorrelationId"
+        },
+        "intent": {
+          "$ref": "../common/defs.schema.json#/$defs/IntentId"
+        },
+        "traceparent": {
+          "$ref": "../common/defs.schema.json#/$defs/TraceParent"
+        },
+        "times": {
+          "$ref": "#/$defs/ExecutionTimes"
+        }
+      }
+    },
+    "ExecutionTimes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "outcome"
+      ],
+      "properties": {
+        "submitted": {
+          "description": "Absent when the transaction failed before submission.",
+          "$ref": "../common/defs.schema.json#/$defs/Timestamp"
+        },
+        "outcome": {
+          "$ref": "../common/defs.schema.json#/$defs/Timestamp"
+        }
+      }
+    },
+    "Verification": {
+      "description": "How the outcome was verified, and the read-back evidence the Data Continuum keeps as observations.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method"
+      ],
+      "properties": {
+        "method": {
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "../common/defs.schema.json#/$defs/ObservationId"
+          },
+          "default": []
+        }
+      }
+    },
+    "Attempt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "n",
+        "max"
+      ],
+      "properties": {
+        "n": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "max": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    }
+  }
+}

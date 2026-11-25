@@ -5,3 +5,12 @@ version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 publish.workspace = true
+
+[dependencies]
+prettyplease = "0.3.0"
+prost-build = "0.14"
+protoc-bin-vendored = "3"
+schemars = "0.8.22"
+serde_json = "1.0.154"
+syn = "3.0.10"
+typify = "0.10.1"

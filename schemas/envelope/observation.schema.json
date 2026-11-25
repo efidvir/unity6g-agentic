@@ -1,0 +1,214 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "Provisional: the reference definition of the implementation guide (Section 5.4) stands in for [IMPL] Annex A until it arrives; work item D.3 replaces it.",
+  "title": "Observation",
+  "description": "One measurement with its envelope, as the Monitoring System runtime publishes it on the observation flow. The runtime makes observations from the records of the logic; a window without a value for an object is published as a gap, with the value absent and the gap flag set.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "envelope",
+    "object",
+    "metric",
+    "kind",
+    "unit",
+    "aggregation"
+  ],
+  "properties": {
+    "envelope": {
+      "$ref": "#/$defs/ObservationEnvelope",
+      "readOnly": true
+    },
+    "object": {
+      "$ref": "../common/defs.schema.json#/$defs/ObjectId"
+    },
+    "metric": {
+      "$ref": "../common/defs.schema.json#/$defs/CatalogRef"
+    },
+    "kind": {
+      "description": "The kind of the metric, from its catalog entry: gauge, counter, state or event.",
+      "$ref": "../common/defs.schema.json#/$defs/CamelName"
+    },
+    "unit": {
+      "description": "The unit of the metric, from its catalog entry.",
+      "type": "string",
+      "minLength": 1
+    },
+    "aggregation": {
+      "description": "The aggregation applied over the window.",
+      "$ref": "../common/defs.schema.json#/$defs/CamelName"
+    },
+    "value": {
+      "description": "The measured value; absent for a gap.",
+      "type": [
+        "number",
+        "string",
+        "boolean"
+      ]
+    }
+  },
+  "$defs": {
+    "ObservationEnvelope": {
+      "description": "The envelope of an observation. Every field is computed by the platform.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "producer",
+        "contract",
+        "generation",
+        "times",
+        "scope",
+        "quality",
+        "sources",
+        "pattern"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "../common/defs.schema.json#/$defs/ObservationId"
+        },
+        "producer": {
+          "$ref": "../common/defs.schema.json#/$defs/InstanceId"
+        },
+        "contract": {
+          "description": "The observation contract of the flow, a catalog entry.",
+          "$ref": "../common/defs.schema.json#/$defs/CatalogRef"
+        },
+        "generation": {
+          "$ref": "../common/defs.schema.json#/$defs/Generation"
+        },
+        "times": {
+          "$ref": "#/$defs/ObservationTimes"
+        },
+        "scope": {
+          "$ref": "../common/defs.schema.json#/$defs/Scope"
+        },
+        "quality": {
+          "$ref": "#/$defs/ObservationQuality"
+        },
+        "sources": {
+          "description": "The sources that contributed, in their declared order of precedence.",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "pattern": {
+          "description": "The acquisition pattern of the source: periodicStream, poll, onChange or event.",
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        }
+      }
+    },
+    "ObservationTimes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "event",
+        "windowStart",
+        "windowEnd",
+        "ingest"
+      ],
+      "properties": {
+        "event": {
+          "$ref": "../common/defs.schema.json#/$defs/Timestamp"
+        },
+        "windowStart": {
+          "$ref": "../common/defs.schema.json#/$defs/Timestamp"
+        },
+        "windowEnd": {
+          "$ref": "../common/defs.schema.json#/$defs/Timestamp"
+        },
+        "ingest": {
+          "$ref": "../common/defs.schema.json#/$defs/Timestamp"
+        }
+      }
+    },
+    "ObservationQuality": {
+      "description": "The quality of the window, from the counters of the runtime.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "coverage",
+        "latencyMs",
+        "jitterMs",
+        "flags"
+      ],
+      "properties": {
+        "coverage": {
+          "$ref": "#/$defs/Coverage"
+        },
+        "loss": {
+          "description": "The loss of the window against the expected count; absent where it is not determinable, for on-change and event sources.",
+          "$ref": "../common/defs.schema.json#/$defs/Ratio"
+        },
+        "latencyMs": {
+          "$ref": "#/$defs/DeliveryLatency"
+        },
+        "jitterMs": {
+          "description": "The 99th percentile of the delivery latency minus its median.",
+          "type": "number",
+          "minimum": 0
+        },
+        "flags": {
+          "description": "The markers of the window: stale, gap, late or clockOffset.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "../common/defs.schema.json#/$defs/CamelName"
+          }
+        }
+      }
+    },
+    "Coverage": {
+      "description": "How many objects were in scope, how many were observed in the window, and which ones were not.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "inScope",
+        "observed",
+        "missing"
+      ],
+      "properties": {
+        "inScope": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "observed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "missing": {
+          "type": "array",
+          "items": {
+            "$ref": "../common/defs.schema.json#/$defs/ObjectId"
+          }
+        }
+      }
+    },
+    "DeliveryLatency": {
+      "description": "The delivery latency of the window in milliseconds: ingest time minus event time.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "p50",
+        "p99",
+        "max"
+      ],
+      "properties": {
+        "p50": {
+          "type": "number",
+          "minimum": 0
+        },
+        "p99": {
+          "type": "number",
+          "minimum": 0
+        },
+        "max": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}

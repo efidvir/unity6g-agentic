@@ -1,0 +1,48 @@
+{
+  "envelope": {
+    "id": "int-a90c33f1",
+    "producer": "tx-1/example.link-assurance/i-0042",
+    "generation": 4,
+    "contract": "catalog://transport/contract/link-intent@1.1.0",
+    "formed": "2026-11-21T10:15:20.455Z",
+    "validUntil": "2026-11-21T10:16:20.455Z",
+    "objective": "link-availability",
+    "urgency": 2,
+    "inputQuality": {
+      "minCoverage": 0.67,
+      "degraded": true
+    },
+    "rationale": {
+      "insights": [
+        "ins-51d2a7e0"
+      ],
+      "objectives": [
+        "link-availability"
+      ],
+      "constraints": [
+        "min-capacity"
+      ],
+      "reasonCode": "DEC-SAFE-DEGRADED-EVIDENCE"
+    },
+    "redecision": {
+      "objective": "link-availability",
+      "used": 0,
+      "max": 3,
+      "window": "PT1H"
+    },
+    "verdict": {
+      "kind": "allow",
+      "ref": "vrd-3e7f0b92",
+      "token": "eyJhbGciOiJFZERTQSIsImtpZCI6ImZhYnJpYzovL3R4LTEifQ.eyJpc3MiOiJmYWJyaWM6Ly90eC0xIiwidnJkIjoidnJkLTNlN2YwYjkyIiwiaW50IjoiaW50LWE5MGMzM2YxIiwiY29yIjoiY29yLThkMjFjNWFhIn0.VgUU8uhdOXu3E8oag21mGS4d4Wzhg7bbcYG9RTg0Fb7ksPekxSpP9e2xcWBPCZuYCLbGQPhe49BIxopbnI3Zba"
+    },
+    "correlation": "cor-8d21c5aa",
+    "traceparent": "00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01"
+  },
+  "actionType": "catalog://transport/action/set-modulation-profile@1.1.0",
+  "targets": [
+    "link-0041"
+  ],
+  "parameters": {
+    "profile": "64QAM"
+  }
+}
