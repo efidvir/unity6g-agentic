@@ -1,0 +1,9 @@
+[workspace]
+members = ["u6g-runtime-rt", "u6g-types", "u6g-typegen"]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.85"
+publish = false

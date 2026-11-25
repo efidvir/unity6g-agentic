@@ -1,0 +1,18 @@
+[project]
+name = "u6g-adapters-ran"
+version = "0.1.0"
+description = "The adapters of the RAN domain: E2 xApps, O1 and A1"
+requires-python = ">=3.12"
+dependencies = [
+    "u6g",
+]
+
+[tool.uv.sources]
+u6g = { workspace = true }
+
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["u6g_adapters_ran"]

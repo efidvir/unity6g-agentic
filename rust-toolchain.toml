@@ -1,0 +1,4 @@
+# The Rust toolchain of the real-time core (guide Annex C: Rust 1.85 or later). The release process pins it.
+[toolchain]
+channel = "stable"
+components = ["rustfmt", "clippy"]

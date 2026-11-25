@@ -1,0 +1,18 @@
+[project]
+name = "u6g-admission"
+version = "0.1.0"
+description = "The admission service and pipeline of an AI/ML domain"
+requires-python = ">=3.12"
+dependencies = [
+    "u6g",
+]
+
+[tool.uv.sources]
+u6g = { workspace = true }
+
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["u6g_admission"]
