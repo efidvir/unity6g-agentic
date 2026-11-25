@@ -10,8 +10,8 @@
 | ID | Status (open, in progress, done, blocked) | Evidence or blocker | Updated |
 |----|-------------------------------------------|---------------------|---------|
 | 0.1 | done | make setup and make check pass locally (Checks below) and in the pipeline: runs 45612680111 (push) and 45612688927 (pull request #1), both success | 2026-11-25 |
-| 0.2 | in progress | the tuple's contracts are done and checked, provisional until [IMPL] 3.2 (pull request #2): make check passes locally (Checks below) and in the pipeline: runs 45619019112 (push) and 45619091662 (pull request #2), both success; the rest of Table 26-1 comes with the items that use it | 2026-11-25 |
-| 0.3 | done | make check passes locally (Checks below); 26 tests, 8 of them property tests over generated condition trees: structure, declared operands, depth limit, results; the pipeline of pull request #3 | 2026-11-25 |
+| 0.2 | in progress | the tuple's contracts are done and checked, provisional until [IMPL] 3.2 (pull request #2): make check passes locally (Checks below) and in the pipeline: runs 45619948464 (push) and 45619959912 (pull request #2), both success; the rest of Table 26-1 comes with the items that use it | 2026-11-25 |
+| 0.3 | done | make check passes locally (Checks below) and in the pipeline: runs 45620156774 (push) and 45620208026 (pull request #3), both success; 26 tests, 8 of them property tests over generated condition trees: structure, declared operands, depth limit, results | 2026-11-25 |
 | 0.7 | open | the transport northbound subset first | 2026-11-25 |
 | 0.4 | open | the transport entries first | 2026-11-25 |
 | 1.1 | open | | 2026-11-25 |
@@ -48,6 +48,9 @@
   (commit "Contracts: arrays and maps of the semantic objects are required") -> make check exit 0
 - 2026-11-25, branch item-0.3-cond: make check -> exit 0; pytest 135 passed (26 new for u6g.cond, 8 property
   tests with Hypothesis, 200 to 300 examples each); mypy strict, no issues in 45 source files
+- AGENTS.md asks a property test for every guarantee of [FW] touched: on item-0.2-contracts, a test removes
+  each required member of the six examples, 314 cases, and the schemas and the models refuse every one
+  ([FW] 3.3.2 and 3.3.4); item-0.3-cond rebased on it -> make check exit 0, pytest 449 passed
 
 ## Documents delivered
 - UNITY6G_Agentic_Implementation_Guide_v1.2.docx, version 1.2, 2026-11-25: the real, emulated and simulated
