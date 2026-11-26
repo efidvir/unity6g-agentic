@@ -1,0 +1,14 @@
+kind: VerificationMethod
+id: platform/verification/controller-query
+version: 1.0.0
+owner: framework
+description: A query of the controller's state, valid only for bindings whose state reflects the device
+deprecated: false
+method: controllerQuery
+readBack: controllerQuery
+typicalLatency: PT2S
+provenance:
+- source: guide
+  ref: Implementation guide v1.2, Section 11.4 and Chapter 8
+- source: framework
+  ref: '[FW] Section 3.6, the kinds of catalog entry'

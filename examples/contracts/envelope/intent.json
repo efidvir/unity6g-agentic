@@ -46,7 +46,7 @@
     "link-0041"
   ],
   "parameters": {
-    "profile": "64QAM"
+    "profile": "qam-64"
   },
   "candidates": []
 }

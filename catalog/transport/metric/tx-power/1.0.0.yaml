@@ -1,0 +1,36 @@
+kind: Metric
+id: transport/metric/tx-power
+version: 1.0.0
+owner: transport-domain
+description: Transmitted signal level
+deprecated: false
+objectClass: mw-link
+definition: The level of the signal the near-end carrier transmits, in dBm, as CeraOS reports it (tsl-dbm). TeraFlowSDN
+  carries it as the KPI RADIO_TX_LEVEL_DBM.
+value:
+  type: number
+  unit: dBm
+type: gauge
+aggregation: last
+sources:
+- transport/source/sdn-telemetry@1.0.0
+teraflowsdn:
+  kpiSampleType: KPISAMPLETYPE_RADIO_TX_LEVEL_DBM
+  scope: endpoint
+  scale: 1
+standard: RFC 8561 actual-transmitted-level
+hardware:
+  status: provisional
+  verifiedOn: []
+  provisionalOn:
+  - IP-20
+  - IP-50
+  - IP-100
+provenance:
+- source: teraflowsdn
+  ref: 'efidvir/teraflowsdn@ddd4aaf: proto/kpi_sample_types.proto KPISAMPLETYPE_RADIO_TX_LEVEL_DBM; src/device/service/drivers/ceragon/Tools.py
+    radio_figure and FAMILY_RADIO_FIGURES'
+- source: ietf
+  ref: RFC 8561, module ietf-microwave-radio-link, leaf actual-transmitted-level
+- source: guide
+  ref: Implementation guide v1.2, Section 17.1 and Table 17-1

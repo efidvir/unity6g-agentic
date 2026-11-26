@@ -17,7 +17,7 @@
   ],
   "outcome": "acknowledgedVerified",
   "applied": {
-    "profile": "64QAM"
+    "profile": "qam-64"
   },
   "verification": {
     "method": "msObservation",

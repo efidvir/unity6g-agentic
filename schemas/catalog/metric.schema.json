@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "Provisional: the reference definition of the implementation guide (Section 11.4), from the kinds and attributes of [FW] Section 3.6, stands in for [IMPL] Annex B until it arrives; work item D.3 replaces it.",
+  "title": "MetricEntry",
+  "description": "A metric: its unit and value, the class of managed object it describes, its definition and the kinds of source that supply it.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "kind",
+    "id",
+    "version",
+    "owner",
+    "description",
+    "deprecated",
+    "objectClass",
+    "definition",
+    "value",
+    "type",
+    "aggregation",
+    "sources",
+    "provenance"
+  ],
+  "properties": {
+    "kind": {
+      "type": "string",
+      "const": "Metric"
+    },
+    "id": {
+      "$ref": "common.schema.json#/$defs/CatalogId"
+    },
+    "version": {
+      "$ref": "../common/defs.schema.json#/$defs/SemVer"
+    },
+    "owner": {
+      "description": "The owner of the entry: the domain owner, framework or kpi-definitions.",
+      "$ref": "../common/defs.schema.json#/$defs/Name"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "deprecated": {
+      "description": "A deprecated entry stays resolvable; admission warns new descriptors.",
+      "type": "boolean"
+    },
+    "objectClass": {
+      "$ref": "../common/defs.schema.json#/$defs/Name"
+    },
+    "definition": {
+      "type": "string",
+      "minLength": 1
+    },
+    "value": {
+      "$ref": "common.schema.json#/$defs/CatalogValue"
+    },
+    "type": {
+      "description": "How the metric behaves over time.",
+      "type": "string",
+      "enum": [
+        "gauge",
+        "counter",
+        "state",
+        "event"
+      ]
+    },
+    "aggregation": {
+      "description": "The aggregation over a window: mean, max, min, last or sum.",
+      "$ref": "../common/defs.schema.json#/$defs/CamelName"
+    },
+    "sources": {
+      "description": "The source kinds that supply the metric.",
+      "type": "array",
+      "items": {
+        "$ref": "../common/defs.schema.json#/$defs/KindPathRef"
+      },
+      "minItems": 1
+    },
+    "provenance": {
+      "description": "Where the entry's content comes from.",
+      "type": "array",
+      "items": {
+        "$ref": "common.schema.json#/$defs/Provenance"
+      },
+      "minItems": 1
+    },
+    "teraflowsdn": {
+      "$ref": "common.schema.json#/$defs/TfsKpi"
+    },
+    "standard": {
+      "description": "The standard's name for the quantity, as RFC 8561 actual-received-level.",
+      "type": "string",
+      "minLength": 1
+    },
+    "hardware": {
+      "$ref": "common.schema.json#/$defs/DeviceVerification"
+    }
+  }
+}

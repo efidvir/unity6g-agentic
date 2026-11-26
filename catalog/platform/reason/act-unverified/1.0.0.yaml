@@ -1,0 +1,15 @@
+kind: ReasonCode
+id: platform/reason/act-unverified
+version: 1.0.0
+owner: framework
+description: The controller acknowledged the command, and the read-back does not show its effect
+deprecated: false
+code: ACT-UNVERIFIED
+category: actuation
+meaning: The controller acknowledged the command, and the read-back does not show its effect
+raisedBy: The transaction engine of the Actuator runtime
+provenance:
+- source: guide
+  ref: Implementation guide v1.2, Annex F.10
+- source: framework
+  ref: '[FW] Section 3.6, the kinds of catalog entry'

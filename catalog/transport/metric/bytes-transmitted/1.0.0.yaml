@@ -1,0 +1,34 @@
+kind: Metric
+id: transport/metric/bytes-transmitted
+version: 1.0.0
+owner: transport-domain
+description: Octets transmitted on an Ethernet port
+deprecated: false
+objectClass: eth-port
+definition: The count of octets transmitted on a traffic port of the radio since the device's counter started, as
+  the device reports it. TeraFlowSDN carries it as the KPI BYTES_TRANSMITTED of the Ethernet endpoint.
+value:
+  type: integer
+  unit: byte
+  min: 0
+type: counter
+aggregation: last
+sources:
+- transport/source/sdn-telemetry@1.0.0
+teraflowsdn:
+  kpiSampleType: KPISAMPLETYPE_BYTES_TRANSMITTED
+  scope: endpoint
+  scale: 1
+hardware:
+  status: provisional
+  verifiedOn: []
+  provisionalOn:
+  - MultiHaul TG
+  - EtherHaul
+  - IP-20
+  - IP-50
+  - IP-100
+provenance:
+- source: teraflowsdn
+  ref: 'efidvir/teraflowsdn@ddd4aaf: proto/kpi_sample_types.proto KPISAMPLETYPE_BYTES_TRANSMITTED; src/device/service/drivers/ceragon/Tools.py
+    endpoint_counter'

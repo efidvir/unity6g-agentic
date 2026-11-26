@@ -1,0 +1,23 @@
+kind: ControllerBinding
+id: transport/binding/intent-engine
+version: 1.0.0
+owner: transport-domain
+description: The transport intent engine as a platform service, which checks candidates in the twin before applying
+  them
+deprecated: false
+controller: transport-intent-engine
+interface: intent-tool
+versions: '>=1.0 <2.0'
+actionTypes:
+- transport/action/move-service-path@1.0.0
+- transport/action/resize-slice@1.0.0
+operations:
+- intent.apply
+adapter: u6g_adapters_southbound.intent:IntentEngineAdapter
+stateReflectsDevice: false
+rollbackRoute: dryRun
+provenance:
+- source: guide
+  ref: Implementation guide v1.2, Section 17.1 and Table 17-1
+- source: framework
+  ref: '[FW] Section 3.6, the kinds of catalog entry'

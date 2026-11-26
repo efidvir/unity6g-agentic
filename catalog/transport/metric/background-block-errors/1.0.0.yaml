@@ -1,0 +1,39 @@
+kind: Metric
+id: transport/metric/background-block-errors
+version: 1.0.0
+owner: transport-domain
+description: Background block errors
+deprecated: false
+objectClass: mw-link
+definition: The background block errors of the near-end carrier in the last completed 15-minute performance monitoring
+  interval, as ITU-T G.826 defines them, from the carrier's PM bins on CeraOS (get-pm-bins, background-block-errors).
+  TeraFlowSDN carries them as the KPI RADIO_BACKGROUND_BLOCK_ERRORS, one sample per interval, stamped with the interval's
+  end.
+value:
+  type: integer
+  unit: count
+  min: 0
+type: gauge
+aggregation: sum
+sources:
+- transport/source/sdn-telemetry@1.0.0
+teraflowsdn:
+  kpiSampleType: KPISAMPLETYPE_RADIO_BACKGROUND_BLOCK_ERRORS
+  scope: endpoint
+  scale: 1
+standard: ITU-T G.826 background block errors
+hardware:
+  status: provisional
+  verifiedOn: []
+  provisionalOn:
+  - IP-20
+  - IP-50
+  - IP-100
+provenance:
+- source: teraflowsdn
+  ref: 'efidvir/teraflowsdn@ddd4aaf: proto/kpi_sample_types.proto KPISAMPLETYPE_RADIO_BACKGROUND_BLOCK_ERRORS; src/device/service/drivers/ceragon/Tools.py
+    radio_figure and FAMILY_RADIO_FIGURES'
+- source: device-api
+  ref: ceragon-pm-telemetry:get-pm-bins/bins/background-block-errors, as the Ceragon driver writes or reads it (efidvir/teraflowsdn@ddd4aaf)
+- source: itu-t
+  ref: ITU-T G.826, error performance events and parameters, and Annex A on unavailable time

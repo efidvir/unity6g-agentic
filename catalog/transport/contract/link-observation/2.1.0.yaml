@@ -1,0 +1,22 @@
+kind: ServiceContract
+id: transport/contract/link-observation
+version: 2.1.0
+owner: transport-domain
+description: The observation flow of a radio-link agent
+deprecated: false
+contribution: flow
+provider: The Monitoring System of a transport agent
+interface: The observation envelope of [IMPL]
+flow: observation
+carries:
+- transport/metric/rsl@1.2.0
+- transport/metric/mse@1.0.0
+- transport/metric/modulation@1.0.0
+- transport/metric/capacity@1.1.0
+- transport/metric/errored-seconds@1.0.0
+- transport/metric/link-state@1.0.0
+provenance:
+- source: guide
+  ref: Implementation guide v1.2, Annex B and Annex F
+- source: framework
+  ref: '[FW] Section 3.6, the kinds of catalog entry'

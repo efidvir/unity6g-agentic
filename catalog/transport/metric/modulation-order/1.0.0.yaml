@@ -1,0 +1,38 @@
+kind: Metric
+id: transport/metric/modulation-order
+version: 1.0.0
+owner: transport-domain
+description: Constellation size in use
+deprecated: false
+objectClass: mw-link
+definition: 'The number of points of the constellation the near end transmits with: 4 for QPSK, 256 for 256-QAM.
+  It comes from the current modulation on CeraOS and EtherHaul, and from the active link''s transmit MCS on MultiHaul
+  TG through the IEEE 802.11ad single-carrier MCS set. TeraFlowSDN carries it as the KPI RADIO_TX_MODULATION_ORDER.'
+value:
+  type: integer
+  min: 2
+type: gauge
+aggregation: last
+sources:
+- transport/source/sdn-telemetry@1.0.0
+teraflowsdn:
+  kpiSampleType: KPISAMPLETYPE_RADIO_TX_MODULATION_ORDER
+  scope: endpoint
+  scale: 1
+hardware:
+  status: provisional
+  verifiedOn: []
+  provisionalOn:
+  - MultiHaul TG
+  - EtherHaul
+  - IP-20
+  - IP-50
+  - IP-100
+provenance:
+- source: teraflowsdn
+  ref: 'efidvir/teraflowsdn@ddd4aaf: proto/kpi_sample_types.proto KPISAMPLETYPE_RADIO_TX_MODULATION_ORDER; src/device/service/drivers/ceragon/Tools.py
+    radio_figure and FAMILY_RADIO_FIGURES'
+- source: teraflowsdn
+  ref: 'efidvir/teraflowsdn@ddd4aaf: src/device/service/drivers/ceragon/Tools.py modulation_order and mcs_modulation_order'
+- source: ieee
+  ref: IEEE 802.11ad, DMG single-carrier modulation and coding schemes

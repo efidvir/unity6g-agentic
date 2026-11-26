@@ -1,0 +1,15 @@
+kind: ObjectiveKpi
+id: kpi/link-capacity-ratio
+version: 1.0.0
+owner: kpi-definitions
+description: Capacity of a radio link against its plan
+deprecated: false
+definition: The capacity the link carried over the window, as a fraction of the capacity planned for it.
+unit: ratio
+methodology: The mean of the capacity metric over the window, divided by the planned capacity.
+unity6gKpi: Capacity
+provenance:
+- source: guide
+  ref: Implementation guide v1.2, Annex B (the descriptor's objectives)
+- source: framework
+  ref: '[FW] Section 3.6, the kinds of catalog entry'

@@ -1,0 +1,14 @@
+kind: VerificationMethod
+id: platform/verification/ms-observation
+version: 1.0.0
+owner: framework
+description: Observation, through the Monitoring System, of quantities the devices report about themselves
+deprecated: false
+method: msObservation
+readBack: monitoringSystem
+typicalLatency: PT10S
+provenance:
+- source: guide
+  ref: Implementation guide v1.2, Section 11.4 and Chapter 8
+- source: framework
+  ref: '[FW] Section 3.6, the kinds of catalog entry'

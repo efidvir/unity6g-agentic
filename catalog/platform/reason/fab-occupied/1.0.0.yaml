@@ -1,0 +1,15 @@
+kind: ReasonCode
+id: platform/reason/fab-occupied
+version: 1.0.0
+owner: framework
+description: The target is held by another agent's exclusive registration
+deprecated: false
+code: FAB-OCCUPIED
+category: mediation
+meaning: The target is held by another agent's exclusive registration
+raisedBy: The mediator of the conflict fabric
+provenance:
+- source: guide
+  ref: Implementation guide v1.2, Annex F.10
+- source: framework
+  ref: '[FW] Section 3.6, the kinds of catalog entry'

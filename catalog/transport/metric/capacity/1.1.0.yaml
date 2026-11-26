@@ -1,0 +1,38 @@
+kind: Metric
+id: transport/metric/capacity
+version: 1.1.0
+owner: transport-domain
+description: Air capacity of the radio link
+deprecated: false
+objectClass: mw-link
+definition: 'The rate the radio link carries, in Mbps: the transmit rate of the active link where the radio reports
+  one (speed-tx on MultiHaul TG, current-capacity-mbps on CeraOS). Where the device reports no active link, as on
+  EtherHaul, the driver reports the product''s nominal maximum capacity from its portfolio. TeraFlowSDN carries
+  it as the KPI LINK_TOTAL_CAPACITY_GBPS of the radio endpoint, in Gbps, scaled here by 1000.'
+value:
+  type: number
+  unit: Mbps
+  min: 0
+type: gauge
+aggregation: mean
+sources:
+- transport/source/sdn-telemetry@1.0.0
+teraflowsdn:
+  kpiSampleType: KPISAMPLETYPE_LINK_TOTAL_CAPACITY_GBPS
+  scope: endpoint
+  scale: 1000
+hardware:
+  status: provisional
+  verifiedOn: []
+  provisionalOn:
+  - MultiHaul TG
+  - EtherHaul
+  - IP-20
+  - IP-50
+  - IP-100
+provenance:
+- source: teraflowsdn
+  ref: 'efidvir/teraflowsdn@ddd4aaf: proto/kpi_sample_types.proto KPISAMPLETYPE_LINK_TOTAL_CAPACITY_GBPS; src/device/service/drivers/ceragon/Tools.py
+    sector_capacity_gbps'
+- source: guide
+  ref: Implementation guide v1.2, Section 17.1 and Table 17-1

@@ -11,3 +11,6 @@ build/
 runtime/rust/target/
 .env
 *.local.yaml
+
+# Signing keys of development machines stay local
+*.key

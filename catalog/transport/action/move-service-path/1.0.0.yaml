@@ -1,0 +1,44 @@
+kind: ActionType
+id: transport/action/move-service-path
+version: 1.0.0
+owner: transport-domain
+description: Move a service to an alternate path
+deprecated: false
+targets:
+  objectClass: l2vpn-service
+  parameters:
+  - transport/param/service-path@1.0.0
+parameters:
+  type: object
+  additionalProperties: false
+  required:
+  - path
+  properties:
+    path:
+      type: string
+      minLength: 1
+idempotent: true
+verification:
+- method: msObservation
+  predicate:
+    metric: transport/metric/service-path@1.0.0
+    eq:
+      param: path
+  typicalLatency: PT10S
+- method: controllerQuery
+  validWhen:
+    bindingProperty: stateReflectsDevice
+rollback:
+  method: restore-previous-path
+controllerBindings:
+- binding: transport/binding/tfs-nbi@2.0.0
+  operations:
+  - service.update
+- binding: transport/binding/intent-engine@1.0.0
+  operations:
+  - intent.apply
+provenance:
+- source: guide
+  ref: Implementation guide v1.2, Section 11.4 and Table 17-1
+- source: framework
+  ref: '[FW] Section 3.6, the kinds of catalog entry'

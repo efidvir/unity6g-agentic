@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "Provisional: the reference definition of the implementation guide (Section 11.4), from the kinds and attributes of [FW] Section 3.6, stands in for [IMPL] Annex B until it arrives; work item D.3 replaces it.",
+  "title": "ControlParameterEntry",
+  "description": "A control parameter: its class of managed object, its value, the controller bindings that set it and how it is read back.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "kind",
+    "id",
+    "version",
+    "owner",
+    "description",
+    "deprecated",
+    "objectClass",
+    "value",
+    "setBy",
+    "readBack",
+    "provenance"
+  ],
+  "properties": {
+    "kind": {
+      "type": "string",
+      "const": "ControlParameter"
+    },
+    "id": {
+      "$ref": "common.schema.json#/$defs/CatalogId"
+    },
+    "version": {
+      "$ref": "../common/defs.schema.json#/$defs/SemVer"
+    },
+    "owner": {
+      "description": "The owner of the entry: the domain owner, framework or kpi-definitions.",
+      "$ref": "../common/defs.schema.json#/$defs/Name"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "deprecated": {
+      "description": "A deprecated entry stays resolvable; admission warns new descriptors.",
+      "type": "boolean"
+    },
+    "objectClass": {
+      "$ref": "../common/defs.schema.json#/$defs/Name"
+    },
+    "value": {
+      "$ref": "common.schema.json#/$defs/CatalogValue"
+    },
+    "setBy": {
+      "description": "The controller bindings that set the parameter.",
+      "type": "array",
+      "items": {
+        "$ref": "../common/defs.schema.json#/$defs/KindPathRef"
+      },
+      "minItems": 1
+    },
+    "readBack": {
+      "$ref": "#/$defs/ParameterReadBack"
+    },
+    "provenance": {
+      "description": "Where the entry's content comes from.",
+      "type": "array",
+      "items": {
+        "$ref": "common.schema.json#/$defs/Provenance"
+      },
+      "minItems": 1
+    },
+    "teraflowsdn": {
+      "$ref": "common.schema.json#/$defs/TfsConfigRule"
+    },
+    "families": {
+      "description": "What the parameter acts on in each product family the driver supports.",
+      "type": "array",
+      "items": {
+        "$ref": "common.schema.json#/$defs/FamilyRealization"
+      },
+      "minItems": 1
+    },
+    "hardware": {
+      "$ref": "common.schema.json#/$defs/DeviceVerification"
+    }
+  },
+  "$defs": {
+    "ParameterReadBack": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method"
+      ],
+      "properties": {
+        "method": {
+          "description": "The verification method that reads the parameter back: msObservation or controllerQuery.",
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        },
+        "metric": {
+          "description": "The metric that reports the parameter, for msObservation.",
+          "$ref": "../common/defs.schema.json#/$defs/KindPathRef"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,180 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "Provisional: the reference definition of the implementation guide (Section 11.4), from the kinds and attributes of [FW] Section 3.6, stands in for [IMPL] Annex B until it arrives; work item D.3 replaces it.",
+  "title": "ActionTypeEntry",
+  "description": "An action type: its target class and the parameters it changes, the schema of its parameters, its idempotency, its verification methods, its rollback and its operations on each controller binding.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "kind",
+    "id",
+    "version",
+    "owner",
+    "description",
+    "deprecated",
+    "targets",
+    "parameters",
+    "idempotent",
+    "verification",
+    "rollback",
+    "controllerBindings",
+    "provenance"
+  ],
+  "properties": {
+    "kind": {
+      "type": "string",
+      "const": "ActionType"
+    },
+    "id": {
+      "$ref": "common.schema.json#/$defs/CatalogId"
+    },
+    "version": {
+      "$ref": "../common/defs.schema.json#/$defs/SemVer"
+    },
+    "owner": {
+      "description": "The owner of the entry: the domain owner, framework or kpi-definitions.",
+      "$ref": "../common/defs.schema.json#/$defs/Name"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "deprecated": {
+      "description": "A deprecated entry stays resolvable; admission warns new descriptors.",
+      "type": "boolean"
+    },
+    "targets": {
+      "$ref": "#/$defs/ActionTargets"
+    },
+    "parameters": {
+      "description": "The JSON Schema of the parameters of an intent of this type.",
+      "type": "object"
+    },
+    "idempotent": {
+      "type": "boolean"
+    },
+    "verification": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ActionVerification"
+      },
+      "minItems": 1
+    },
+    "rollback": {
+      "$ref": "#/$defs/ActionRollback"
+    },
+    "controllerBindings": {
+      "description": "The bindings that support the action, with the only operations Translate may emit on each.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ActionBinding"
+      },
+      "minItems": 1
+    },
+    "provenance": {
+      "description": "Where the entry's content comes from.",
+      "type": "array",
+      "items": {
+        "$ref": "common.schema.json#/$defs/Provenance"
+      },
+      "minItems": 1
+    },
+    "teraflowsdn": {
+      "$ref": "common.schema.json#/$defs/TfsOperation"
+    },
+    "hardware": {
+      "$ref": "common.schema.json#/$defs/DeviceVerification"
+    }
+  },
+  "$defs": {
+    "ActionTargets": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "objectClass",
+        "parameters"
+      ],
+      "properties": {
+        "objectClass": {
+          "$ref": "../common/defs.schema.json#/$defs/Name"
+        },
+        "parameters": {
+          "description": "The control parameters the action changes.",
+          "type": "array",
+          "items": {
+            "$ref": "../common/defs.schema.json#/$defs/KindPathRef"
+          },
+          "minItems": 1
+        }
+      }
+    },
+    "ActionVerification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method"
+      ],
+      "properties": {
+        "method": {
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        },
+        "predicate": {
+          "description": "What the read-back must show, in the condition structure; operands may name the action's parameters.",
+          "$ref": "../common/defs.schema.json#/$defs/Condition"
+        },
+        "typicalLatency": {
+          "$ref": "../common/defs.schema.json#/$defs/Duration"
+        },
+        "validWhen": {
+          "$ref": "#/$defs/ActionValidity"
+        }
+      }
+    },
+    "ActionValidity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "bindingProperty"
+      ],
+      "properties": {
+        "bindingProperty": {
+          "description": "A property the binding's entry must state, for example stateReflectsDevice.",
+          "$ref": "../common/defs.schema.json#/$defs/CamelName"
+        }
+      }
+    },
+    "ActionRollback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method"
+      ],
+      "properties": {
+        "method": {
+          "$ref": "../common/defs.schema.json#/$defs/Name"
+        }
+      }
+    },
+    "ActionBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "binding",
+        "operations"
+      ],
+      "properties": {
+        "binding": {
+          "$ref": "../common/defs.schema.json#/$defs/KindPathRef"
+        },
+        "operations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        }
+      }
+    }
+  }
+}

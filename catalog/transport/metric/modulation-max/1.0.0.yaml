@@ -1,0 +1,46 @@
+kind: Metric
+id: transport/metric/modulation-max
+version: 1.0.0
+owner: transport-domain
+description: The highest modulation adaptive modulation may select
+deprecated: false
+objectClass: mw-link
+definition: 'The highest coding and modulation the radio''s adaptive modulation may select, as an identity of ietf-microwave-types,
+  read back from the device. The driver''s views do not carry it yet: reading it back needs the device''s own configuration
+  (mrmc-max-profile on CeraOS, max-modulation on EtherHaul).'
+value:
+  type: string
+  values:
+  - bpsk
+  - qpsk
+  - qam-16
+  - qam-32
+  - qam-64
+  - qam-128
+  - qam-256
+  - qam-512
+  - qam-1024
+  - qam-2048
+  - qam-4096
+type: state
+aggregation: last
+sources:
+- transport/source/sdn-device-state@1.0.0
+standard: RFC 8561 selected-max-acm
+hardware:
+  status: provisional
+  verifiedOn: []
+  provisionalOn:
+  - EtherHaul
+  - IP-20
+  - IP-50
+  - IP-100
+provenance:
+- source: ietf
+  ref: RFC 8561, module ietf-microwave-radio-link, leaf selected-max-acm
+- source: device-api
+  ref: ceragon-radio-link:radio-link-cfg/mrmc-max-profile, as the Ceragon driver writes or reads it (efidvir/teraflowsdn@ddd4aaf)
+- source: device-api
+  ref: radio-bridge-eh-radio:eh-radio/max-modulation, as the Ceragon driver writes or reads it (efidvir/teraflowsdn@ddd4aaf)
+- source: guide
+  ref: Implementation guide v1.2, Section 17.1 and Table 17-1

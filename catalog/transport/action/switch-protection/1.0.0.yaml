@@ -1,0 +1,43 @@
+kind: ActionType
+id: transport/action/switch-protection
+version: 1.0.0
+owner: transport-domain
+description: Switch a protected radio link to its working or protecting side
+deprecated: false
+targets:
+  objectClass: mw-link
+  parameters:
+  - transport/param/protection-state@1.0.0
+parameters:
+  type: object
+  additionalProperties: false
+  required:
+  - state
+  properties:
+    state:
+      type: string
+      enum:
+      - working
+      - protecting
+idempotent: true
+verification:
+- method: msObservation
+  predicate:
+    metric: transport/metric/protection-state@1.0.0
+    eq:
+      param: state
+  typicalLatency: PT10S
+- method: controllerQuery
+  validWhen:
+    bindingProperty: stateReflectsDevice
+rollback:
+  method: restore-previous-protection
+controllerBindings:
+- binding: transport/binding/tfs-nbi@2.0.0
+  operations:
+  - device.config.set
+provenance:
+- source: guide
+  ref: Implementation guide v1.2, Section 11.4 and Table 17-1
+- source: framework
+  ref: '[FW] Section 3.6, the kinds of catalog entry'

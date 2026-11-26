@@ -1,0 +1,21 @@
+kind: Metric
+id: transport/metric/delay-variation
+version: 1.0.0
+owner: transport-domain
+description: Delay variation
+deprecated: false
+objectClass: path
+definition: The variation of the one-way delay of a path over the window, measured by TWAMP Light probes.
+value:
+  type: number
+  unit: ms
+  min: 0
+type: gauge
+aggregation: mean
+sources:
+- transport/source/twamp-light@1.0.0
+provenance:
+- source: guide
+  ref: Implementation guide v1.2, Section 17.1 and Table 17-1
+- source: framework
+  ref: '[FW] Section 3.6, the kinds of catalog entry'

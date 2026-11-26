@@ -1,0 +1,16 @@
+kind: SourceKind
+id: transport/source/snmp
+version: 1.0.0
+owner: transport-domain
+description: Counters read over SNMP
+deprecated: false
+protocol: SNMPv3 get
+readOnly: true
+patterns:
+- poll
+adapter: u6g_adapters_sources.snmp:SnmpSource
+provenance:
+- source: guide
+  ref: Implementation guide v1.2, Section 17.1 and Table 17-1
+- source: framework
+  ref: '[FW] Section 3.6, the kinds of catalog entry'

@@ -1,0 +1,24 @@
+kind: Metric
+id: transport/metric/utilization
+version: 1.0.0
+owner: transport-domain
+description: Utilization
+deprecated: false
+objectClass: eth-port
+definition: The fraction of the port's rate in use over the window.
+value:
+  type: number
+  unit: ratio
+  min: 0
+  max: 1
+type: gauge
+aggregation: mean
+sources:
+- transport/source/sdn-telemetry@1.0.0
+- transport/source/gnmi-stream@1.0.0
+- transport/source/snmp@1.0.0
+provenance:
+- source: guide
+  ref: Implementation guide v1.2, Section 17.1 and Table 17-1
+- source: framework
+  ref: '[FW] Section 3.6, the kinds of catalog entry'

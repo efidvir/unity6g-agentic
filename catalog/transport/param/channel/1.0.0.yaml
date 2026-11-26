@@ -1,0 +1,21 @@
+kind: ControlParameter
+id: transport/param/channel
+version: 1.0.0
+owner: transport-domain
+description: The channel of a radio link within its band plan
+deprecated: false
+objectClass: mw-link
+value:
+  type: integer
+  unit: count
+  min: 1
+setBy:
+- transport/binding/tfs-nbi@2.0.0
+readBack:
+  method: msObservation
+  metric: transport/metric/channel@1.0.0
+provenance:
+- source: guide
+  ref: Implementation guide v1.2, Section 17.1 and Table 17-1
+- source: framework
+  ref: '[FW] Section 3.6, the kinds of catalog entry'

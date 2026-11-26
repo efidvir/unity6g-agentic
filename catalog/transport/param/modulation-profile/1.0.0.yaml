@@ -1,0 +1,71 @@
+kind: ControlParameter
+id: transport/param/modulation-profile
+version: 1.0.0
+owner: transport-domain
+description: The modulation of a radio link with fixed modulation
+deprecated: false
+objectClass: mw-link
+value:
+  type: string
+  values:
+  - bpsk
+  - qpsk
+  - qam-16
+  - qam-32
+  - qam-64
+  - qam-128
+  - qam-256
+  - qam-512
+  - qam-1024
+  - qam-2048
+  - qam-4096
+setBy:
+- transport/binding/tfs-nbi@2.0.0
+readBack:
+  method: msObservation
+  metric: transport/metric/modulation@1.0.0
+teraflowsdn:
+  deviceDriver: DEVICEDRIVER_CERAGON
+  resourceKey: /interface[name=<if>]/acm
+  field: min_modulation and max_modulation, both the profile, with adaptive_enabled false
+families:
+- apiFlavor: ceraos
+  deviceNode: ceragon-radio-link:radio-link-cfg/mrmc-max-profile
+  behaviour: With adaptive_enabled false the driver sets mrmc-mode fixed; the profile is written as the minimum
+    and the maximum.
+  values:
+  - bpsk
+  - qpsk
+  - qam-8
+  - qam-16
+  - qam-32
+  - qam-64
+  - qam-128
+  - qam-256
+  - qam-512
+  - qam-1024
+  - qam-2048
+  - qam-4096
+- apiFlavor: siklu_eh
+  deviceNode: radio-bridge-eh-radio:eh-radio/max-modulation
+  behaviour: With adaptive_enabled false the driver sets acm-enabled false; the profile is written as the minimum
+    and the maximum.
+- apiFlavor: siklu_tg
+  deviceNode: none
+  behaviour: The driver has no fixed modulation for MultiHaul TG.
+hardware:
+  status: provisional
+  verifiedOn: []
+  provisionalOn:
+  - EtherHaul
+  - IP-20
+  - IP-50
+  - IP-100
+provenance:
+- source: teraflowsdn
+  ref: 'efidvir/teraflowsdn@ddd4aaf: src/device/service/drivers/ceragon/routing.py apply_rule (acm) and client.py
+    apply_acm_config'
+- source: ietf
+  ref: RFC 8561, module ietf-microwave-radio-link, leaf selected-cm
+- source: guide
+  ref: Implementation guide v1.2, Section 17.1 and Table 17-1

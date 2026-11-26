@@ -1,0 +1,22 @@
+kind: ControlParameter
+id: transport/param/slice-capacity
+version: 1.0.0
+owner: transport-domain
+description: The capacity allotted to a slice
+deprecated: false
+objectClass: network-slice
+value:
+  type: number
+  unit: Mbps
+  min: 0
+setBy:
+- transport/binding/tfs-nbi@2.0.0
+- transport/binding/intent-engine@1.0.0
+readBack:
+  method: msObservation
+  metric: transport/metric/slice-capacity@1.0.0
+provenance:
+- source: guide
+  ref: Implementation guide v1.2, Section 17.1 and Table 17-1
+- source: framework
+  ref: '[FW] Section 3.6, the kinds of catalog entry'

@@ -1,0 +1,46 @@
+kind: Metric
+id: transport/metric/modulation
+version: 1.0.0
+owner: transport-domain
+description: Coding and modulation in use
+deprecated: false
+objectClass: mw-link
+definition: 'The coding and modulation the near end transmits with, as an identity of ietf-microwave-types: the
+  radio''s current modulation on CeraOS and EtherHaul, and the modulation of the active link''s transmit MCS on
+  MultiHaul TG (IEEE 802.11ad single-carrier set). Read from the driver''s RFC 8561 view, /microwave-radio-link,
+  which holds it at radio-performance/selected-cm; RFC 8561 names the leaf actual-tx-cm.'
+value:
+  type: string
+  values:
+  - bpsk
+  - qpsk
+  - qam-16
+  - qam-32
+  - qam-64
+  - qam-128
+  - qam-256
+  - qam-512
+  - qam-1024
+  - qam-2048
+  - qam-4096
+type: state
+aggregation: last
+sources:
+- transport/source/sdn-device-state@1.0.0
+standard: RFC 8561 actual-tx-cm
+hardware:
+  status: provisional
+  verifiedOn: []
+  provisionalOn:
+  - MultiHaul TG
+  - EtherHaul
+  - IP-20
+  - IP-50
+  - IP-100
+provenance:
+- source: ietf
+  ref: RFC 8561, module ietf-microwave-radio-link, leaf actual-tx-cm
+- source: teraflowsdn
+  ref: 'efidvir/teraflowsdn@ddd4aaf: src/device/service/drivers/ceragon/Tools.py compose_rfc8561_view and coding_modulation_identity'
+- source: guide
+  ref: Implementation guide v1.2, Section 17.1 and Table 17-1
