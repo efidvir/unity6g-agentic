@@ -1,0 +1,45 @@
+# The mock controller of a small transport domain: four radio units on three microwave links, 112 MHz
+# channels. A rain fade on link-0041 rises from minute 2, holds 25 dB for ten minutes and falls back: enough
+# to take 256QAM down while 64QAM, at 510 Mbps, stays up. Behaviors are added at run time through
+# /mock/v1/behaviors, or listed under behaviors to start with them.
+controller:
+  interface: tfs-nbi
+  version: "7.0"
+clock:
+  epoch: "2026-11-21T10:00:00Z"
+  mode: realTime
+  scale: 1.0
+seed: 7
+devices:
+  - { id: mw-north-1, site: north-1, endpoints: [rf1] }
+  - { id: mw-north-2, site: north-2, endpoints: [rf1, rf2] }
+  - { id: mw-north-3, site: north-3, endpoints: [rf1, rf2] }
+  - { id: mw-south-1, site: south-1, endpoints: [rf1] }
+links:
+  - id: link-0041
+    a: { device: mw-north-1, endpoint: rf1 }
+    b: { device: mw-north-2, endpoint: rf1 }
+    bandwidthMhz: 112
+    pathLossDb: 136
+    antennaGainDb: 76
+    modulation: 256QAM
+    txPowerDbm: 18
+  - id: link-0042
+    a: { device: mw-north-2, endpoint: rf2 }
+    b: { device: mw-north-3, endpoint: rf1 }
+    bandwidthMhz: 112
+    pathLossDb: 132
+    antennaGainDb: 76
+    modulation: 256QAM
+    txPowerDbm: 16
+  - id: link-0057
+    a: { device: mw-north-3, endpoint: rf2 }
+    b: { device: mw-south-1, endpoint: rf1 }
+    bandwidthMhz: 56
+    pathLossDb: 138
+    antennaGainDb: 80
+    modulation: 64QAM
+    txPowerDbm: 20
+fades:
+  - { link: link-0041, start: PT2M, rise: PT5M, hold: PT10M, fall: PT5M, peakDb: 25 }
+behaviors: []

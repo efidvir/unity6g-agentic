@@ -2,9 +2,9 @@
 
 ## Now
 - Date, session author: 2026-11-25, Claude (AI agent), for the owner of the framework
-- Working on: 0.3 Condition evaluator u6g.cond, done in pull request #3, stacked on pull request #2, itself
-  stacked on #1; all three await the owner's review
-- Next: 0.7 Mock controller, the transport northbound subset first
+- Working on: 0.7 Mock controller, the transport part, done in pull request #4, stacked on #3, #2 and #1;
+  all four await the owner's review
+- Next: 0.4 Catalog, the transport entries first
 
 ## Items
 | ID | Status (open, in progress, done, blocked) | Evidence or blocker | Updated |
@@ -12,7 +12,7 @@
 | 0.1 | done | make setup and make check pass locally (Checks below) and in the pipeline: runs 45612680111 (push) and 45612688927 (pull request #1), both success | 2026-11-25 |
 | 0.2 | in progress | the tuple's contracts are done and checked, provisional until [IMPL] 3.2 (pull request #2): make check passes locally (Checks below) and in the pipeline: runs 45619948464 (push) and 45619959912 (pull request #2), both success; the rest of Table 26-1 comes with the items that use it | 2026-11-25 |
 | 0.3 | done | make check passes locally (Checks below) and in the pipeline: runs 45620156774 (push) and 45620208026 (pull request #3), both success; 26 tests, 8 of them property tests over generated condition trees: structure, declared operands, depth limit, results | 2026-11-25 |
-| 0.7 | open | the transport northbound subset first | 2026-11-25 |
+| 0.7 | in progress | the transport part is done and checked (pull request #4): the tfs-api subset, telemetry, the simulated radio links and the five behaviors, each reproducible by configuration; make check passes locally and in the pipeline of pull request #4; the E2 node simulator comes with the RAN | 2026-11-26 |
 | 0.4 | open | the transport entries first | 2026-11-25 |
 | 1.1 | open | | 2026-11-25 |
 | 1.2 | open | | 2026-11-25 |
@@ -51,6 +51,11 @@
 - AGENTS.md asks a property test for every guarantee of [FW] touched: on item-0.2-contracts, a test removes
   each required member of the six examples, 314 cases, and the schemas and the models refuse every one
   ([FW] 3.3.2 and 3.3.4); item-0.3-cond rebased on it -> make check exit 0, pytest 449 passed
+- 2026-11-26, branch item-0.7-mockctl (fastapi 0.165, uvicorn 0.54, httpx 0.28): 22 tests of the mock
+  controller: the tfs-api reads, configuration through either end of a link, malformed requests refused,
+  the fade on link-0041 taking 256QAM down while 64QAM stays up, the channel reproduced from the seed,
+  and each behavior by configuration (reject, timeout with and without the change, silence of the
+  interface and of the telemetry, versionChange, ackWithoutEffect) -> make check exit 0
 
 ## Documents delivered
 - UNITY6G_Agentic_Implementation_Guide_v1.2.docx, version 1.2, 2026-11-25: the real, emulated and simulated
@@ -67,6 +72,12 @@
 - 2026-11-25 Whether the reference implementation of the IDMO and the DMOs runs in containers (question 12)
   -> open
 - 2026-11-25 Emulators in the lab for many UEs, radio units and radio channels (question 13) -> open
+- 2026-11-26 The config rules of the radio-link parameters in the TeraFlowSDN driver of the radios
+  (modulation profile, transmit power): the mock uses /radio-link[<link>]/modulation-profile with
+  {"profile"} and /radio-link[<link>]/tx-power with {"powerDbm"}, set through either device -> open
+  (asked 2026-11-25)
+- 2026-11-26 How the transport adapter learns the interface version of TeraFlowSDN, which the tfs-api does
+  not report; the mock serves it at /mock/v1/controller/version -> open, for work item 1.7
 - 2026-11-25 The permitted depth of conditions, which [FW] Section 3.5.18 leaves to [IMPL]: three levels of
   groups assumed, a single comparison being depth 0 -> open
 - 2026-11-25 The protos of Annex F keep their names as written, and buf lint leaves out five naming rules of
@@ -111,6 +122,12 @@
   decided with values missing stays the same when they arrive (source: finding)
 - 2026-11-25 Conditions nest at most three levels of groups, a provisional value until [IMPL] sets the
   permitted depth (source: finding)
+- 2026-11-26 Work item 0.7 comes in two parts: the transport part now, the E2 node simulator with the RAN
+  (source: finding) [refines: the tuple-first order]
+- 2026-11-26 The mock controller models the tfs-api of TeraFlowSDN for devices, links and configuration,
+  serves the counters of the radio links for the sources of the Monitoring System, and keeps the
+  controller's view apart from the radios'; behaviors are set by configuration, each with an explicit
+  count (source: finding)
 
 ## Provisional contracts
 - schemas/common/defs.schema.json, schemas/descriptor/descriptor.schema.json and

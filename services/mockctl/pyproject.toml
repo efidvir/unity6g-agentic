@@ -4,7 +4,10 @@ version = "0.1.0"
 description = "The mock controller: a simulated transport northbound interface and E2 node"
 requires-python = ">=3.12"
 dependencies = [
+    "fastapi>=0.115",
+    "pyyaml>=6.0",
     "u6g",
+    "uvicorn>=0.32",
 ]
 
 [tool.uv.sources]
