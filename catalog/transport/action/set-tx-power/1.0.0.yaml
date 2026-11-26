@@ -1,0 +1,37 @@
+kind: ActionType
+id: transport/action/set-tx-power
+version: 1.0.0
+owner: transport-domain
+description: Set the transmit power of a radio link within its regulatory bounds
+deprecated: false
+targets:
+  objectClass: mw-link
+  parameters:
+  - transport/param/tx-power@1.0.0
+parameters:
+  type: object
+  additionalProperties: false
+  required:
+  - powerDbm
+  properties:
+    powerDbm:
+      type: number
+      minimum: 0
+      maximum: 30
+idempotent: true
+verification:
+- method: msObservation
+  predicate:
+    metric: transport/metric/tx-power@1.0.0
+    eq:
+      param: powerDbm
+  typicalLatency: PT10S
+- method: controllerQuery
+  validWhen:
+    bindingProperty: stateReflectsDevice
+rollback:
+  method: restore-previous-power
+controllerBindings:
+- binding: transport/binding/tfs-nbi@2.0.0
+  operations:
+  - device.config.set

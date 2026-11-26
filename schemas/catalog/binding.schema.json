@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "Provisional: the reference definition of the implementation guide (Section 11.4), from the kinds and attributes of [FW] Section 3.6, stands in for [IMPL] Annex B until it arrives; work item D.3 replaces it.",
+  "title": "ControllerBindingEntry",
+  "description": "A controller binding: its kind of controller, interface and versions, the action types it supports and its southbound adapter.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "kind",
+    "id",
+    "version",
+    "owner",
+    "description",
+    "deprecated",
+    "controller",
+    "interface",
+    "versions",
+    "actionTypes",
+    "operations",
+    "adapter",
+    "stateReflectsDevice",
+    "rollbackRoute"
+  ],
+  "properties": {
+    "kind": {
+      "type": "string",
+      "const": "ControllerBinding"
+    },
+    "id": {
+      "$ref": "common.schema.json#/$defs/CatalogId"
+    },
+    "version": {
+      "$ref": "../common/defs.schema.json#/$defs/SemVer"
+    },
+    "owner": {
+      "description": "The owner of the entry: the domain owner, framework or kpi-definitions.",
+      "$ref": "../common/defs.schema.json#/$defs/Name"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "deprecated": {
+      "description": "A deprecated entry stays resolvable; admission warns new descriptors.",
+      "type": "boolean"
+    },
+    "controller": {
+      "$ref": "../common/defs.schema.json#/$defs/Name"
+    },
+    "interface": {
+      "$ref": "../common/defs.schema.json#/$defs/Name"
+    },
+    "versions": {
+      "description": "The range of interface versions the adapter supports, for example >=7.0 <8.0.",
+      "type": "string",
+      "minLength": 1
+    },
+    "actionTypes": {
+      "type": "array",
+      "items": {
+        "$ref": "../common/defs.schema.json#/$defs/KindPathRef"
+      },
+      "minItems": 1
+    },
+    "operations": {
+      "description": "The operations of the interface the adapter performs.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1
+    },
+    "adapter": {
+      "description": "The southbound adapter, as module:class of u6g-adapters.",
+      "type": "string",
+      "minLength": 1
+    },
+    "stateReflectsDevice": {
+      "description": "Whether the controller's state queries reflect the device, so that controllerQuery may verify (guide Section 8.3).",
+      "type": "boolean"
+    },
+    "rollbackRoute": {
+      "type": "string",
+      "enum": [
+        "candidate",
+        "dryRun",
+        "controllerDryRun",
+        "readOnly"
+      ]
+    }
+  }
+}

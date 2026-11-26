@@ -1,0 +1,39 @@
+kind: ActionType
+id: transport/action/resize-slice
+version: 1.0.0
+owner: transport-domain
+description: Resize the capacity of a slice in the transport domain
+deprecated: false
+targets:
+  objectClass: network-slice
+  parameters:
+  - transport/param/slice-capacity@1.0.0
+parameters:
+  type: object
+  additionalProperties: false
+  required:
+  - capacityMbps
+  properties:
+    capacityMbps:
+      type: number
+      exclusiveMinimum: 0
+idempotent: true
+verification:
+- method: msObservation
+  predicate:
+    metric: transport/metric/slice-capacity@1.0.0
+    ge:
+      param: capacityMbps
+  typicalLatency: PT10S
+- method: controllerQuery
+  validWhen:
+    bindingProperty: stateReflectsDevice
+rollback:
+  method: restore-previous-capacity
+controllerBindings:
+- binding: transport/binding/tfs-nbi@2.0.0
+  operations:
+  - slice.update
+- binding: transport/binding/intent-engine@1.0.0
+  operations:
+  - intent.apply

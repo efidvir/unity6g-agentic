@@ -1,0 +1,11 @@
+kind: SourceKind
+id: transport/source/snmp
+version: 1.0.0
+owner: transport-domain
+description: Counters read over SNMP
+deprecated: false
+protocol: SNMPv3 get
+readOnly: true
+patterns:
+- poll
+adapter: u6g_adapters_sources.snmp:SnmpSource

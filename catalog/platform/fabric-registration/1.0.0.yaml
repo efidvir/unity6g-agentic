@@ -1,0 +1,11 @@
+kind: ServiceContract
+id: platform/fabric-registration
+version: 1.0.0
+owner: framework
+description: Registration of a Decision Engine with the conflict fabric
+deprecated: false
+contribution: platformService
+provider: The conflict fabric of the domain
+interface: u6g.fabric.v1.ConflictFabric/Register
+carries: []
+consumedAt: The realization of the agent, before its Decision Engine submits an intent

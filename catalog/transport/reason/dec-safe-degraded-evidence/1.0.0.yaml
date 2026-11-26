@@ -1,0 +1,10 @@
+kind: ReasonCode
+id: transport/reason/dec-safe-degraded-evidence
+version: 1.0.0
+owner: transport-domain
+description: The safe intent of the failure policy, formed on degraded evidence
+deprecated: false
+code: DEC-SAFE-DEGRADED-EVIDENCE
+category: decision
+meaning: The safe intent of the failure policy, formed on degraded evidence
+raisedBy: The decision logic of the link-assurance agent

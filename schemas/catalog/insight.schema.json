@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "Provisional: the reference definition of the implementation guide (Section 11.4), from the kinds and attributes of [FW] Section 3.6, stands in for [IMPL] Annex B until it arrives; work item D.3 replaces it.",
+  "title": "InsightTypeEntry",
+  "description": "An insight type: its schema, its meaning and the class of object it is about.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "kind",
+    "id",
+    "version",
+    "owner",
+    "description",
+    "deprecated",
+    "objectClass",
+    "meaning",
+    "payload"
+  ],
+  "properties": {
+    "kind": {
+      "type": "string",
+      "const": "InsightType"
+    },
+    "id": {
+      "$ref": "common.schema.json#/$defs/CatalogId"
+    },
+    "version": {
+      "$ref": "../common/defs.schema.json#/$defs/SemVer"
+    },
+    "owner": {
+      "description": "The owner of the entry: the domain owner, framework or kpi-definitions.",
+      "$ref": "../common/defs.schema.json#/$defs/Name"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "deprecated": {
+      "description": "A deprecated entry stays resolvable; admission warns new descriptors.",
+      "type": "boolean"
+    },
+    "objectClass": {
+      "$ref": "../common/defs.schema.json#/$defs/Name"
+    },
+    "meaning": {
+      "type": "string",
+      "minLength": 1
+    },
+    "payload": {
+      "description": "The JSON Schema of the payload of an insight of this type.",
+      "type": "object"
+    }
+  }
+}

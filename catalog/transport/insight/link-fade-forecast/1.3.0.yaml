@@ -1,0 +1,22 @@
+kind: InsightType
+id: transport/insight/link-fade-forecast
+version: 1.3.0
+owner: transport-domain
+description: Forecast of a fade into outage
+deprecated: false
+objectClass: mw-link
+meaning: The probability that the link fades into outage within the horizon, from its counters and the weather.
+payload:
+  type: object
+  additionalProperties: false
+  required:
+  - p_outage_15min
+  - horizon
+  properties:
+    p_outage_15min:
+      type: number
+      minimum: 0
+      maximum: 1
+    horizon:
+      type: string
+      minLength: 3

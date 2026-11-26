@@ -1,0 +1,10 @@
+kind: ReasonCode
+id: transport/reason/dec-restore-capacity
+version: 1.0.0
+owner: transport-domain
+description: Modulation stepped back up once the fade has passed and the margin allows
+deprecated: false
+code: DEC-RESTORE-CAPACITY
+category: decision
+meaning: Modulation stepped back up once the fade has passed and the margin allows
+raisedBy: The decision logic of the link-assurance agent

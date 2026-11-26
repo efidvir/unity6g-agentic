@@ -1,0 +1,53 @@
+kind: ActionType
+id: transport/action/set-modulation-limits
+version: 1.0.0
+owner: transport-domain
+description: Set the limits of adaptive modulation on a radio link
+deprecated: false
+targets:
+  objectClass: mw-link
+  parameters:
+  - transport/param/modulation-min@1.0.0
+  - transport/param/modulation-max@1.0.0
+parameters:
+  type: object
+  additionalProperties: false
+  required:
+  - minProfile
+  - maxProfile
+  properties:
+    minProfile: &id001
+      type: string
+      enum:
+      - QPSK
+      - 16QAM
+      - 32QAM
+      - 64QAM
+      - 128QAM
+      - 256QAM
+      - 512QAM
+      - 1024QAM
+      - 2048QAM
+      - 4096QAM
+    maxProfile: *id001
+idempotent: true
+verification:
+- method: msObservation
+  predicate:
+    all:
+    - metric: transport/metric/modulation-min@1.0.0
+      eq:
+        param: minProfile
+    - metric: transport/metric/modulation-max@1.0.0
+      eq:
+        param: maxProfile
+  typicalLatency: PT10S
+- method: controllerQuery
+  validWhen:
+    bindingProperty: stateReflectsDevice
+rollback:
+  method: restore-previous-limits
+controllerBindings:
+- binding: transport/binding/tfs-nbi@2.0.0
+  operations:
+  - device.config.set

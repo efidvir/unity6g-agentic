@@ -1,0 +1,10 @@
+kind: ReasonCode
+id: platform/reason/fab-scope-exceeded
+version: 1.0.0
+owner: framework
+description: The submission reaches outside the agent's registered scope
+deprecated: false
+code: FAB-SCOPE-EXCEEDED
+category: mediation
+meaning: The submission reaches outside the agent's registered scope
+raisedBy: The mediator of the conflict fabric

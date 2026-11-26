@@ -1,0 +1,23 @@
+kind: ControllerBinding
+id: transport/binding/tfs-nbi
+version: 2.0.0
+owner: transport-domain
+description: The northbound interface of TeraFlowSDN
+deprecated: false
+controller: teraflowsdn
+interface: tfs-nbi
+versions: '>=7.0 <8.0'
+actionTypes:
+- transport/action/set-modulation-profile@1.1.0
+- transport/action/set-modulation-limits@1.0.0
+- transport/action/set-tx-power@1.0.0
+- transport/action/move-service-path@1.0.0
+- transport/action/resize-slice@1.0.0
+- transport/action/switch-protection@1.0.0
+operations:
+- device.config.set
+- service.update
+- slice.update
+adapter: u6g_adapters_southbound.tfs:TfsAdapter
+stateReflectsDevice: false
+rollbackRoute: readOnly

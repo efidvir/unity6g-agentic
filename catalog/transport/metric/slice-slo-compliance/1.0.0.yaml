@@ -1,0 +1,18 @@
+kind: Metric
+id: transport/metric/slice-slo-compliance
+version: 1.0.0
+owner: transport-domain
+description: Slice SLO compliance
+deprecated: false
+objectClass: network-slice
+definition: The fraction of the window in which the slice met its service level objectives.
+value:
+  type: number
+  unit: ratio
+  min: 0
+  max: 1
+type: gauge
+aggregation: mean
+sources:
+- transport/source/sdn-telemetry@1.0.0
+- transport/source/context-broker@1.0.0

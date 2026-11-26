@@ -1,0 +1,15 @@
+kind: ControlParameter
+id: transport/param/service-path
+version: 1.0.0
+owner: transport-domain
+description: The path that carries a service
+deprecated: false
+objectClass: l2vpn-service
+value:
+  type: string
+setBy:
+- transport/binding/tfs-nbi@2.0.0
+- transport/binding/intent-engine@1.0.0
+readBack:
+  method: msObservation
+  metric: transport/metric/service-path@1.0.0

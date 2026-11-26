@@ -1,0 +1,11 @@
+kind: SourceKind
+id: transport/source/radio-counters
+version: 1.3.0
+owner: transport-domain
+description: Performance counters of the radios
+deprecated: false
+protocol: RESTCONF reads of the radios' performance counters
+readOnly: true
+patterns:
+- poll
+adapter: u6g_adapters_sources.radio:CountersSource

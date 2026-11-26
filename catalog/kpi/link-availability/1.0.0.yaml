@@ -1,0 +1,10 @@
+kind: ObjectiveKpi
+id: kpi/link-availability
+version: 1.0.0
+owner: kpi-definitions
+description: Availability of a radio link
+deprecated: false
+definition: The fraction of the window during which the link is available, as ITU-T G.826 counts unavailable time.
+unit: ratio
+methodology: One minus the unavailable seconds over the seconds of the window, from the radio counters.
+unity6gKpi: Availability

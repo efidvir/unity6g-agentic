@@ -1,0 +1,25 @@
+kind: ControlParameter
+id: transport/param/modulation-min
+version: 1.0.0
+owner: transport-domain
+description: The lowest profile adaptive modulation may select
+deprecated: false
+objectClass: mw-link
+value:
+  type: string
+  values:
+  - QPSK
+  - 16QAM
+  - 32QAM
+  - 64QAM
+  - 128QAM
+  - 256QAM
+  - 512QAM
+  - 1024QAM
+  - 2048QAM
+  - 4096QAM
+setBy:
+- transport/binding/tfs-nbi@2.0.0
+readBack:
+  method: msObservation
+  metric: transport/metric/modulation-min@1.0.0

@@ -1,0 +1,11 @@
+kind: SourceKind
+id: transport/source/twamp-light
+version: 1.0.0
+owner: transport-domain
+description: Path measurements of TWAMP Light probes
+deprecated: false
+protocol: TWAMP Light (RFC 5357, Appendix I)
+readOnly: true
+patterns:
+- periodicStream
+adapter: u6g_adapters_sources.twamp:TwampSource

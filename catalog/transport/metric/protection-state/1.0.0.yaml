@@ -1,0 +1,18 @@
+kind: Metric
+id: transport/metric/protection-state
+version: 1.0.0
+owner: transport-domain
+description: Protection state
+deprecated: false
+objectClass: mw-link
+definition: Which side of a protected link carries the traffic.
+value:
+  type: string
+  values:
+  - working
+  - protecting
+type: state
+aggregation: last
+sources:
+- transport/source/radio-counters@1.3.0
+- transport/source/sdn-telemetry@1.0.0

@@ -1,0 +1,17 @@
+kind: ControlParameter
+id: transport/param/protection-state
+version: 1.0.0
+owner: transport-domain
+description: Which side of a protected link carries the traffic
+deprecated: false
+objectClass: mw-link
+value:
+  type: string
+  values:
+  - working
+  - protecting
+setBy:
+- transport/binding/tfs-nbi@2.0.0
+readBack:
+  method: msObservation
+  metric: transport/metric/protection-state@1.0.0

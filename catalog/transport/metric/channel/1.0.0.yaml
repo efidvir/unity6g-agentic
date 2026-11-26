@@ -1,0 +1,17 @@
+kind: Metric
+id: transport/metric/channel
+version: 1.0.0
+owner: transport-domain
+description: Channel
+deprecated: false
+objectClass: mw-link
+definition: The channel of the link within its band plan, as the radio reports it.
+value:
+  type: integer
+  unit: count
+  min: 1
+type: state
+aggregation: last
+sources:
+- transport/source/radio-counters@1.3.0
+- transport/source/sdn-telemetry@1.0.0

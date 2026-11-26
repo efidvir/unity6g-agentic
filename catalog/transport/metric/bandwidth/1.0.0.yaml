@@ -1,0 +1,17 @@
+kind: Metric
+id: transport/metric/bandwidth
+version: 1.0.0
+owner: transport-domain
+description: Channel bandwidth
+deprecated: false
+objectClass: mw-link
+definition: The bandwidth of the link's channel, as the radio reports it.
+value:
+  type: number
+  unit: MHz
+  min: 0
+type: state
+aggregation: last
+sources:
+- transport/source/radio-counters@1.3.0
+- transport/source/sdn-telemetry@1.0.0

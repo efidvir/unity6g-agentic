@@ -1,0 +1,10 @@
+kind: ReasonCode
+id: platform/reason/act-binding-version
+version: 1.0.0
+owner: framework
+description: The interface version of the controller lies outside the range the binding pins
+deprecated: false
+code: ACT-BINDING-VERSION
+category: actuation
+meaning: The interface version of the controller lies outside the range the binding pins
+raisedBy: The transaction engine of the Actuator runtime

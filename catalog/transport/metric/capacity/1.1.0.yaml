@@ -1,0 +1,18 @@
+kind: Metric
+id: transport/metric/capacity
+version: 1.1.0
+owner: transport-domain
+description: Capacity
+deprecated: false
+objectClass: mw-link
+definition: The capacity the link carries at its current modulation and channel bandwidth; zero while the link is
+  down.
+value:
+  type: number
+  unit: Mbps
+  min: 0
+type: gauge
+aggregation: mean
+sources:
+- transport/source/radio-counters@1.3.0
+- transport/source/sdn-telemetry@1.0.0

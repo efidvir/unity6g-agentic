@@ -1,0 +1,15 @@
+kind: Metric
+id: transport/metric/service-path
+version: 1.0.0
+owner: transport-domain
+description: Path of a service
+deprecated: false
+objectClass: l2vpn-service
+definition: The path that carries the service, as the controller's context reports it.
+value:
+  type: string
+type: state
+aggregation: last
+sources:
+- transport/source/sdn-telemetry@1.0.0
+- transport/source/context-broker@1.0.0

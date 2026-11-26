@@ -1,0 +1,10 @@
+kind: ReasonCode
+id: platform/reason/act-timeout
+version: 1.0.0
+owner: framework
+description: The controller did not answer within the deadline; the outcome stays unresolved until read back
+deprecated: false
+code: ACT-TIMEOUT
+category: actuation
+meaning: The controller did not answer within the deadline; the outcome stays unresolved until read back
+raisedBy: The transaction engine of the Actuator runtime

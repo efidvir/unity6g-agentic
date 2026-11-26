@@ -1,0 +1,10 @@
+kind: ReasonCode
+id: platform/reason/act-held
+version: 1.0.0
+owner: framework
+description: The target is held because its state cannot be established; escalated
+deprecated: false
+code: ACT-HELD
+category: actuation
+meaning: The target is held because its state cannot be established; escalated
+raisedBy: The transaction engine of the Actuator runtime

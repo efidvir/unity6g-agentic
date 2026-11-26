@@ -1,0 +1,4 @@
+area: platform
+owner: framework
+description: 'The framework''s own entries: verification methods, reason codes and platform services'
+objectClasses: []

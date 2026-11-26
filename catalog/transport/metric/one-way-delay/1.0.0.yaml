@@ -1,0 +1,16 @@
+kind: Metric
+id: transport/metric/one-way-delay
+version: 1.0.0
+owner: transport-domain
+description: One-way delay
+deprecated: false
+objectClass: path
+definition: The one-way delay of a path, measured by TWAMP Light probes.
+value:
+  type: number
+  unit: ms
+  min: 0
+type: gauge
+aggregation: mean
+sources:
+- transport/source/twamp-light@1.0.0

@@ -1,0 +1,10 @@
+kind: ReasonCode
+id: platform/reason/act-ok
+version: 1.0.0
+owner: framework
+description: The actuation was applied and verified
+deprecated: false
+code: ACT-OK
+category: actuation
+meaning: The actuation was applied and verified
+raisedBy: The transaction engine of the Actuator runtime

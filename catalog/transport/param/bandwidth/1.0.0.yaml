@@ -1,0 +1,16 @@
+kind: ControlParameter
+id: transport/param/bandwidth
+version: 1.0.0
+owner: transport-domain
+description: The channel bandwidth of a radio link
+deprecated: false
+objectClass: mw-link
+value:
+  type: number
+  unit: MHz
+  min: 0
+setBy:
+- transport/binding/tfs-nbi@2.0.0
+readBack:
+  method: msObservation
+  metric: transport/metric/bandwidth@1.0.0

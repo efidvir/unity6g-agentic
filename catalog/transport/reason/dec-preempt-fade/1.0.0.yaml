@@ -1,0 +1,10 @@
+kind: ReasonCode
+id: transport/reason/dec-preempt-fade
+version: 1.0.0
+owner: transport-domain
+description: Modulation stepped down ahead of a forecast fade
+deprecated: false
+code: DEC-PREEMPT-FADE
+category: decision
+meaning: Modulation stepped down ahead of a forecast fade
+raisedBy: The decision logic of the link-assurance agent

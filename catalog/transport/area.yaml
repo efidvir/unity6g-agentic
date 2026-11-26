@@ -1,0 +1,12 @@
+area: transport
+owner: transport-domain
+description: The entries of the transport domain (guide Section 17.1)
+objectClasses:
+- mw-link
+- mw-radio
+- eth-port
+- path
+- l2vpn-service
+- l3vpn-service
+- network-slice
+- site

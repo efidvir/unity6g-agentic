@@ -1,0 +1,17 @@
+kind: Metric
+id: transport/metric/mse
+version: 1.0.0
+owner: transport-domain
+description: Mean squared error
+deprecated: false
+objectClass: mw-link
+definition: The mean squared error of the received constellation, the radio's measure of signal quality; lower is
+  better.
+value:
+  type: number
+  unit: dB
+type: gauge
+aggregation: mean
+sources:
+- transport/source/radio-counters@1.3.0
+- transport/source/sdn-telemetry@1.0.0

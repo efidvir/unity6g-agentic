@@ -1,0 +1,16 @@
+kind: Metric
+id: transport/metric/tx-power
+version: 1.0.0
+owner: transport-domain
+description: Transmit power
+deprecated: false
+objectClass: mw-link
+definition: The transmit power actually set on the link, as the radio reports it.
+value:
+  type: number
+  unit: dBm
+type: gauge
+aggregation: last
+sources:
+- transport/source/radio-counters@1.3.0
+- transport/source/sdn-telemetry@1.0.0

@@ -1,0 +1,13 @@
+kind: ServiceContract
+id: transport/contract/link-intent
+version: 1.1.0
+owner: transport-domain
+description: The intent flow of radio-link actions
+deprecated: false
+contribution: flow
+provider: The Decision Engine of a transport agent
+interface: The intent envelope of [IMPL]
+flow: intent
+carries:
+- transport/action/set-modulation-profile@1.1.0
+- transport/action/set-tx-power@1.0.0

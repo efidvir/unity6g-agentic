@@ -1,0 +1,9 @@
+kind: VerificationMethod
+id: platform/verification/ms-observation
+version: 1.0.0
+owner: framework
+description: Observation, through the Monitoring System, of quantities the devices report about themselves
+deprecated: false
+method: msObservation
+readBack: monitoringSystem
+typicalLatency: PT10S

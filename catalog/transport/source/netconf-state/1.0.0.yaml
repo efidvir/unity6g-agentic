@@ -1,0 +1,11 @@
+kind: SourceKind
+id: transport/source/netconf-state
+version: 1.0.0
+owner: transport-domain
+description: Operational state read over NETCONF
+deprecated: false
+protocol: NETCONF get
+readOnly: true
+patterns:
+- poll
+adapter: u6g_adapters_sources.netconf:NetconfSource

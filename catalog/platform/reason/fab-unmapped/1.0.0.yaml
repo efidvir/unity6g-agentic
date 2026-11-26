@@ -1,0 +1,10 @@
+kind: ReasonCode
+id: platform/reason/fab-unmapped
+version: 1.0.0
+owner: framework
+description: The action type has no mapping in the fabric's model of resources
+deprecated: false
+code: FAB-UNMAPPED
+category: mediation
+meaning: The action type has no mapping in the fabric's model of resources
+raisedBy: The mediator of the conflict fabric

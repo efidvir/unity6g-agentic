@@ -1,0 +1,12 @@
+kind: SourceKind
+id: transport/source/context-broker
+version: 1.0.0
+owner: transport-domain
+description: The domain's context broker
+deprecated: false
+protocol: NGSI-LD subscriptions
+readOnly: true
+patterns:
+- onChange
+- event
+adapter: u6g_adapters_sources.ngsild:ContextBrokerSource

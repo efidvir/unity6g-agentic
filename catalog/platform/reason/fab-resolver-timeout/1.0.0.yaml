@@ -1,0 +1,10 @@
+kind: ReasonCode
+id: platform/reason/fab-resolver-timeout
+version: 1.0.0
+owner: framework
+description: The resolver did not decide within the mediation deadline
+deprecated: false
+code: FAB-RESOLVER-TIMEOUT
+category: mediation
+meaning: The resolver did not decide within the mediation deadline
+raisedBy: The mediator of the conflict fabric

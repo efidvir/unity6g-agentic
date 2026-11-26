@@ -1,0 +1,9 @@
+kind: VerificationMethod
+id: platform/verification/controller-query
+version: 1.0.0
+owner: framework
+description: A query of the controller's state, valid only for bindings whose state reflects the device
+deprecated: false
+method: controllerQuery
+readBack: controllerQuery
+typicalLatency: PT2S

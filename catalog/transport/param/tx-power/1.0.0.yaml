@@ -1,0 +1,17 @@
+kind: ControlParameter
+id: transport/param/tx-power
+version: 1.0.0
+owner: transport-domain
+description: The transmit power of a radio link, within its regulatory bounds
+deprecated: false
+objectClass: mw-link
+value:
+  type: number
+  unit: dBm
+  min: 0
+  max: 30
+setBy:
+- transport/binding/tfs-nbi@2.0.0
+readBack:
+  method: msObservation
+  metric: transport/metric/tx-power@1.0.0

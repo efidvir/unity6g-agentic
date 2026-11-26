@@ -1,0 +1,10 @@
+kind: ReasonCode
+id: platform/reason/act-rejected
+version: 1.0.0
+owner: framework
+description: The controller refused the command
+deprecated: false
+code: ACT-REJECTED
+category: actuation
+meaning: The controller refused the command
+raisedBy: The transaction engine of the Actuator runtime

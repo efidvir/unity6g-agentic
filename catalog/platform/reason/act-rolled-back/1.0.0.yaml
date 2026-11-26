@@ -1,0 +1,10 @@
+kind: ReasonCode
+id: platform/reason/act-rolled-back
+version: 1.0.0
+owner: framework
+description: The change was reverted by the rollback of the action type
+deprecated: false
+code: ACT-ROLLED-BACK
+category: actuation
+meaning: The change was reverted by the rollback of the action type
+raisedBy: The transaction engine of the Actuator runtime

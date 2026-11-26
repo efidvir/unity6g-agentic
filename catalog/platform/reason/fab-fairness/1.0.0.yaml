@@ -1,0 +1,10 @@
+kind: ReasonCode
+id: platform/reason/fab-fairness
+version: 1.0.0
+owner: framework
+description: Decided by the fairness rule among agents of equal priority
+deprecated: false
+code: FAB-FAIRNESS
+category: mediation
+meaning: Decided by the fairness rule among agents of equal priority
+raisedBy: The mediator of the conflict fabric

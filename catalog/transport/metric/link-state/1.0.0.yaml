@@ -1,0 +1,18 @@
+kind: Metric
+id: transport/metric/link-state
+version: 1.0.0
+owner: transport-domain
+description: Link state
+deprecated: false
+objectClass: mw-link
+definition: Whether the radio link carries traffic.
+value:
+  type: string
+  values:
+  - up
+  - down
+type: state
+aggregation: last
+sources:
+- transport/source/radio-counters@1.3.0
+- transport/source/sdn-telemetry@1.0.0

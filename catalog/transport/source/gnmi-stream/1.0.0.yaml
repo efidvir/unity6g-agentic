@@ -1,0 +1,12 @@
+kind: SourceKind
+id: transport/source/gnmi-stream
+version: 1.0.0
+owner: transport-domain
+description: gNMI streaming telemetry of network elements
+deprecated: false
+protocol: gNMI Subscribe
+readOnly: true
+patterns:
+- periodicStream
+- onChange
+adapter: u6g_adapters_sources.gnmi:GnmiSource

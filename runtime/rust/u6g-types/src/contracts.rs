@@ -34,6 +34,74 @@ pub struct ActFunction {
     )]
     pub unresolved_after: ::std::option::Option<Duration>,
 }
+///`ActionBinding`
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct ActionBinding {
+    pub binding: KindPathRef,
+    pub operations: ::std::vec::Vec<ActionBindingOperationsItem>,
+}
+///`ActionBindingOperationsItem`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct ActionBindingOperationsItem(::std::string::String);
+impl ::std::ops::Deref for ActionBindingOperationsItem {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<ActionBindingOperationsItem> for ::std::string::String {
+    fn from(value: ActionBindingOperationsItem) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for ActionBindingOperationsItem {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for ActionBindingOperationsItem {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for ActionBindingOperationsItem {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for ActionBindingOperationsItem {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///`ActionRollback`
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct ActionRollback {
+    pub method: Name,
+}
 ///An action type of the action space with every attribute [FW] makes mandatory.
 #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
 #[serde(deny_unknown_fields)]
@@ -54,6 +122,119 @@ pub struct ActionSpec {
     pub stability: Stability,
     pub targets: TargetSelector,
     pub verification: VerificationSpec,
+}
+///`ActionTargets`
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct ActionTargets {
+    #[serde(rename = "objectClass")]
+    pub object_class: Name,
+    ///The control parameters the action changes.
+    pub parameters: ::std::vec::Vec<KindPathRef>,
+}
+///An action type: its target class and the parameters it changes, the schema of its parameters, its idempotency, its verification methods, its rollback and its operations on each controller binding.
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct ActionTypeEntry {
+    ///The bindings that support the action, with the only operations Translate may emit on each.
+    #[serde(rename = "controllerBindings")]
+    pub controller_bindings: ::std::vec::Vec<ActionBinding>,
+    ///A deprecated entry stays resolvable; admission warns new descriptors.
+    pub deprecated: bool,
+    pub description: ActionTypeEntryDescription,
+    pub id: CatalogId,
+    pub idempotent: bool,
+    pub kind: ::std::string::String,
+    ///The owner of the entry: the domain owner, framework or kpi-definitions.
+    pub owner: Name,
+    ///The JSON Schema of the parameters of an intent of this type.
+    pub parameters: ::serde_json::Map<::std::string::String, ::serde_json::Value>,
+    pub rollback: ActionRollback,
+    pub targets: ActionTargets,
+    pub verification: ::std::vec::Vec<ActionVerification>,
+    pub version: SemVer,
+}
+///`ActionTypeEntryDescription`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct ActionTypeEntryDescription(::std::string::String);
+impl ::std::ops::Deref for ActionTypeEntryDescription {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<ActionTypeEntryDescription> for ::std::string::String {
+    fn from(value: ActionTypeEntryDescription) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for ActionTypeEntryDescription {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for ActionTypeEntryDescription {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for ActionTypeEntryDescription {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for ActionTypeEntryDescription {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///`ActionValidity`
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct ActionValidity {
+    ///A property the binding's entry must state, for example stateReflectsDevice.
+    #[serde(rename = "bindingProperty")]
+    pub binding_property: CamelName,
+}
+///`ActionVerification`
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct ActionVerification {
+    pub method: CamelName,
+    ///What the read-back must show, in the condition structure; operands may name the action's parameters.
+    #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+    pub predicate: ::std::option::Option<Condition>,
+    #[serde(
+        rename = "typicalLatency",
+        skip_serializing_if = "::std::option::Option::is_none"
+    )]
+    pub typical_latency: ::std::option::Option<Duration>,
+    #[serde(
+        rename = "validWhen",
+        skip_serializing_if = "::std::option::Option::is_none"
+    )]
+    pub valid_when: ::std::option::Option<ActionValidity>,
 }
 ///`AeFailurePolicy`
 #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug, Default)]
@@ -694,6 +875,137 @@ impl<'de> ::serde::Deserialize<'de> for CapabilityModeSubsetItem {
             })
     }
 }
+///The manifest of an area of the catalog, catalog/<area>/area.yaml: its owner and the classes of managed object its entries describe.
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct CatalogArea {
+    pub area: Name,
+    pub description: CatalogAreaDescription,
+    #[serde(rename = "objectClasses")]
+    pub object_classes: ::std::vec::Vec<Name>,
+    pub owner: Name,
+}
+///`CatalogAreaDescription`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct CatalogAreaDescription(::std::string::String);
+impl ::std::ops::Deref for CatalogAreaDescription {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<CatalogAreaDescription> for ::std::string::String {
+    fn from(value: CatalogAreaDescription) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for CatalogAreaDescription {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for CatalogAreaDescription {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for CatalogAreaDescription {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for CatalogAreaDescription {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///The identity of an entry: its area, its kind and its name, as in transport/metric/rsl; the file of an entry is catalog/<id>/<version>.yaml.
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct CatalogId(::std::string::String);
+impl ::std::ops::Deref for CatalogId {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<CatalogId> for ::std::string::String {
+    fn from(value: CatalogId) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for CatalogId {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for CatalogId {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        static PATTERN: ::std::sync::LazyLock<::regress::Regex> = ::std::sync::LazyLock::new(||
+        {
+            ::regress::Regex::with_flags(
+                    "^[a-z0-9]+(?:-[a-z0-9]+)*(?:/[a-z0-9]+(?:-[a-z0-9]+)*)+$",
+                    "u",
+                )
+                .unwrap()
+        });
+        if PATTERN.find(value).is_none() {
+            return Err(
+                "doesn't match pattern \"^[a-z0-9]+(?:-[a-z0-9]+)*(?:/[a-z0-9]+(?:-[a-z0-9]+)*)+$\""
+                    .into(),
+            );
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for CatalogId {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for CatalogId {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
 ///A reference to an entry of the type catalog with its version, as descriptors and envelopes write it (guide Annex F.9).
 #[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 #[serde(transparent)]
@@ -748,6 +1060,196 @@ impl ::std::convert::TryFrom<::std::string::String> for CatalogRef {
     }
 }
 impl<'de> ::serde::Deserialize<'de> for CatalogRef {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///The value of a metric or a control parameter.
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct CatalogValue {
+    #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+    pub max: ::std::option::Option<f64>,
+    #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+    pub min: ::std::option::Option<f64>,
+    #[serde(rename = "type")]
+    pub type_: CatalogValueType,
+    ///The unit of a number, as the catalog writes it: dBm, dB, Mbps, ms, s, ratio, count.
+    #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+    pub unit: ::std::option::Option<CatalogValueUnit>,
+    ///The values of an enumerated string.
+    #[serde(default, skip_serializing_if = "::std::vec::Vec::is_empty")]
+    pub values: ::std::vec::Vec<CatalogValueValuesItem>,
+}
+///`CatalogValueType`
+#[derive(
+    ::serde::Deserialize,
+    ::serde::Serialize,
+    Clone,
+    Copy,
+    Debug,
+    Eq,
+    Hash,
+    Ord,
+    PartialEq,
+    PartialOrd
+)]
+pub enum CatalogValueType {
+    #[serde(rename = "number")]
+    Number,
+    #[serde(rename = "integer")]
+    Integer,
+    #[serde(rename = "string")]
+    String,
+    #[serde(rename = "boolean")]
+    Boolean,
+}
+impl ::std::fmt::Display for CatalogValueType {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        match *self {
+            Self::Number => f.write_str("number"),
+            Self::Integer => f.write_str("integer"),
+            Self::String => f.write_str("string"),
+            Self::Boolean => f.write_str("boolean"),
+        }
+    }
+}
+impl ::std::str::FromStr for CatalogValueType {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        match value {
+            "number" => Ok(Self::Number),
+            "integer" => Ok(Self::Integer),
+            "string" => Ok(Self::String),
+            "boolean" => Ok(Self::Boolean),
+            _ => Err("invalid value".into()),
+        }
+    }
+}
+impl ::std::convert::TryFrom<&str> for CatalogValueType {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        value.parse()
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for CatalogValueType {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        value.parse()
+    }
+}
+///The unit of a number, as the catalog writes it: dBm, dB, Mbps, ms, s, ratio, count.
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct CatalogValueUnit(::std::string::String);
+impl ::std::ops::Deref for CatalogValueUnit {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<CatalogValueUnit> for ::std::string::String {
+    fn from(value: CatalogValueUnit) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for CatalogValueUnit {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for CatalogValueUnit {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for CatalogValueUnit {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for CatalogValueUnit {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///`CatalogValueValuesItem`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct CatalogValueValuesItem(::std::string::String);
+impl ::std::ops::Deref for CatalogValueValuesItem {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<CatalogValueValuesItem> for ::std::string::String {
+    fn from(value: CatalogValueValuesItem) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for CatalogValueValuesItem {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for CatalogValueValuesItem {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for CatalogValueValuesItem {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for CatalogValueValuesItem {
     fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
     where
         D: ::serde::Deserializer<'de>,
@@ -1159,6 +1661,83 @@ impl ::std::convert::TryFrom<::std::string::String> for ConflictPolicyKind {
         value.parse()
     }
 }
+///A control parameter: its class of managed object, its value, the controller bindings that set it and how it is read back.
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct ControlParameterEntry {
+    ///A deprecated entry stays resolvable; admission warns new descriptors.
+    pub deprecated: bool,
+    pub description: ControlParameterEntryDescription,
+    pub id: CatalogId,
+    pub kind: ::std::string::String,
+    #[serde(rename = "objectClass")]
+    pub object_class: Name,
+    ///The owner of the entry: the domain owner, framework or kpi-definitions.
+    pub owner: Name,
+    #[serde(rename = "readBack")]
+    pub read_back: ParameterReadBack,
+    ///The controller bindings that set the parameter.
+    #[serde(rename = "setBy")]
+    pub set_by: ::std::vec::Vec<KindPathRef>,
+    pub value: CatalogValue,
+    pub version: SemVer,
+}
+///`ControlParameterEntryDescription`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct ControlParameterEntryDescription(::std::string::String);
+impl ::std::ops::Deref for ControlParameterEntryDescription {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<ControlParameterEntryDescription> for ::std::string::String {
+    fn from(value: ControlParameterEntryDescription) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for ControlParameterEntryDescription {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for ControlParameterEntryDescription {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String>
+for ControlParameterEntryDescription {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for ControlParameterEntryDescription {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
 ///`ControlScope`
 #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
 #[serde(deny_unknown_fields)]
@@ -1222,6 +1801,321 @@ impl ::std::convert::TryFrom<::std::string::String> for ControllerBindingAccepte
     }
 }
 impl<'de> ::serde::Deserialize<'de> for ControllerBindingAccepted {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///A controller binding: its kind of controller, interface and versions, the action types it supports and its southbound adapter.
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct ControllerBindingEntry {
+    #[serde(rename = "actionTypes")]
+    pub action_types: ::std::vec::Vec<KindPathRef>,
+    ///The southbound adapter, as module:class of u6g-adapters.
+    pub adapter: ControllerBindingEntryAdapter,
+    pub controller: Name,
+    ///A deprecated entry stays resolvable; admission warns new descriptors.
+    pub deprecated: bool,
+    pub description: ControllerBindingEntryDescription,
+    pub id: CatalogId,
+    pub interface: Name,
+    pub kind: ::std::string::String,
+    ///The operations of the interface the adapter performs.
+    pub operations: ::std::vec::Vec<ControllerBindingEntryOperationsItem>,
+    ///The owner of the entry: the domain owner, framework or kpi-definitions.
+    pub owner: Name,
+    #[serde(rename = "rollbackRoute")]
+    pub rollback_route: ControllerBindingEntryRollbackRoute,
+    ///Whether the controller's state queries reflect the device, so that controllerQuery may verify (guide Section 8.3).
+    #[serde(rename = "stateReflectsDevice")]
+    pub state_reflects_device: bool,
+    pub version: SemVer,
+    ///The range of interface versions the adapter supports, for example >=7.0 <8.0.
+    pub versions: ControllerBindingEntryVersions,
+}
+///The southbound adapter, as module:class of u6g-adapters.
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct ControllerBindingEntryAdapter(::std::string::String);
+impl ::std::ops::Deref for ControllerBindingEntryAdapter {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<ControllerBindingEntryAdapter> for ::std::string::String {
+    fn from(value: ControllerBindingEntryAdapter) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for ControllerBindingEntryAdapter {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for ControllerBindingEntryAdapter {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for ControllerBindingEntryAdapter {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for ControllerBindingEntryAdapter {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///`ControllerBindingEntryDescription`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct ControllerBindingEntryDescription(::std::string::String);
+impl ::std::ops::Deref for ControllerBindingEntryDescription {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<ControllerBindingEntryDescription> for ::std::string::String {
+    fn from(value: ControllerBindingEntryDescription) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for ControllerBindingEntryDescription {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for ControllerBindingEntryDescription {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String>
+for ControllerBindingEntryDescription {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for ControllerBindingEntryDescription {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///`ControllerBindingEntryOperationsItem`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct ControllerBindingEntryOperationsItem(::std::string::String);
+impl ::std::ops::Deref for ControllerBindingEntryOperationsItem {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<ControllerBindingEntryOperationsItem>
+for ::std::string::String {
+    fn from(value: ControllerBindingEntryOperationsItem) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for ControllerBindingEntryOperationsItem {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for ControllerBindingEntryOperationsItem {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String>
+for ControllerBindingEntryOperationsItem {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for ControllerBindingEntryOperationsItem {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///`ControllerBindingEntryRollbackRoute`
+#[derive(
+    ::serde::Deserialize,
+    ::serde::Serialize,
+    Clone,
+    Copy,
+    Debug,
+    Eq,
+    Hash,
+    Ord,
+    PartialEq,
+    PartialOrd
+)]
+pub enum ControllerBindingEntryRollbackRoute {
+    #[serde(rename = "candidate")]
+    Candidate,
+    #[serde(rename = "dryRun")]
+    DryRun,
+    #[serde(rename = "controllerDryRun")]
+    ControllerDryRun,
+    #[serde(rename = "readOnly")]
+    ReadOnly,
+}
+impl ::std::fmt::Display for ControllerBindingEntryRollbackRoute {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        match *self {
+            Self::Candidate => f.write_str("candidate"),
+            Self::DryRun => f.write_str("dryRun"),
+            Self::ControllerDryRun => f.write_str("controllerDryRun"),
+            Self::ReadOnly => f.write_str("readOnly"),
+        }
+    }
+}
+impl ::std::str::FromStr for ControllerBindingEntryRollbackRoute {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        match value {
+            "candidate" => Ok(Self::Candidate),
+            "dryRun" => Ok(Self::DryRun),
+            "controllerDryRun" => Ok(Self::ControllerDryRun),
+            "readOnly" => Ok(Self::ReadOnly),
+            _ => Err("invalid value".into()),
+        }
+    }
+}
+impl ::std::convert::TryFrom<&str> for ControllerBindingEntryRollbackRoute {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        value.parse()
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String>
+for ControllerBindingEntryRollbackRoute {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        value.parse()
+    }
+}
+///The range of interface versions the adapter supports, for example >=7.0 <8.0.
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct ControllerBindingEntryVersions(::std::string::String);
+impl ::std::ops::Deref for ControllerBindingEntryVersions {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<ControllerBindingEntryVersions> for ::std::string::String {
+    fn from(value: ControllerBindingEntryVersions) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for ControllerBindingEntryVersions {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for ControllerBindingEntryVersions {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for ControllerBindingEntryVersions {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for ControllerBindingEntryVersions {
     fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
     where
         D: ::serde::Deserializer<'de>,
@@ -2535,6 +3429,134 @@ pub struct InsightTimes {
     pub event: Timestamp,
     pub produced: Timestamp,
 }
+///An insight type: its schema, its meaning and the class of object it is about.
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct InsightTypeEntry {
+    ///A deprecated entry stays resolvable; admission warns new descriptors.
+    pub deprecated: bool,
+    pub description: InsightTypeEntryDescription,
+    pub id: CatalogId,
+    pub kind: ::std::string::String,
+    pub meaning: InsightTypeEntryMeaning,
+    #[serde(rename = "objectClass")]
+    pub object_class: Name,
+    ///The owner of the entry: the domain owner, framework or kpi-definitions.
+    pub owner: Name,
+    ///The JSON Schema of the payload of an insight of this type.
+    pub payload: ::serde_json::Map<::std::string::String, ::serde_json::Value>,
+    pub version: SemVer,
+}
+///`InsightTypeEntryDescription`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct InsightTypeEntryDescription(::std::string::String);
+impl ::std::ops::Deref for InsightTypeEntryDescription {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<InsightTypeEntryDescription> for ::std::string::String {
+    fn from(value: InsightTypeEntryDescription) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for InsightTypeEntryDescription {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for InsightTypeEntryDescription {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for InsightTypeEntryDescription {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for InsightTypeEntryDescription {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///`InsightTypeEntryMeaning`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct InsightTypeEntryMeaning(::std::string::String);
+impl ::std::ops::Deref for InsightTypeEntryMeaning {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<InsightTypeEntryMeaning> for ::std::string::String {
+    fn from(value: InsightTypeEntryMeaning) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for InsightTypeEntryMeaning {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for InsightTypeEntryMeaning {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for InsightTypeEntryMeaning {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for InsightTypeEntryMeaning {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
 ///`InsightTypeSpec`
 #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
 #[serde(deny_unknown_fields)]
@@ -2889,6 +3911,203 @@ pub struct LogicPin {
         skip_serializing_if = "::std::option::Option::is_none"
     )]
     pub state_policy: ::std::option::Option<CamelName>,
+}
+///A metric: its unit and value, the class of managed object it describes, its definition and the kinds of source that supply it.
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct MetricEntry {
+    ///The aggregation over a window: mean, max, min, last or sum.
+    pub aggregation: CamelName,
+    pub definition: MetricEntryDefinition,
+    ///A deprecated entry stays resolvable; admission warns new descriptors.
+    pub deprecated: bool,
+    pub description: MetricEntryDescription,
+    pub id: CatalogId,
+    pub kind: ::std::string::String,
+    #[serde(rename = "objectClass")]
+    pub object_class: Name,
+    ///The owner of the entry: the domain owner, framework or kpi-definitions.
+    pub owner: Name,
+    ///The source kinds that supply the metric.
+    pub sources: ::std::vec::Vec<KindPathRef>,
+    ///How the metric behaves over time.
+    #[serde(rename = "type")]
+    pub type_: MetricEntryType,
+    pub value: CatalogValue,
+    pub version: SemVer,
+}
+///`MetricEntryDefinition`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct MetricEntryDefinition(::std::string::String);
+impl ::std::ops::Deref for MetricEntryDefinition {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<MetricEntryDefinition> for ::std::string::String {
+    fn from(value: MetricEntryDefinition) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for MetricEntryDefinition {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for MetricEntryDefinition {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for MetricEntryDefinition {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for MetricEntryDefinition {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///`MetricEntryDescription`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct MetricEntryDescription(::std::string::String);
+impl ::std::ops::Deref for MetricEntryDescription {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<MetricEntryDescription> for ::std::string::String {
+    fn from(value: MetricEntryDescription) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for MetricEntryDescription {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for MetricEntryDescription {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for MetricEntryDescription {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for MetricEntryDescription {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///How the metric behaves over time.
+#[derive(
+    ::serde::Deserialize,
+    ::serde::Serialize,
+    Clone,
+    Copy,
+    Debug,
+    Eq,
+    Hash,
+    Ord,
+    PartialEq,
+    PartialOrd
+)]
+pub enum MetricEntryType {
+    #[serde(rename = "gauge")]
+    Gauge,
+    #[serde(rename = "counter")]
+    Counter,
+    #[serde(rename = "state")]
+    State,
+    #[serde(rename = "event")]
+    Event,
+}
+impl ::std::fmt::Display for MetricEntryType {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        match *self {
+            Self::Gauge => f.write_str("gauge"),
+            Self::Counter => f.write_str("counter"),
+            Self::State => f.write_str("state"),
+            Self::Event => f.write_str("event"),
+        }
+    }
+}
+impl ::std::str::FromStr for MetricEntryType {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        match value {
+            "gauge" => Ok(Self::Gauge),
+            "counter" => Ok(Self::Counter),
+            "state" => Ok(Self::State),
+            "event" => Ok(Self::Event),
+            _ => Err("invalid value".into()),
+        }
+    }
+}
+impl ::std::convert::TryFrom<&str> for MetricEntryType {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        value.parse()
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for MetricEntryType {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        value.parse()
+    }
 }
 ///`Migration`
 #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
@@ -3477,6 +4696,300 @@ impl ::std::convert::TryFrom<::std::string::String> for ObjectiveDirection {
         value: ::std::string::String,
     ) -> ::std::result::Result<Self, self::error::ConversionError> {
         value.parse()
+    }
+}
+///An objective KPI: its definition, unit and measurement methodology in the form of the UNITY-6G KPI definitions, and its link to the UNITY-6G KPIs.
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct ObjectiveKpiEntry {
+    pub definition: ObjectiveKpiEntryDefinition,
+    ///A deprecated entry stays resolvable; admission warns new descriptors.
+    pub deprecated: bool,
+    pub description: ObjectiveKpiEntryDescription,
+    pub id: CatalogId,
+    pub kind: ::std::string::String,
+    pub methodology: ObjectiveKpiEntryMethodology,
+    ///The owner of the entry: the domain owner, framework or kpi-definitions.
+    pub owner: Name,
+    pub unit: ObjectiveKpiEntryUnit,
+    ///The UNITY-6G KPI the objective KPI serves.
+    #[serde(rename = "unity6gKpi")]
+    pub unity6g_kpi: ObjectiveKpiEntryUnity6gKpi,
+    pub version: SemVer,
+}
+///`ObjectiveKpiEntryDefinition`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct ObjectiveKpiEntryDefinition(::std::string::String);
+impl ::std::ops::Deref for ObjectiveKpiEntryDefinition {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<ObjectiveKpiEntryDefinition> for ::std::string::String {
+    fn from(value: ObjectiveKpiEntryDefinition) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for ObjectiveKpiEntryDefinition {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for ObjectiveKpiEntryDefinition {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for ObjectiveKpiEntryDefinition {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for ObjectiveKpiEntryDefinition {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///`ObjectiveKpiEntryDescription`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct ObjectiveKpiEntryDescription(::std::string::String);
+impl ::std::ops::Deref for ObjectiveKpiEntryDescription {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<ObjectiveKpiEntryDescription> for ::std::string::String {
+    fn from(value: ObjectiveKpiEntryDescription) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for ObjectiveKpiEntryDescription {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for ObjectiveKpiEntryDescription {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for ObjectiveKpiEntryDescription {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for ObjectiveKpiEntryDescription {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///`ObjectiveKpiEntryMethodology`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct ObjectiveKpiEntryMethodology(::std::string::String);
+impl ::std::ops::Deref for ObjectiveKpiEntryMethodology {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<ObjectiveKpiEntryMethodology> for ::std::string::String {
+    fn from(value: ObjectiveKpiEntryMethodology) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for ObjectiveKpiEntryMethodology {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for ObjectiveKpiEntryMethodology {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for ObjectiveKpiEntryMethodology {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for ObjectiveKpiEntryMethodology {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///`ObjectiveKpiEntryUnit`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct ObjectiveKpiEntryUnit(::std::string::String);
+impl ::std::ops::Deref for ObjectiveKpiEntryUnit {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<ObjectiveKpiEntryUnit> for ::std::string::String {
+    fn from(value: ObjectiveKpiEntryUnit) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for ObjectiveKpiEntryUnit {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for ObjectiveKpiEntryUnit {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for ObjectiveKpiEntryUnit {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for ObjectiveKpiEntryUnit {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///The UNITY-6G KPI the objective KPI serves.
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct ObjectiveKpiEntryUnity6gKpi(::std::string::String);
+impl ::std::ops::Deref for ObjectiveKpiEntryUnity6gKpi {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<ObjectiveKpiEntryUnity6gKpi> for ::std::string::String {
+    fn from(value: ObjectiveKpiEntryUnity6gKpi) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for ObjectiveKpiEntryUnity6gKpi {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for ObjectiveKpiEntryUnity6gKpi {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for ObjectiveKpiEntryUnity6gKpi {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for ObjectiveKpiEntryUnity6gKpi {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
     }
 }
 ///`ObjectiveTarget`
@@ -4177,6 +5690,16 @@ impl ::std::convert::From<f64> for ParameterBoundsEnumItem {
         Self::Number(value)
     }
 }
+///`ParameterReadBack`
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct ParameterReadBack {
+    ///The verification method that reads the parameter back: msObservation or controllerQuery.
+    pub method: CamelName,
+    ///The metric that reports the parameter, for msObservation.
+    #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+    pub metric: ::std::option::Option<KindPathRef>,
+}
 ///`Policies`
 #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
 #[serde(deny_unknown_fields)]
@@ -4503,6 +6026,252 @@ impl<'de> ::serde::Deserialize<'de> for ReasonCode {
             })
     }
 }
+///A reason code: its category and its meaning.
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct ReasonCodeEntry {
+    pub category: ReasonCodeEntryCategory,
+    pub code: ReasonCode,
+    ///A deprecated entry stays resolvable; admission warns new descriptors.
+    pub deprecated: bool,
+    pub description: ReasonCodeEntryDescription,
+    pub id: CatalogId,
+    pub kind: ::std::string::String,
+    pub meaning: ReasonCodeEntryMeaning,
+    ///The owner of the entry: the domain owner, framework or kpi-definitions.
+    pub owner: Name,
+    #[serde(rename = "raisedBy")]
+    pub raised_by: ReasonCodeEntryRaisedBy,
+    pub version: SemVer,
+}
+///`ReasonCodeEntryCategory`
+#[derive(
+    ::serde::Deserialize,
+    ::serde::Serialize,
+    Clone,
+    Copy,
+    Debug,
+    Eq,
+    Hash,
+    Ord,
+    PartialEq,
+    PartialOrd
+)]
+pub enum ReasonCodeEntryCategory {
+    #[serde(rename = "decision")]
+    Decision,
+    #[serde(rename = "mediation")]
+    Mediation,
+    #[serde(rename = "actuation")]
+    Actuation,
+    #[serde(rename = "lifecycle")]
+    Lifecycle,
+}
+impl ::std::fmt::Display for ReasonCodeEntryCategory {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        match *self {
+            Self::Decision => f.write_str("decision"),
+            Self::Mediation => f.write_str("mediation"),
+            Self::Actuation => f.write_str("actuation"),
+            Self::Lifecycle => f.write_str("lifecycle"),
+        }
+    }
+}
+impl ::std::str::FromStr for ReasonCodeEntryCategory {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        match value {
+            "decision" => Ok(Self::Decision),
+            "mediation" => Ok(Self::Mediation),
+            "actuation" => Ok(Self::Actuation),
+            "lifecycle" => Ok(Self::Lifecycle),
+            _ => Err("invalid value".into()),
+        }
+    }
+}
+impl ::std::convert::TryFrom<&str> for ReasonCodeEntryCategory {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        value.parse()
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for ReasonCodeEntryCategory {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        value.parse()
+    }
+}
+///`ReasonCodeEntryDescription`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct ReasonCodeEntryDescription(::std::string::String);
+impl ::std::ops::Deref for ReasonCodeEntryDescription {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<ReasonCodeEntryDescription> for ::std::string::String {
+    fn from(value: ReasonCodeEntryDescription) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for ReasonCodeEntryDescription {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for ReasonCodeEntryDescription {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for ReasonCodeEntryDescription {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for ReasonCodeEntryDescription {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///`ReasonCodeEntryMeaning`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct ReasonCodeEntryMeaning(::std::string::String);
+impl ::std::ops::Deref for ReasonCodeEntryMeaning {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<ReasonCodeEntryMeaning> for ::std::string::String {
+    fn from(value: ReasonCodeEntryMeaning) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for ReasonCodeEntryMeaning {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for ReasonCodeEntryMeaning {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for ReasonCodeEntryMeaning {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for ReasonCodeEntryMeaning {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///`ReasonCodeEntryRaisedBy`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct ReasonCodeEntryRaisedBy(::std::string::String);
+impl ::std::ops::Deref for ReasonCodeEntryRaisedBy {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<ReasonCodeEntryRaisedBy> for ::std::string::String {
+    fn from(value: ReasonCodeEntryRaisedBy) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for ReasonCodeEntryRaisedBy {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for ReasonCodeEntryRaisedBy {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for ReasonCodeEntryRaisedBy {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for ReasonCodeEntryRaisedBy {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
 ///The re-decision budget of the objective: the re-decisions used and the maximum within the window.
 #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
 #[serde(deny_unknown_fields)]
@@ -4781,6 +6550,308 @@ impl<'de> ::serde::Deserialize<'de> for SemVer {
             })
     }
 }
+///A service contract: its contribution class, provider, interface and version and, for a platform service, the point at which the platform consumes it. A flow contract names the flow and what it carries.
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct ServiceContractEntry {
+    ///The metrics, insight types or action types the flow carries.
+    pub carries: ::std::vec::Vec<KindPathRef>,
+    ///For a platform service: where the platform consumes it.
+    #[serde(
+        rename = "consumedAt",
+        skip_serializing_if = "::std::option::Option::is_none"
+    )]
+    pub consumed_at: ::std::option::Option<ServiceContractEntryConsumedAt>,
+    pub contribution: ServiceContractEntryContribution,
+    ///A deprecated entry stays resolvable; admission warns new descriptors.
+    pub deprecated: bool,
+    pub description: ServiceContractEntryDescription,
+    #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+    pub flow: ::std::option::Option<FlowKind>,
+    pub id: CatalogId,
+    pub interface: ServiceContractEntryInterface,
+    pub kind: ::std::string::String,
+    ///The owner of the entry: the domain owner, framework or kpi-definitions.
+    pub owner: Name,
+    pub provider: ServiceContractEntryProvider,
+    pub version: SemVer,
+}
+///For a platform service: where the platform consumes it.
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct ServiceContractEntryConsumedAt(::std::string::String);
+impl ::std::ops::Deref for ServiceContractEntryConsumedAt {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<ServiceContractEntryConsumedAt> for ::std::string::String {
+    fn from(value: ServiceContractEntryConsumedAt) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for ServiceContractEntryConsumedAt {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for ServiceContractEntryConsumedAt {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for ServiceContractEntryConsumedAt {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for ServiceContractEntryConsumedAt {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///`ServiceContractEntryContribution`
+#[derive(
+    ::serde::Deserialize,
+    ::serde::Serialize,
+    Clone,
+    Copy,
+    Debug,
+    Eq,
+    Hash,
+    Ord,
+    PartialEq,
+    PartialOrd
+)]
+pub enum ServiceContractEntryContribution {
+    #[serde(rename = "flow")]
+    Flow,
+    #[serde(rename = "platformService")]
+    PlatformService,
+}
+impl ::std::fmt::Display for ServiceContractEntryContribution {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        match *self {
+            Self::Flow => f.write_str("flow"),
+            Self::PlatformService => f.write_str("platformService"),
+        }
+    }
+}
+impl ::std::str::FromStr for ServiceContractEntryContribution {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        match value {
+            "flow" => Ok(Self::Flow),
+            "platformService" => Ok(Self::PlatformService),
+            _ => Err("invalid value".into()),
+        }
+    }
+}
+impl ::std::convert::TryFrom<&str> for ServiceContractEntryContribution {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        value.parse()
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String>
+for ServiceContractEntryContribution {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        value.parse()
+    }
+}
+///`ServiceContractEntryDescription`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct ServiceContractEntryDescription(::std::string::String);
+impl ::std::ops::Deref for ServiceContractEntryDescription {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<ServiceContractEntryDescription> for ::std::string::String {
+    fn from(value: ServiceContractEntryDescription) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for ServiceContractEntryDescription {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for ServiceContractEntryDescription {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for ServiceContractEntryDescription {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for ServiceContractEntryDescription {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///`ServiceContractEntryInterface`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct ServiceContractEntryInterface(::std::string::String);
+impl ::std::ops::Deref for ServiceContractEntryInterface {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<ServiceContractEntryInterface> for ::std::string::String {
+    fn from(value: ServiceContractEntryInterface) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for ServiceContractEntryInterface {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for ServiceContractEntryInterface {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for ServiceContractEntryInterface {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for ServiceContractEntryInterface {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///`ServiceContractEntryProvider`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct ServiceContractEntryProvider(::std::string::String);
+impl ::std::ops::Deref for ServiceContractEntryProvider {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<ServiceContractEntryProvider> for ::std::string::String {
+    fn from(value: ServiceContractEntryProvider) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for ServiceContractEntryProvider {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for ServiceContractEntryProvider {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for ServiceContractEntryProvider {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for ServiceContractEntryProvider {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
 ///`ServiceDependency`
 #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
 #[serde(deny_unknown_fields)]
@@ -4868,6 +6939,191 @@ pub struct ServiceTree {
     )]
     pub operational_timeout: ::std::option::Option<Duration>,
     pub services: ::std::vec::Vec<ServiceDependency>,
+}
+///A source kind: its protocol, its acquisition patterns and its guarantee of read-only access.
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct SourceKindEntry {
+    ///The source adapter, as module:class of u6g-adapters.
+    pub adapter: SourceKindEntryAdapter,
+    ///A deprecated entry stays resolvable; admission warns new descriptors.
+    pub deprecated: bool,
+    pub description: SourceKindEntryDescription,
+    pub id: CatalogId,
+    pub kind: ::std::string::String,
+    ///The owner of the entry: the domain owner, framework or kpi-definitions.
+    pub owner: Name,
+    ///periodicStream, poll, onChange or event.
+    pub patterns: ::std::vec::Vec<CamelName>,
+    pub protocol: SourceKindEntryProtocol,
+    #[serde(rename = "readOnly")]
+    pub read_only: bool,
+    pub version: SemVer,
+}
+///The source adapter, as module:class of u6g-adapters.
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct SourceKindEntryAdapter(::std::string::String);
+impl ::std::ops::Deref for SourceKindEntryAdapter {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<SourceKindEntryAdapter> for ::std::string::String {
+    fn from(value: SourceKindEntryAdapter) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for SourceKindEntryAdapter {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for SourceKindEntryAdapter {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for SourceKindEntryAdapter {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for SourceKindEntryAdapter {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///`SourceKindEntryDescription`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct SourceKindEntryDescription(::std::string::String);
+impl ::std::ops::Deref for SourceKindEntryDescription {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<SourceKindEntryDescription> for ::std::string::String {
+    fn from(value: SourceKindEntryDescription) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for SourceKindEntryDescription {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for SourceKindEntryDescription {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for SourceKindEntryDescription {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for SourceKindEntryDescription {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///`SourceKindEntryProtocol`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct SourceKindEntryProtocol(::std::string::String);
+impl ::std::ops::Deref for SourceKindEntryProtocol {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<SourceKindEntryProtocol> for ::std::string::String {
+    fn from(value: SourceKindEntryProtocol) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for SourceKindEntryProtocol {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for SourceKindEntryProtocol {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for SourceKindEntryProtocol {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for SourceKindEntryProtocol {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
 }
 ///`SourceSpec`
 #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
@@ -5404,6 +7660,136 @@ impl ::std::convert::TryFrom<::std::string::String> for VerdictRefKind {
 pub struct Verification {
     pub evidence: ::std::vec::Vec<ObservationId>,
     pub method: CamelName,
+}
+///A verification method: its read-back path and its typical latency.
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct VerificationMethodEntry {
+    ///A deprecated entry stays resolvable; admission warns new descriptors.
+    pub deprecated: bool,
+    pub description: VerificationMethodEntryDescription,
+    pub id: CatalogId,
+    pub kind: ::std::string::String,
+    ///The name action types and descriptors use.
+    pub method: CamelName,
+    ///The owner of the entry: the domain owner, framework or kpi-definitions.
+    pub owner: Name,
+    #[serde(rename = "readBack")]
+    pub read_back: VerificationMethodEntryReadBack,
+    #[serde(rename = "typicalLatency")]
+    pub typical_latency: Duration,
+    pub version: SemVer,
+}
+///`VerificationMethodEntryDescription`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct VerificationMethodEntryDescription(::std::string::String);
+impl ::std::ops::Deref for VerificationMethodEntryDescription {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<VerificationMethodEntryDescription> for ::std::string::String {
+    fn from(value: VerificationMethodEntryDescription) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for VerificationMethodEntryDescription {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for VerificationMethodEntryDescription {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String>
+for VerificationMethodEntryDescription {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for VerificationMethodEntryDescription {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///`VerificationMethodEntryReadBack`
+#[derive(
+    ::serde::Deserialize,
+    ::serde::Serialize,
+    Clone,
+    Copy,
+    Debug,
+    Eq,
+    Hash,
+    Ord,
+    PartialEq,
+    PartialOrd
+)]
+pub enum VerificationMethodEntryReadBack {
+    #[serde(rename = "monitoringSystem")]
+    MonitoringSystem,
+    #[serde(rename = "controllerQuery")]
+    ControllerQuery,
+}
+impl ::std::fmt::Display for VerificationMethodEntryReadBack {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        match *self {
+            Self::MonitoringSystem => f.write_str("monitoringSystem"),
+            Self::ControllerQuery => f.write_str("controllerQuery"),
+        }
+    }
+}
+impl ::std::str::FromStr for VerificationMethodEntryReadBack {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        match value {
+            "monitoringSystem" => Ok(Self::MonitoringSystem),
+            "controllerQuery" => Ok(Self::ControllerQuery),
+            _ => Err("invalid value".into()),
+        }
+    }
+}
+impl ::std::convert::TryFrom<&str> for VerificationMethodEntryReadBack {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        value.parse()
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for VerificationMethodEntryReadBack {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        value.parse()
+    }
 }
 ///`VerificationSpec`
 #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
