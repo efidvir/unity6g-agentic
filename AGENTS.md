@@ -4,7 +4,7 @@
 The platform of the UNITY-6G agentic framework: the capability runtime, the descriptor toolchain,
 the agent host of the DMOs, the platform services of the AI/ML domains, the agent-support module
 beside the IDMO, the conflict mediator, the adapters and the twin service.
-Concepts: [FW] version 8. Formats: [IMPL]. Practice: the implementation guide version 1.2.
+Concepts: [FW] version 8. Formats: [IMPL]. Practice: the implementation guide version 1.3.
 
 ## Read first
 1. STATE.md: where the work stands and the next item.

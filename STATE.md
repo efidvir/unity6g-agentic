@@ -70,6 +70,12 @@
   driver's 20 KPI constants equal to the enum
 
 ## Documents delivered
+- UNITY6G_Agentic_Implementation_Guide_v1.3.docx, version 1.3, 2026-11-26, 223 pages: the real TeraFlowSDN of
+  the lab with a fault proxy where version 1.2 had a mock controller (Sections 19.6 and 19.9, Chapters 20, 22
+  and 25, Annex G), the exact catalog (Sections 11.4 and 17.1, Table 17-1), the radio KPIs and the Monitoring
+  System as the only path of the controller's telemetry to the Data Continuum (Section 5.6), the RFC 8561
+  modulation identities in the examples, and the service models TeraFlowSDN's interfaces implement (RFC 8466
+  and RFC 8299)
 - UNITY6G_Agentic_Implementation_Guide_v1.2.docx, version 1.2, 2026-11-25: the real, emulated and simulated
   forms of each component per environment (Section 19.9), the connection to the components of others
   (Section 19.10), contract suites at the boundary (Section 20.7), OCUDU in the lab, the dependencies of the
