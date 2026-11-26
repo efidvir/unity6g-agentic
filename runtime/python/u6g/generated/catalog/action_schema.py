@@ -104,3 +104,9 @@ class ActionTypeEntry(BaseModel):
     """
     The bindings that support the action, with the only operations Translate may emit on each.
     """
+    provenance: Annotated[list[common_schema.Provenance], Field(min_length=1)]
+    """
+    Where the entry's content comes from.
+    """
+    teraflowsdn: common_schema.TfsOperation | None = None
+    hardware: common_schema.DeviceVerification | None = None

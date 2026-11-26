@@ -38,3 +38,7 @@ class InsightTypeEntry(BaseModel):
     """
     The JSON Schema of the payload of an insight of this type.
     """
+    provenance: Annotated[list[common_schema.Provenance], Field(min_length=1)]
+    """
+    Where the entry's content comes from.
+    """

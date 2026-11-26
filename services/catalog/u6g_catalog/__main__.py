@@ -4,13 +4,17 @@ python -m u6g_catalog build <catalog_dir> --out <dir>     validate, index and ar
 python -m u6g_catalog keygen --out <dir>                  a signing key pair for a development machine
 python -m u6g_catalog sign <snapshot> --key <pem>         write <snapshot>.sig.json
 python -m u6g_catalog verify <snapshot> --pub <pem>       check <snapshot>.sig.json
-python -m u6g_catalog serve --index <index.json>          serve the index over REST"""
+python -m u6g_catalog serve --index <index.json>          serve the index over REST
+python -m u6g_catalog import-tfs <tfs_dir> --source <owner/repo@commit> --binding <entry.yaml>
+                                                          write what TeraFlowSDN declares into a binding"""
 
 import argparse
 import json
 import os
 import sys
 from pathlib import Path
+
+import yaml
 
 from u6g_catalog.build import build_index, load
 from u6g_catalog.snapshot import archive, keygen, sha256, sign, verify
@@ -64,6 +68,25 @@ def cmd_verify(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_import_tfs(args: argparse.Namespace) -> int:
+    """Write what a TeraFlowSDN source tree declares into the model of a controller binding entry."""
+    from u6g_catalog.tfs import read_model
+
+    entry = yaml.safe_load(args.binding.read_text())
+    model = {"source": args.source, **read_model(args.tfs_dir)}
+    if entry.get("model") == model:
+        print(f"u6g-catalog: {args.binding} already holds the model of {args.source}")
+        return 0
+    if args.check:
+        print(f"u6g-catalog: {args.binding} differs from the model of {args.source}", file=sys.stderr)
+        return 1
+    entry["model"] = model
+    args.binding.write_text(yaml.safe_dump(entry, sort_keys=False, allow_unicode=True, width=110))
+    counts = ", ".join(f"{len(v)} {k}" for k, v in model.items() if isinstance(v, list))
+    print(f"u6g-catalog: {args.binding} now holds the model of {args.source}: {counts}")
+    return 0
+
+
 def cmd_serve(args: argparse.Namespace) -> int:
     import uvicorn
 
@@ -94,6 +117,12 @@ def main(argv: list[str]) -> int:
     ver.add_argument("snapshot", type=Path)
     ver.add_argument("--pub", type=Path, required=True)
     ver.set_defaults(run=cmd_verify)
+    imp = commands.add_parser("import-tfs")
+    imp.add_argument("tfs_dir", type=Path)
+    imp.add_argument("--source", required=True, help="the repository and commit read, as owner/repo@commit")
+    imp.add_argument("--binding", type=Path, required=True, help="the controller binding entry to write")
+    imp.add_argument("--check", action="store_true", help="report a difference and write nothing")
+    imp.set_defaults(run=cmd_import_tfs)
     serve = commands.add_parser("serve")
     serve.add_argument("--index", type=Path, required=True)
     serve.add_argument("--host", default="127.0.0.1")

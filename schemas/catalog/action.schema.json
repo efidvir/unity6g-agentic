@@ -17,7 +17,8 @@
     "idempotent",
     "verification",
     "rollback",
-    "controllerBindings"
+    "controllerBindings",
+    "provenance"
   ],
   "properties": {
     "kind": {
@@ -69,6 +70,20 @@
         "$ref": "#/$defs/ActionBinding"
       },
       "minItems": 1
+    },
+    "provenance": {
+      "description": "Where the entry's content comes from.",
+      "type": "array",
+      "items": {
+        "$ref": "common.schema.json#/$defs/Provenance"
+      },
+      "minItems": 1
+    },
+    "teraflowsdn": {
+      "$ref": "common.schema.json#/$defs/TfsOperation"
+    },
+    "hardware": {
+      "$ref": "common.schema.json#/$defs/DeviceVerification"
     }
   },
   "$defs": {

@@ -77,6 +77,466 @@
           }
         }
       }
+    },
+    "Provenance": {
+      "description": "Where part of an entry comes from, exactly enough to find it again.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "ref"
+      ],
+      "properties": {
+        "source": {
+          "description": "The kind of source: the TeraFlowSDN code at a commit, a YANG module at a revision, a standard, the API of a device as a driver reads it, the framework or the implementation guide.",
+          "type": "string",
+          "enum": [
+            "teraflowsdn",
+            "yang",
+            "ietf",
+            "itu-t",
+            "ieee",
+            "device-api",
+            "framework",
+            "guide"
+          ]
+        },
+        "ref": {
+          "description": "The place within the source: a repository at a commit with a path and a symbol, a module@revision with a node, an RFC or Recommendation with a section, a section of [FW] or of the guide.",
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "TfsKpi": {
+      "description": "How TeraFlowSDN delivers a metric: a KPI sample type, collected for one kind of entity of a KPI descriptor.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kpiSampleType",
+        "scope",
+        "scale"
+      ],
+      "properties": {
+        "kpiSampleType": {
+          "type": "string",
+          "pattern": "^KPISAMPLETYPE_[A-Z0-9_]+$"
+        },
+        "scope": {
+          "description": "The entity of the KPI descriptor the samples describe.",
+          "type": "string",
+          "enum": [
+            "device",
+            "endpoint",
+            "link",
+            "service",
+            "slice",
+            "connection"
+          ]
+        },
+        "scale": {
+          "description": "The factor from the KPI's value to the metric's unit: 1000 turns Gbps into Mbps.",
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "TfsConfigRule": {
+      "description": "How a TeraFlowSDN driver sets a control parameter: the resource key of a config rule and the field of its value.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "deviceDriver",
+        "resourceKey",
+        "field"
+      ],
+      "properties": {
+        "deviceDriver": {
+          "type": "string",
+          "pattern": "^DEVICEDRIVER_[A-Z0-9_]+$"
+        },
+        "resourceKey": {
+          "description": "The key, with <placeholders> for its parts, as /interface[name=<if>]/acm.",
+          "type": "string",
+          "minLength": 1
+        },
+        "field": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "FamilyRealization": {
+      "description": "What a control parameter acts on in one product family, through the driver.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "apiFlavor",
+        "deviceNode",
+        "behaviour"
+      ],
+      "properties": {
+        "apiFlavor": {
+          "description": "The API flavour of the family as the driver's portfolio names it: siklu_tg, siklu_eh or ceraos.",
+          "type": "string",
+          "minLength": 1
+        },
+        "deviceNode": {
+          "description": "The node of the device's own model the driver writes, as module:node; none when the family has no equivalent.",
+          "type": "string",
+          "minLength": 1
+        },
+        "behaviour": {
+          "description": "What setting the parameter does on that family.",
+          "type": "string",
+          "minLength": 1
+        },
+        "values": {
+          "description": "The values the family's device accepts for the parameter, as the driver passes them, where they differ from the catalog's values.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        }
+      }
+    },
+    "TfsOperation": {
+      "description": "How an action type reaches the network through TeraFlowSDN.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operation"
+      ],
+      "properties": {
+        "operation": {
+          "description": "device.config.set writes config rules to a device; service.update and slice.update change a service or a slice of the context.",
+          "type": "string",
+          "enum": [
+            "device.config.set",
+            "service.update",
+            "slice.update"
+          ]
+        },
+        "serviceType": {
+          "type": "string",
+          "pattern": "^SERVICETYPE_[A-Z0-9_]+$"
+        },
+        "configRule": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "TfsModel": {
+      "description": "The declarations of a TeraFlowSDN source tree at one commit (u6g_catalog.tfs).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "deviceTypes",
+        "deviceDrivers",
+        "serviceTypes",
+        "kpiSampleTypes",
+        "drivers",
+        "serviceHandlers",
+        "northbound",
+        "sloMetricTypes",
+        "ceragonPortfolio"
+      ],
+      "properties": {
+        "source": {
+          "description": "The repository and commit read, as owner/repo@commit.",
+          "type": "string",
+          "minLength": 1
+        },
+        "deviceTypes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "value"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "value": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "deviceDrivers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "value"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "value": {
+                "type": "integer"
+              },
+              "comment": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "serviceTypes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "value"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "value": {
+                "type": "integer"
+              },
+              "comment": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "kpiSampleTypes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "value"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "value": {
+                "type": "integer"
+              },
+              "comment": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "drivers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "driverClass",
+              "deviceTypes",
+              "drivers"
+            ],
+            "properties": {
+              "driverClass": {
+                "type": "string",
+                "minLength": 1
+              },
+              "deviceTypes": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "drivers": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        },
+        "serviceHandlers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "handlerClass",
+              "serviceTypes",
+              "drivers"
+            ],
+            "properties": {
+              "handlerClass": {
+                "type": "string",
+                "minLength": 1
+              },
+              "serviceTypes": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "drivers": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        },
+        "northbound": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "interface",
+              "yang"
+            ],
+            "properties": {
+              "interface": {
+                "type": "string",
+                "minLength": 1
+              },
+              "yang": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        },
+        "sloMetricTypes": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "module",
+            "identities"
+          ],
+          "properties": {
+            "module": {
+              "type": "string",
+              "minLength": 1
+            },
+            "identities": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "identity"
+                ],
+                "properties": {
+                  "identity": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "description": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "reference": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "ceragonPortfolio": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "model",
+              "family",
+              "apiFlavor",
+              "apiVerified"
+            ],
+            "properties": {
+              "model": {
+                "type": "string",
+                "minLength": 1
+              },
+              "family": {
+                "type": "string",
+                "minLength": 1
+              },
+              "apiFlavor": {
+                "type": "string",
+                "minLength": 1
+              },
+              "apiVerified": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      }
+    },
+    "DeviceVerification": {
+      "description": "Whether the device-dependent content of an entry has been checked on real equipment. The products are named as the radio driver's portfolio names them.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "verifiedOn",
+        "provisionalOn"
+      ],
+      "properties": {
+        "status": {
+          "description": "verified when every product the entry applies to has been checked; provisional otherwise.",
+          "type": "string",
+          "enum": [
+            "verified",
+            "provisional"
+          ]
+        },
+        "verifiedOn": {
+          "description": "The products checked against the entry on real equipment.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "provisionalOn": {
+          "description": "The products or families whose behaviour the entry follows from their API as the driver models it, until checked on hardware.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
     }
   }
 }

@@ -44,3 +44,7 @@ class ServiceContractEntry(BaseModel):
     """
     For a platform service: where the platform consumes it.
     """
+    provenance: Annotated[list[common_schema.Provenance], Field(min_length=1)]
+    """
+    Where the entry's content comes from.
+    """

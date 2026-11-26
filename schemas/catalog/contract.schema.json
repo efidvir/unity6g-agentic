@@ -15,7 +15,8 @@
     "contribution",
     "provider",
     "interface",
-    "carries"
+    "carries",
+    "provenance"
   ],
   "properties": {
     "kind": {
@@ -69,6 +70,14 @@
       "description": "For a platform service: where the platform consumes it.",
       "type": "string",
       "minLength": 1
+    },
+    "provenance": {
+      "description": "Where the entry's content comes from.",
+      "type": "array",
+      "items": {
+        "$ref": "common.schema.json#/$defs/Provenance"
+      },
+      "minItems": 1
     }
   }
 }

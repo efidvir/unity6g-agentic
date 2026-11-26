@@ -7,3 +7,8 @@ deprecated: false
 method: controllerQuery
 readBack: controllerQuery
 typicalLatency: PT2S
+provenance:
+- source: guide
+  ref: Implementation guide v1.2, Section 11.4 and Chapter 8
+- source: framework
+  ref: '[FW] Section 3.6, the kinds of catalog entry'

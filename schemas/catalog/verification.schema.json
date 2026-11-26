@@ -14,7 +14,8 @@
     "deprecated",
     "method",
     "readBack",
-    "typicalLatency"
+    "typicalLatency",
+    "provenance"
   ],
   "properties": {
     "kind": {
@@ -52,6 +53,14 @@
     },
     "typicalLatency": {
       "$ref": "../common/defs.schema.json#/$defs/Duration"
+    },
+    "provenance": {
+      "description": "Where the entry's content comes from.",
+      "type": "array",
+      "items": {
+        "$ref": "common.schema.json#/$defs/Provenance"
+      },
+      "minItems": 1
     }
   }
 }

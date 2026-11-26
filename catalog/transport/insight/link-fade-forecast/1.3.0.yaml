@@ -20,3 +20,8 @@ payload:
     horizon:
       type: string
       minLength: 3
+provenance:
+- source: guide
+  ref: Implementation guide v1.2, Section 6.6 and Annex B
+- source: framework
+  ref: '[FW] Section 3.6, the kinds of catalog entry'

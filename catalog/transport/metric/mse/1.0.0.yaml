@@ -2,16 +2,34 @@ kind: Metric
 id: transport/metric/mse
 version: 1.0.0
 owner: transport-domain
-description: Mean squared error
+description: Mean square error of the demodulator
 deprecated: false
 objectClass: mw-link
-definition: The mean squared error of the received constellation, the radio's measure of signal quality; lower is
-  better.
+definition: The mean square error of the near-end carrier's demodulator, in dB, as CeraOS reports it (mse-db). TeraFlowSDN
+  carries it as the KPI RADIO_MSE_DB. MultiHaul TG and EtherHaul report a signal to noise figure, transport/metric/snir.
 value:
   type: number
   unit: dB
 type: gauge
 aggregation: mean
 sources:
-- transport/source/radio-counters@1.3.0
 - transport/source/sdn-telemetry@1.0.0
+teraflowsdn:
+  kpiSampleType: KPISAMPLETYPE_RADIO_MSE_DB
+  scope: endpoint
+  scale: 1
+hardware:
+  status: provisional
+  verifiedOn: []
+  provisionalOn:
+  - IP-20
+  - IP-50
+  - IP-100
+provenance:
+- source: teraflowsdn
+  ref: 'efidvir/teraflowsdn@ddd4aaf: proto/kpi_sample_types.proto KPISAMPLETYPE_RADIO_MSE_DB; src/device/service/drivers/ceragon/Tools.py
+    radio_figure and FAMILY_RADIO_FIGURES'
+- source: device-api
+  ref: ceragon-radio-link:carrier/mse-db, as the Ceragon driver writes or reads it (efidvir/teraflowsdn@ddd4aaf)
+- source: guide
+  ref: Implementation guide v1.2, Section 17.1 and Table 17-1

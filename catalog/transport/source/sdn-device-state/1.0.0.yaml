@@ -1,0 +1,17 @@
+kind: SourceKind
+id: transport/source/sdn-device-state
+version: 1.0.0
+owner: transport-domain
+description: A device's state as the transport SDN controller reads it from the device
+deprecated: false
+protocol: 'TeraFlowSDN tfs-api GET /tfs-api/device/<uuid>: the device''s configuration rules, among them the driver''s
+  read-only views such as /microwave-radio-link'
+readOnly: true
+patterns:
+- poll
+adapter: u6g_adapters_sources.tfs:DeviceStateSource
+provenance:
+- source: teraflowsdn
+  ref: 'efidvir/teraflowsdn@ddd4aaf: src/nbi/service/tfs_api/__init__.py route /device/<path:device_uuid>'
+- source: teraflowsdn
+  ref: 'efidvir/teraflowsdn@ddd4aaf: src/device/service/drivers/ceragon/Tools.py compose_initial_config and compose_rfc8561_view'

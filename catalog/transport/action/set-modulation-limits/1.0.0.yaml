@@ -19,16 +19,17 @@ parameters:
     minProfile: &id001
       type: string
       enum:
-      - QPSK
-      - 16QAM
-      - 32QAM
-      - 64QAM
-      - 128QAM
-      - 256QAM
-      - 512QAM
-      - 1024QAM
-      - 2048QAM
-      - 4096QAM
+      - bpsk
+      - qpsk
+      - qam-16
+      - qam-32
+      - qam-64
+      - qam-128
+      - qam-256
+      - qam-512
+      - qam-1024
+      - qam-2048
+      - qam-4096
     maxProfile: *id001
 idempotent: true
 verification:
@@ -51,3 +52,23 @@ controllerBindings:
 - binding: transport/binding/tfs-nbi@2.0.0
   operations:
   - device.config.set
+provenance:
+- source: teraflowsdn
+  ref: 'efidvir/teraflowsdn@ddd4aaf: src/device/service/drivers/ceragon/routing.py apply_rule (acm) and client.py
+    apply_acm_config'
+- source: guide
+  ref: Implementation guide v1.2, Section 11.4 and Table 17-1
+- source: framework
+  ref: '[FW] Section 3.6, the kinds of catalog entry'
+teraflowsdn:
+  operation: device.config.set
+  configRule: /interface[name=<if>]/acm
+hardware:
+  status: provisional
+  verifiedOn: []
+  provisionalOn:
+  - MultiHaul TG
+  - EtherHaul
+  - IP-20
+  - IP-50
+  - IP-100

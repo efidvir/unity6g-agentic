@@ -14,7 +14,7 @@
 | 0.2 | in progress | the tuple's contracts are done and checked, provisional until [IMPL] 3.2 (pull request #2): make check passes locally (Checks below) and in the pipeline: runs 45619948464 (push) and 45619959912 (pull request #2), both success; the rest of Table 26-1 comes with the items that use it | 2026-11-25 |
 | 0.3 | done | make check passes locally (Checks below) and in the pipeline: runs 45620156774 (push) and 45620208026 (pull request #3), both success; 26 tests, 8 of them property tests over generated condition trees: structure, declared operands, depth limit, results | 2026-11-25 |
 | 0.7 | in progress | reworked by the owner's ruling of 2026-11-26: the controller is the real TeraFlowSDN on cersrv-029, and a proxy in front of its northbound interface injects the five failure behaviors; the mock of pull request #4 is withdrawn; blocked on the route into the server | 2026-11-26 |
-| 0.4 | in progress | reworked by the owner's ruling of 2026-11-26: entries generated from TeraFlowSDN's protos, registries and YANG, each with its provenance and verification status; the build, index, signed snapshot and service of pull request #5 stay | 2026-11-26 |
+| 0.4 | in progress | reworked by the owner's ruling of 2026-11-26 (pull request #5, now on #3): the controller binding holds the model u6g-catalog import-tfs reads from the TeraFlowSDN fork at ddd4aaf (48 device types, 23 kinds of driver, 15 service types, 60 KPI sample types, the driver and handler registries, the YANG of the northbound interfaces, the SLO metric types, the radio portfolio); every entry has its provenance; the radio metrics, parameters and actions name their KPI types, config rules and per-family behaviour, each provisional on hardware; the build checks them against the model; 86 entries; the guide's Table 17-1 and examples follow in its next version | 2026-11-26 |
 | 1.1 | open | | 2026-11-25 |
 | 1.2 | open | | 2026-11-25 |
 | 1.3 | open | authority read from a local file until the AI/ML domain exists | 2026-11-25 |
@@ -84,9 +84,23 @@
 - 2026-11-26 The UNITY-6G KPIs that kpi/link-availability and kpi/link-capacity-ratio serve, named
   Availability and Capacity for now -> open
 - 2026-11-26 The route into cersrv-029, whose SSH key is on the owner's laptop: a GitHub Actions runner on the
-  server tied to a private repository, or work through the laptop -> open
+  server tied to a private repository, or work through the laptop -> the laptop, the owner's choice; taking
+  over a computer leaves terminals click-only, so the owner runs a read-only probe
+  (Downloads/cersrv029_probe.sh) and the output comes back through the Downloads folder; the runner stays the
+  lasting route for deploying and testing on the server -> open
 - 2026-11-26 [IMPL] version 3.2, for Annex B, whose fields the exact catalog follows -> open; the owner is
   looking for the file
+- 2026-11-26 Which features of the radio driver were exercised on the MultiHaul MH-T261: the portfolio marks the
+  product's API as checked, and the catalog marks an entry verified only for what was exercised; until then
+  every device-dependent entry is provisional -> open
+- 2026-11-26 What the radio driver does at ddd4aaf that departs from the standards or the catalog's meaning,
+  to fix in the fork -> open:
+  - its RFC 8561 view uses a radio-performance container and selected-cm where RFC 8561 has the
+    carrier-termination leaves and actual-tx-cm, and it bundles reduced copies of the two modules;
+  - on MultiHaul TG, the maximum modulation becomes link-distance (Normal when the value contains 12), the
+    minimum is left unset, the transmit power in dBm is written as a power index clamped to 6..31;
+  - the capacity KPI reports the product's nominal maximum where the device reports no active link;
+  - the adaptive modulation limits cannot be read back through the controller
 - 2026-11-25 The permitted depth of conditions, which [FW] Section 3.5.18 leaves to [IMPL]: three levels of
   groups assumed, a single comparison being depth 0 -> open
 - 2026-11-25 The protos of Annex F keep their names as written, and buf lint leaves out five naming rules of
@@ -155,6 +169,14 @@
 - 2026-11-26 The consortium's SharePoint is read-only for this work (source: owner)
 - 2026-11-26 The implementation documents follow the code: a departure or a gap found while implementing is
   written into the guide and, where it concerns it, into [IMPL] (source: owner)
+- 2026-11-26 Every catalog entry carries its provenance; what TeraFlowSDN declares enters the catalog through
+  u6g-catalog import-tfs, read from its code at a named commit; metrics, parameters and actions name the KPI
+  type, config rule or operation that realizes them and the build checks them against that model; device-
+  dependent entries carry their status on hardware (source: owner, the realization a finding)
+- 2026-11-26 Modulation values in the catalog are the coding-modulation identities of ietf-microwave-types
+  (RFC 8561); a family's own values, as CeraOS's mrmc profiles, are listed with that family (source: finding)
+- 2026-11-26 Work item 0.4 goes on top of 0.3: the catalog needs no controller, so pull request #5 no longer
+  stacks on the withdrawn #4 (source: finding)
 
 ## Provisional contracts
 - schemas/common/defs.schema.json, schemas/descriptor/descriptor.schema.json and

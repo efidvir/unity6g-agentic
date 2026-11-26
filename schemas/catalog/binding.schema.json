@@ -19,7 +19,8 @@
     "operations",
     "adapter",
     "stateReflectsDevice",
-    "rollbackRoute"
+    "rollbackRoute",
+    "provenance"
   ],
   "properties": {
     "kind": {
@@ -88,6 +89,18 @@
         "controllerDryRun",
         "readOnly"
       ]
+    },
+    "provenance": {
+      "description": "Where the entry's content comes from.",
+      "type": "array",
+      "items": {
+        "$ref": "common.schema.json#/$defs/Provenance"
+      },
+      "minItems": 1
+    },
+    "model": {
+      "description": "What the controller declares about the devices, drivers, services and KPIs it supports, generated from its code by u6g-catalog import-tfs; written by the tool only.",
+      "$ref": "common.schema.json#/$defs/TfsModel"
     }
   }
 }

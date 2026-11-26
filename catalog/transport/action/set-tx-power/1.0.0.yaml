@@ -35,3 +35,23 @@ controllerBindings:
 - binding: transport/binding/tfs-nbi@2.0.0
   operations:
   - device.config.set
+provenance:
+- source: teraflowsdn
+  ref: 'efidvir/teraflowsdn@ddd4aaf: src/device/service/drivers/ceragon/routing.py apply_rule (radio) and client.py
+    apply_radio_tuning'
+- source: guide
+  ref: Implementation guide v1.2, Section 11.4 and Table 17-1
+- source: framework
+  ref: '[FW] Section 3.6, the kinds of catalog entry'
+teraflowsdn:
+  operation: device.config.set
+  configRule: /interface[name=<if>]/radio
+hardware:
+  status: provisional
+  verifiedOn: []
+  provisionalOn:
+  - MultiHaul TG
+  - EtherHaul
+  - IP-20
+  - IP-50
+  - IP-100

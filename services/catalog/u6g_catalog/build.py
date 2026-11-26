@@ -281,10 +281,90 @@ def _check_contract(catalog: Catalog, rel: str, contract: dict[str, Any]) -> Non
         catalog.find(rel, "consistency", "a platform service states where the platform consumes it")
 
 
+def _tfs_declarations(catalog: Catalog) -> dict[str, set[str]]:
+    """The names TeraFlowSDN declares, from the models of the catalog's live controller bindings."""
+    declared: dict[str, set[str]] = {
+        "kpiSampleTypes": set(),
+        "deviceDrivers": set(),
+        "serviceTypes": set(),
+        "products": set(),
+        "verifiedProducts": set(),
+        "families": set(),
+    }
+    for entry in catalog.entries.values():
+        model = (
+            entry.get("model") if entry["kind"] == "ControllerBinding" and not entry["deprecated"] else None
+        )
+        if model is None:
+            continue
+        for key in ("kpiSampleTypes", "deviceDrivers", "serviceTypes"):
+            declared[key].update(item["name"] for item in model[key])
+        for product in model["ceragonPortfolio"]:
+            declared["products"].add(product["model"])
+            declared["families"].update((product["family"], product["apiFlavor"]))
+            if product["apiVerified"]:
+                declared["verifiedProducts"].add(product["model"])
+    return declared
+
+
+def _check_realization(catalog: Catalog, rel: str, entry: dict[str, Any]) -> None:
+    """A metric, control parameter or action type that names TeraFlowSDN's KPI types, drivers or services,
+    or the products it was checked on, names what the controller declares."""
+    declared = _tfs_declarations(catalog)
+    tfs = entry.get("teraflowsdn", {})
+    for attr, key in (
+        ("kpiSampleType", "kpiSampleTypes"),
+        ("deviceDriver", "deviceDrivers"),
+        ("serviceType", "serviceTypes"),
+    ):
+        name = tfs.get(attr)
+        if name is not None and name not in declared[key]:
+            catalog.find(rel, "consistency", f"TeraFlowSDN declares no {attr} {name}")
+    verification = entry.get("hardware")
+    if verification is not None:
+        for product in verification["verifiedOn"]:
+            if product not in declared["verifiedProducts"]:
+                catalog.find(
+                    rel,
+                    "consistency",
+                    f"{product} is not a product the driver marks as checked on a real device",
+                )
+        for product in verification["provisionalOn"]:
+            if product not in declared["products"] | declared["families"]:
+                catalog.find(
+                    rel, "consistency", f"{product} is not a product or family of the driver's portfolio"
+                )
+        provisional = bool(verification["provisionalOn"])
+        if (verification["status"] == "verified") == provisional or not (
+            verification["verifiedOn"] or provisional
+        ):
+            catalog.find(
+                rel,
+                "consistency",
+                "verified means every product listed was checked; "
+                "provisional lists the products still to check",
+            )
+
+
+def _check_metric(catalog: Catalog, rel: str, metric: dict[str, Any]) -> None:
+    _check_realization(catalog, rel, metric)
+
+
+def _check_parameter_and_realization(catalog: Catalog, rel: str, param: dict[str, Any]) -> None:
+    _check_parameter(catalog, rel, param)
+    _check_realization(catalog, rel, param)
+
+
+def _check_action_and_realization(catalog: Catalog, rel: str, action: dict[str, Any]) -> None:
+    _check_action(catalog, rel, action)
+    _check_realization(catalog, rel, action)
+
+
 CHECKS = {
-    "ActionType": _check_action,
+    "ActionType": _check_action_and_realization,
     "ControllerBinding": _check_binding,
-    "ControlParameter": _check_parameter,
+    "ControlParameter": _check_parameter_and_realization,
+    "Metric": _check_metric,
     "ServiceContract": _check_contract,
 }
 

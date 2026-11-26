@@ -42,3 +42,7 @@ class SourceKindEntry(BaseModel):
     """
     The source adapter, as module:class of u6g-adapters.
     """
+    provenance: Annotated[list[common_schema.Provenance], Field(min_length=1)]
+    """
+    Where the entry's content comes from.
+    """

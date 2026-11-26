@@ -50,6 +50,289 @@ class CatalogValue(BaseModel):
     max: float | None = None
 
 
+class Provenance(BaseModel):
+    """
+    Where part of an entry comes from, exactly enough to find it again.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+        populate_by_name=True,
+    )
+    source: Literal[
+        'teraflowsdn',
+        'yang',
+        'ietf',
+        'itu-t',
+        'ieee',
+        'device-api',
+        'framework',
+        'guide',
+    ]
+    """
+    The kind of source: the TeraFlowSDN code at a commit, a YANG module at a revision, a standard, the API of a device as a driver reads it, the framework or the implementation guide.
+    """
+    ref: Annotated[str, Field(min_length=1)]
+    """
+    The place within the source: a repository at a commit with a path and a symbol, a module@revision with a node, an RFC or Recommendation with a section, a section of [FW] or of the guide.
+    """
+
+
+class TfsKpi(BaseModel):
+    """
+    How TeraFlowSDN delivers a metric: a KPI sample type, collected for one kind of entity of a KPI descriptor.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+        populate_by_name=True,
+    )
+    kpi_sample_type: Annotated[
+        str, Field(alias='kpiSampleType', pattern='^KPISAMPLETYPE_[A-Z0-9_]+$')
+    ]
+    scope: Literal['device', 'endpoint', 'link', 'service', 'slice', 'connection']
+    """
+    The entity of the KPI descriptor the samples describe.
+    """
+    scale: Annotated[float, Field(gt=0.0)]
+    """
+    The factor from the KPI's value to the metric's unit: 1000 turns Gbps into Mbps.
+    """
+
+
+class TfsConfigRule(BaseModel):
+    """
+    How a TeraFlowSDN driver sets a control parameter: the resource key of a config rule and the field of its value.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+        populate_by_name=True,
+    )
+    device_driver: Annotated[
+        str, Field(alias='deviceDriver', pattern='^DEVICEDRIVER_[A-Z0-9_]+$')
+    ]
+    resource_key: Annotated[str, Field(alias='resourceKey', min_length=1)]
+    """
+    The key, with <placeholders> for its parts, as /interface[name=<if>]/acm.
+    """
+    field: Annotated[str, Field(min_length=1)]
+
+
+class FamilyRealization(BaseModel):
+    """
+    What a control parameter acts on in one product family, through the driver.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+        populate_by_name=True,
+    )
+    api_flavor: Annotated[str, Field(alias='apiFlavor', min_length=1)]
+    """
+    The API flavour of the family as the driver's portfolio names it: siklu_tg, siklu_eh or ceraos.
+    """
+    device_node: Annotated[str, Field(alias='deviceNode', min_length=1)]
+    """
+    The node of the device's own model the driver writes, as module:node; none when the family has no equivalent.
+    """
+    behaviour: Annotated[str, Field(min_length=1)]
+    """
+    What setting the parameter does on that family.
+    """
+    values: Annotated[list[Value] | None, Field(min_length=1)] = None
+    """
+    The values the family's device accepts for the parameter, as the driver passes them, where they differ from the catalog's values.
+    """
+
+
+class TfsOperation(BaseModel):
+    """
+    How an action type reaches the network through TeraFlowSDN.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+        populate_by_name=True,
+    )
+    operation: Literal['device.config.set', 'service.update', 'slice.update']
+    """
+    device.config.set writes config rules to a device; service.update and slice.update change a service or a slice of the context.
+    """
+    service_type: Annotated[
+        str | None, Field(alias='serviceType', pattern='^SERVICETYPE_[A-Z0-9_]+$')
+    ] = None
+    config_rule: Annotated[str | None, Field(alias='configRule', min_length=1)] = None
+
+
+class DeviceType(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+        populate_by_name=True,
+    )
+    name: Annotated[str, Field(min_length=1)]
+    value: Annotated[str, Field(min_length=1)]
+
+
+class DeviceDriver(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+        populate_by_name=True,
+    )
+    name: Annotated[str, Field(min_length=1)]
+    value: int
+    comment: Annotated[str | None, Field(min_length=1)] = None
+
+
+class ServiceType(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+        populate_by_name=True,
+    )
+    name: Annotated[str, Field(min_length=1)]
+    value: int
+    comment: Annotated[str | None, Field(min_length=1)] = None
+
+
+class KpiSampleType(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+        populate_by_name=True,
+    )
+    name: Annotated[str, Field(min_length=1)]
+    value: int
+    comment: Annotated[str | None, Field(min_length=1)] = None
+
+
+type DeviceType1 = Annotated[str, Field(min_length=1)]
+
+
+type Driver1 = Annotated[str, Field(min_length=1)]
+
+
+class Driver(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+        populate_by_name=True,
+    )
+    driver_class: Annotated[str, Field(alias='driverClass', min_length=1)]
+    device_types: Annotated[list[DeviceType1], Field(alias='deviceTypes')]
+    drivers: list[Driver1]
+
+
+type ServiceType1 = Annotated[str, Field(min_length=1)]
+
+
+type Driver2 = Annotated[str, Field(min_length=1)]
+
+
+class ServiceHandler(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+        populate_by_name=True,
+    )
+    handler_class: Annotated[str, Field(alias='handlerClass', min_length=1)]
+    service_types: Annotated[list[ServiceType1], Field(alias='serviceTypes')]
+    drivers: list[Driver2]
+
+
+type YangItem = Annotated[str, Field(min_length=1)]
+
+
+class NorthboundItem(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+        populate_by_name=True,
+    )
+    interface: Annotated[str, Field(min_length=1)]
+    yang: list[YangItem]
+
+
+class Identity(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+        populate_by_name=True,
+    )
+    identity: Annotated[str, Field(min_length=1)]
+    description: Annotated[str | None, Field(min_length=1)] = None
+    reference: Annotated[str | None, Field(min_length=1)] = None
+
+
+class SloMetricTypes(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+        populate_by_name=True,
+    )
+    module: Annotated[str, Field(min_length=1)]
+    identities: list[Identity]
+
+
+class CeragonPortfolioItem(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+        populate_by_name=True,
+    )
+    model: Annotated[str, Field(min_length=1)]
+    family: Annotated[str, Field(min_length=1)]
+    api_flavor: Annotated[str, Field(alias='apiFlavor', min_length=1)]
+    api_verified: Annotated[bool, Field(alias='apiVerified')]
+
+
+class TfsModel(BaseModel):
+    """
+    The declarations of a TeraFlowSDN source tree at one commit (u6g_catalog.tfs).
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+        populate_by_name=True,
+    )
+    source: Annotated[str, Field(min_length=1)]
+    """
+    The repository and commit read, as owner/repo@commit.
+    """
+    device_types: Annotated[list[DeviceType], Field(alias='deviceTypes')]
+    device_drivers: Annotated[list[DeviceDriver], Field(alias='deviceDrivers')]
+    service_types: Annotated[list[ServiceType], Field(alias='serviceTypes')]
+    kpi_sample_types: Annotated[list[KpiSampleType], Field(alias='kpiSampleTypes')]
+    drivers: list[Driver]
+    service_handlers: Annotated[list[ServiceHandler], Field(alias='serviceHandlers')]
+    northbound: list[NorthboundItem]
+    slo_metric_types: Annotated[SloMetricTypes, Field(alias='sloMetricTypes')]
+    ceragon_portfolio: Annotated[
+        list[CeragonPortfolioItem], Field(alias='ceragonPortfolio')
+    ]
+
+
+type VerifiedOnItem = Annotated[str, Field(min_length=1)]
+
+
+type ProvisionalOnItem = Annotated[str, Field(min_length=1)]
+
+
+class DeviceVerification(BaseModel):
+    """
+    Whether the device-dependent content of an entry has been checked on real equipment. The products are named as the radio driver's portfolio names them.
+    """
+
+    model_config = ConfigDict(
+        extra='forbid',
+        populate_by_name=True,
+    )
+    status: Literal['verified', 'provisional']
+    """
+    verified when every product the entry applies to has been checked; provisional otherwise.
+    """
+    verified_on: Annotated[list[VerifiedOnItem], Field(alias='verifiedOn')]
+    """
+    The products checked against the entry on real equipment.
+    """
+    provisional_on: Annotated[list[ProvisionalOnItem], Field(alias='provisionalOn')]
+    """
+    The products or families whose behaviour the entry follows from their API as the driver models it, until checked on hardware.
+    """
+
+
 class CatalogArea(BaseModel):
     """
     The manifest of an area of the catalog, catalog/<area>/area.yaml: its owner and the classes of managed object its entries describe.

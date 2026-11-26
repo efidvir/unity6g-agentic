@@ -1,0 +1,33 @@
+kind: Metric
+id: transport/metric/per-rx
+version: 1.0.0
+owner: transport-domain
+description: Packet error rate of the packets received
+deprecated: false
+objectClass: mw-link
+definition: The share of the packets received on the active link that failed, in percent, as MultiHaul TG reports
+  it (rx-per). TeraFlowSDN carries it as the KPI RADIO_RX_PER_PERCENT.
+value:
+  type: number
+  unit: '%'
+  min: 0
+  max: 100
+type: gauge
+aggregation: mean
+sources:
+- transport/source/sdn-telemetry@1.0.0
+teraflowsdn:
+  kpiSampleType: KPISAMPLETYPE_RADIO_RX_PER_PERCENT
+  scope: endpoint
+  scale: 1
+hardware:
+  status: provisional
+  verifiedOn: []
+  provisionalOn:
+  - MultiHaul TG
+provenance:
+- source: teraflowsdn
+  ref: 'efidvir/teraflowsdn@ddd4aaf: proto/kpi_sample_types.proto KPISAMPLETYPE_RADIO_RX_PER_PERCENT; src/device/service/drivers/ceragon/Tools.py
+    radio_figure and FAMILY_RADIO_FIGURES'
+- source: device-api
+  ref: radio-bridge-tg-radio-common:radio-common/links/active/rx-per, as the Ceragon driver writes or reads it (efidvir/teraflowsdn@ddd4aaf)

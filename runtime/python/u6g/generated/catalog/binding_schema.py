@@ -59,3 +59,11 @@ class ControllerBindingEntry(BaseModel):
         Literal['candidate', 'dryRun', 'controllerDryRun', 'readOnly'],
         Field(alias='rollbackRoute'),
     ]
+    provenance: Annotated[list[common_schema.Provenance], Field(min_length=1)]
+    """
+    Where the entry's content comes from.
+    """
+    model: common_schema.TfsModel | None = None
+    """
+    What the controller declares about the devices, drivers, services and KPIs it supports, generated from its code by u6g-catalog import-tfs; written by the tool only.
+    """

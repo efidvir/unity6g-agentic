@@ -8,3 +8,8 @@ code: ACT-OK
 category: actuation
 meaning: The actuation was applied and verified
 raisedBy: The transaction engine of the Actuator runtime
+provenance:
+- source: guide
+  ref: Implementation guide v1.2, Annex F.10
+- source: framework
+  ref: '[FW] Section 3.6, the kinds of catalog entry'

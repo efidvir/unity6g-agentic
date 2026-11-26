@@ -2,10 +2,16 @@ kind: SourceKind
 id: transport/source/sdn-telemetry
 version: 1.0.0
 owner: transport-domain
-description: Telemetry and KPIs of the transport SDN controller
+description: KPIs of the transport SDN controller
 deprecated: false
-protocol: TeraFlowSDN telemetry and KPI management, streamed
+protocol: 'TeraFlowSDN KPI management and telemetry: a KPI descriptor per entity and KPI sample type, and a collector
+  at the sampling interval the Monitoring System asks for'
 readOnly: true
 patterns:
 - periodicStream
 adapter: u6g_adapters_sources.tfs:TelemetrySource
+provenance:
+- source: teraflowsdn
+  ref: 'efidvir/teraflowsdn@ddd4aaf: proto/kpi_manager.proto KpiDescriptor; proto/telemetry_frontend.proto Collector'
+- source: guide
+  ref: Implementation guide v1.2, Section 17.1 and Table 17-1

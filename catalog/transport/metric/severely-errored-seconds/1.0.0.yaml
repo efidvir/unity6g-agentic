@@ -5,13 +5,38 @@ owner: transport-domain
 description: Severely errored seconds
 deprecated: false
 objectClass: mw-link
-definition: The count of seconds with 30 % or more errored blocks, since the counter's start (ITU-T G.826).
+definition: The severely errored seconds of the near-end carrier in the last completed 15-minute performance monitoring
+  interval, as ITU-T G.826 defines them, from the carrier's PM bins on CeraOS (get-pm-bins, severely-errored-seconds).
+  TeraFlowSDN carries them as the KPI RADIO_SEVERELY_ERRORED_SECONDS, one sample per interval, stamped with the
+  interval's end.
 value:
   type: integer
-  unit: count
+  unit: s
   min: 0
-type: counter
+type: gauge
 aggregation: sum
 sources:
-- transport/source/radio-counters@1.3.0
 - transport/source/sdn-telemetry@1.0.0
+teraflowsdn:
+  kpiSampleType: KPISAMPLETYPE_RADIO_SEVERELY_ERRORED_SECONDS
+  scope: endpoint
+  scale: 1
+standard: ITU-T G.826 severely errored seconds
+hardware:
+  status: provisional
+  verifiedOn: []
+  provisionalOn:
+  - IP-20
+  - IP-50
+  - IP-100
+provenance:
+- source: teraflowsdn
+  ref: 'efidvir/teraflowsdn@ddd4aaf: proto/kpi_sample_types.proto KPISAMPLETYPE_RADIO_SEVERELY_ERRORED_SECONDS;
+    src/device/service/drivers/ceragon/Tools.py radio_figure and FAMILY_RADIO_FIGURES'
+- source: device-api
+  ref: ceragon-pm-telemetry:get-pm-bins/bins/severely-errored-seconds, as the Ceragon driver writes or reads it
+    (efidvir/teraflowsdn@ddd4aaf)
+- source: itu-t
+  ref: ITU-T G.826, error performance events and parameters, and Annex A on unavailable time
+- source: guide
+  ref: Implementation guide v1.2, Section 17.1 and Table 17-1

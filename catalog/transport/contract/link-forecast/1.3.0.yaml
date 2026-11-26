@@ -10,3 +10,8 @@ interface: The insight envelope of [IMPL]
 flow: insight
 carries:
 - transport/insight/link-fade-forecast@1.3.0
+provenance:
+- source: guide
+  ref: Implementation guide v1.2, Annex B and Annex F
+- source: framework
+  ref: '[FW] Section 3.6, the kinds of catalog entry'

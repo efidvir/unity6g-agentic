@@ -1,0 +1,33 @@
+kind: Metric
+id: transport/metric/mcs-rx
+version: 1.0.0
+owner: transport-domain
+description: MCS index the near end receives with
+deprecated: false
+objectClass: mw-link
+definition: The index of the modulation and coding scheme the near end receives with on the active link, as MultiHaul
+  TG reports it (mcs-rx), in the IEEE 802.11ad single-carrier MCS set. TeraFlowSDN carries it as the KPI RADIO_RX_MCS_INDEX.
+value:
+  type: integer
+  min: 0
+type: gauge
+aggregation: last
+sources:
+- transport/source/sdn-telemetry@1.0.0
+teraflowsdn:
+  kpiSampleType: KPISAMPLETYPE_RADIO_RX_MCS_INDEX
+  scope: endpoint
+  scale: 1
+hardware:
+  status: provisional
+  verifiedOn: []
+  provisionalOn:
+  - MultiHaul TG
+provenance:
+- source: teraflowsdn
+  ref: 'efidvir/teraflowsdn@ddd4aaf: proto/kpi_sample_types.proto KPISAMPLETYPE_RADIO_RX_MCS_INDEX; src/device/service/drivers/ceragon/Tools.py
+    radio_figure and FAMILY_RADIO_FIGURES'
+- source: device-api
+  ref: radio-bridge-tg-radio-common:radio-common/links/active/mcs-rx, as the Ceragon driver writes or reads it (efidvir/teraflowsdn@ddd4aaf)
+- source: ieee
+  ref: IEEE 802.11ad, DMG single-carrier modulation and coding schemes

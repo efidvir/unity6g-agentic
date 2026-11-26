@@ -30,6 +30,53 @@ the area of their domain, the framework's in `platform`.
 | ReasonCode | Code, category (decision, mediation, actuation or lifecycle), meaning, who raises it |
 | ServiceContract | Contribution (flow or platform service), provider, interface, what a flow carries, where the platform consumes a service |
 
+## Exact entries
+
+The owner asked for a catalog that is exact for any device TeraFlowSDN supports (2026-11-26). Three things
+make it so.
+
+**Every entry says where it comes from.** `provenance` lists each source of the entry's content, exactly
+enough to find it again:
+
+- TeraFlowSDN's code at a commit, with a path and a symbol;
+- a YANG module at its revision, with a node;
+- an RFC or an ITU-T Recommendation;
+- a device API as the driver reads or writes it;
+- a section of [FW] or of the guide.
+
+**What TeraFlowSDN declares is read from its code, never retyped.** `python -m u6g_catalog import-tfs
+<tfs_dir> --source <owner/repo@commit> --binding <entry.yaml>` reads a TeraFlowSDN source tree as text and as
+Python syntax trees, running nothing from it (`u6g_catalog/tfs.py`). It writes the result into the `model` of
+the controller binding. `--check` reports a difference and writes nothing. The model holds:
+
+- the device types, the kinds of driver and of service, and the KPI sample types;
+- which driver serves which device types, and which handler realizes which service type on which drivers;
+- the YANG modules of each northbound interface;
+- the SLO metric types of the network slice service;
+- the radio driver's portfolio, with the products checked against a real device.
+
+**Entries that depend on the controller or the devices are checked against that model.**
+
+- A metric names the KPI sample type that carries it, and the entity and scale it is collected with
+  (`teraflowsdn`). Its definition says what each product family reports, and `standard` gives the standard's
+  name for the quantity.
+- A control parameter names the driver's config rule and field (`teraflowsdn`). Its `families` say what
+  each product family's device does with it, as the driver's code does it.
+- An action type names the controller operation and the config rule.
+- `hardware` records the products the entry has been checked on, and the families still to check. Every
+  device-dependent entry starts provisional.
+
+The build reports, under consistency:
+
+- a KPI sample type, a driver or a service type the model does not declare;
+- an entry verified on a product the driver does not mark as checked;
+- a product or family missing from the portfolio;
+- a status that disagrees with its lists.
+
+The first model is the fork's `feat/radio-kpis` at `ddd4aaf`, the radio KPIs included, with 48 device types,
+23 kinds of driver, 15 service types and 60 KPI sample types. When the fork merges, the import is repeated
+at the merge commit, and again for the ref the lab server runs.
+
 ## The build
 
 `python -m u6g_catalog build catalog --out <dir>` validates and indexes the catalog, and writes nothing if it
@@ -43,10 +90,15 @@ finds a breach. Each finding names the file and the rule:
   says);
 - **area**: the entry's area has no manifest, its owner differs from the area's, or its object class is not
   one of the area's;
-- **consistency**: an action type and its bindings disagree on each other or on operations, a predicate names
-  something other than the action's parameters, a verification method is missing, a read-back by controller
-  query relies on a binding whose state does not reflect the device, a flow contract names no flow, or two
-  entries claim one code.
+- **consistency**:
+  - an action type and its bindings disagree on each other or on operations;
+  - a predicate names something other than the action's parameters;
+  - a verification method is missing;
+  - a read-back by controller query relies on a binding whose state does not reflect the device;
+  - a flow contract names no flow;
+  - two entries claim one code;
+  - an entry departs from what TeraFlowSDN declares, or claims a check on hardware the portfolio does not
+    record.
 
 The index lists every entry with the SHA-256 digest of its canonical JSON form (RFC 8785), the latest version
 of each identity, and the entry of each reason code.
@@ -59,9 +111,32 @@ pair with `keygen`; the private key stays out of the repository. `serve` exposes
 `/v1/resolve?ref=`, `/v1/entries`, `/v1/entries/<id>@<version>`, `/v1/latest/<id>`,
 `/v1/reason-codes/<code>` and `/v1/health`.
 
+## What making it exact turned up
+
+These come from the radio driver's code at `ddd4aaf`. They are written into the entries as the driver
+behaves, and listed in `STATE.md` for the fork:
+
+- **The RFC 8561 view is not RFC 8561's module.** The driver's `/microwave-radio-link` puts the figures in a
+  `radio-performance` container, and the coding and modulation in use at `selected-cm`. RFC 8561 has
+  `actual-transmitted-level`, `actual-received-level`, `actual-snir`, `actual-xpi` and `actual-tx-cm` on the
+  carrier termination, and `selected-cm` only for fixed modulation. The bundled `ietf-microwave-radio-link`
+  and `ietf-microwave-types` are reduced copies of the modules.
+- **On MultiHaul TG:**
+  - the maximum modulation is turned into `link-distance`: Normal when the value contains the characters
+    12, Long otherwise;
+  - the minimum is left unset;
+  - there is no fixed modulation;
+  - the transmit power in dBm is written as a power index clamped to 6..31;
+  - the frequency snaps to the nearest of four channels.
+- **Capacity of radios with no active link.** Where the device reports no active link, as EtherHaul always
+  does, the capacity KPI carries the product's nominal maximum from the portfolio.
+- **No read-back of the adaptive modulation limits.** The driver's views do not carry the limits, so
+  `set-modulation-limits` has no read-back through the controller yet.
+- **Values with no RFC 8561 identity.** CeraOS has an 8-QAM profile, which RFC 8561 does not define.
+
 ## Open points
 
-- The first entries are those of the transport domain (Table 17-1) and those the tuple needs: 73 entries. The
+- The first entries are those of the transport domain (Table 17-1) and those the tuple needs: 86 entries. The
   reason codes of the runtime's own stages (GEN, ING, PRE, POST, MS, AE) wait on their category: [FW] names
   four, and these codes fit none of them cleanly (`STATE.md`, questions). The families of admission, gates,
   demotion, holds, delegation and bindings come with those components.

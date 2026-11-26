@@ -15,7 +15,8 @@
     "protocol",
     "readOnly",
     "patterns",
-    "adapter"
+    "adapter",
+    "provenance"
   ],
   "properties": {
     "kind": {
@@ -60,6 +61,14 @@
       "description": "The source adapter, as module:class of u6g-adapters.",
       "type": "string",
       "minLength": 1
+    },
+    "provenance": {
+      "description": "Where the entry's content comes from.",
+      "type": "array",
+      "items": {
+        "$ref": "common.schema.json#/$defs/Provenance"
+      },
+      "minItems": 1
     }
   }
 }

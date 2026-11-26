@@ -8,3 +8,8 @@ code: DEC-RESTORE-CAPACITY
 category: decision
 meaning: Modulation stepped back up once the fade has passed and the margin allows
 raisedBy: The decision logic of the link-assurance agent
+provenance:
+- source: guide
+  ref: Implementation guide v1.2, Annex F.10
+- source: framework
+  ref: '[FW] Section 3.6, the kinds of catalog entry'

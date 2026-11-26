@@ -15,3 +15,33 @@ setBy:
 readBack:
   method: msObservation
   metric: transport/metric/tx-power@1.0.0
+teraflowsdn:
+  deviceDriver: DEVICEDRIVER_CERAGON
+  resourceKey: /interface[name=<if>]/radio
+  field: tx_power_dbm
+families:
+- apiFlavor: ceraos
+  deviceNode: ceragon-radio-link:radio-link-cfg/tx-power-dbm
+  behaviour: The driver writes the value in dBm.
+- apiFlavor: siklu_eh
+  deviceNode: radio-bridge-eh-radio:eh-radio/tx-power-dbm
+  behaviour: The driver writes the value in dBm, rounded down to an integer.
+- apiFlavor: siklu_tg
+  deviceNode: radio-bridge-tg-radio-common:radio-common/node-config/tx-power-control
+  behaviour: The driver writes the value as the transmit power index, an integer clamped to 6..31, and writes auto
+    when atpc_enabled is true; the index is a step of the radio's scale and its relation to dBm is the radio's.
+hardware:
+  status: provisional
+  verifiedOn: []
+  provisionalOn:
+  - MultiHaul TG
+  - EtherHaul
+  - IP-20
+  - IP-50
+  - IP-100
+provenance:
+- source: teraflowsdn
+  ref: 'efidvir/teraflowsdn@ddd4aaf: src/device/service/drivers/ceragon/routing.py apply_rule (radio) and client.py
+    apply_radio_tuning'
+- source: guide
+  ref: Implementation guide v1.2, Section 17.1 and Table 17-1

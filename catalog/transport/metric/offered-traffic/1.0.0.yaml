@@ -1,0 +1,35 @@
+kind: Metric
+id: transport/metric/offered-traffic
+version: 1.0.0
+owner: transport-domain
+description: Traffic offered to the radio
+deprecated: false
+objectClass: mw-radio
+definition: The traffic the radio's Ethernet traffic ports receive, in Mbps, from the ingress octet counters between
+  two polls; the driver reports the device's total on each radio endpoint. TeraFlowSDN carries it as the KPI LINK_USED_CAPACITY_GBPS,
+  in Gbps, scaled here by 1000.
+value:
+  type: number
+  unit: Mbps
+  min: 0
+type: gauge
+aggregation: mean
+sources:
+- transport/source/sdn-telemetry@1.0.0
+teraflowsdn:
+  kpiSampleType: KPISAMPLETYPE_LINK_USED_CAPACITY_GBPS
+  scope: endpoint
+  scale: 1000
+hardware:
+  status: provisional
+  verifiedOn: []
+  provisionalOn:
+  - MultiHaul TG
+  - EtherHaul
+  - IP-20
+  - IP-50
+  - IP-100
+provenance:
+- source: teraflowsdn
+  ref: 'efidvir/teraflowsdn@ddd4aaf: proto/kpi_sample_types.proto KPISAMPLETYPE_LINK_USED_CAPACITY_GBPS; src/device/service/drivers/ceragon/CeragonDriver.py
+    _used_capacity_gbps'

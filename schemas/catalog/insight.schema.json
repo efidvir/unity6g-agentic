@@ -14,7 +14,8 @@
     "deprecated",
     "objectClass",
     "meaning",
-    "payload"
+    "payload",
+    "provenance"
   ],
   "properties": {
     "kind": {
@@ -49,6 +50,14 @@
     "payload": {
       "description": "The JSON Schema of the payload of an insight of this type.",
       "type": "object"
+    },
+    "provenance": {
+      "description": "Where the entry's content comes from.",
+      "type": "array",
+      "items": {
+        "$ref": "common.schema.json#/$defs/Provenance"
+      },
+      "minItems": 1
     }
   }
 }

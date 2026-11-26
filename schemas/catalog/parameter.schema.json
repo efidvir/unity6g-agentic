@@ -15,7 +15,8 @@
     "objectClass",
     "value",
     "setBy",
-    "readBack"
+    "readBack",
+    "provenance"
   ],
   "properties": {
     "kind": {
@@ -56,6 +57,28 @@
     },
     "readBack": {
       "$ref": "#/$defs/ParameterReadBack"
+    },
+    "provenance": {
+      "description": "Where the entry's content comes from.",
+      "type": "array",
+      "items": {
+        "$ref": "common.schema.json#/$defs/Provenance"
+      },
+      "minItems": 1
+    },
+    "teraflowsdn": {
+      "$ref": "common.schema.json#/$defs/TfsConfigRule"
+    },
+    "families": {
+      "description": "What the parameter acts on in each product family the driver supports.",
+      "type": "array",
+      "items": {
+        "$ref": "common.schema.json#/$defs/FamilyRealization"
+      },
+      "minItems": 1
+    },
+    "hardware": {
+      "$ref": "common.schema.json#/$defs/DeviceVerification"
     }
   },
   "$defs": {

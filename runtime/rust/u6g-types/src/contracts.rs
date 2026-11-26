@@ -142,6 +142,8 @@ pub struct ActionTypeEntry {
     ///A deprecated entry stays resolvable; admission warns new descriptors.
     pub deprecated: bool,
     pub description: ActionTypeEntryDescription,
+    #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+    pub hardware: ::std::option::Option<DeviceVerification>,
     pub id: CatalogId,
     pub idempotent: bool,
     pub kind: ::std::string::String,
@@ -149,8 +151,12 @@ pub struct ActionTypeEntry {
     pub owner: Name,
     ///The JSON Schema of the parameters of an intent of this type.
     pub parameters: ::serde_json::Map<::std::string::String, ::serde_json::Value>,
+    ///Where the entry's content comes from.
+    pub provenance: ::std::vec::Vec<Provenance>,
     pub rollback: ActionRollback,
     pub targets: ActionTargets,
+    #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+    pub teraflowsdn: ::std::option::Option<TfsOperation>,
     pub verification: ::std::vec::Vec<ActionVerification>,
     pub version: SemVer,
 }
@@ -1668,17 +1674,26 @@ pub struct ControlParameterEntry {
     ///A deprecated entry stays resolvable; admission warns new descriptors.
     pub deprecated: bool,
     pub description: ControlParameterEntryDescription,
+    ///What the parameter acts on in each product family the driver supports.
+    #[serde(default, skip_serializing_if = "::std::vec::Vec::is_empty")]
+    pub families: ::std::vec::Vec<FamilyRealization>,
+    #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+    pub hardware: ::std::option::Option<DeviceVerification>,
     pub id: CatalogId,
     pub kind: ::std::string::String,
     #[serde(rename = "objectClass")]
     pub object_class: Name,
     ///The owner of the entry: the domain owner, framework or kpi-definitions.
     pub owner: Name,
+    ///Where the entry's content comes from.
+    pub provenance: ::std::vec::Vec<Provenance>,
     #[serde(rename = "readBack")]
     pub read_back: ParameterReadBack,
     ///The controller bindings that set the parameter.
     #[serde(rename = "setBy")]
     pub set_by: ::std::vec::Vec<KindPathRef>,
+    #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+    pub teraflowsdn: ::std::option::Option<TfsConfigRule>,
     pub value: CatalogValue,
     pub version: SemVer,
 }
@@ -1828,10 +1843,15 @@ pub struct ControllerBindingEntry {
     pub id: CatalogId,
     pub interface: Name,
     pub kind: ::std::string::String,
+    ///What the controller declares about the devices, drivers, services and KPIs it supports, generated from its code by u6g-catalog import-tfs; written by the tool only.
+    #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+    pub model: ::std::option::Option<TfsModel>,
     ///The operations of the interface the adapter performs.
     pub operations: ::std::vec::Vec<ControllerBindingEntryOperationsItem>,
     ///The owner of the entry: the domain owner, framework or kpi-definitions.
     pub owner: Name,
+    ///Where the entry's content comes from.
+    pub provenance: ::std::vec::Vec<Provenance>,
     #[serde(rename = "rollbackRoute")]
     pub rollback_route: ControllerBindingEntryRollbackRoute,
     ///Whether the controller's state queries reflect the device, so that controllerQuery may verify (guide Section 8.3).
@@ -2368,6 +2388,187 @@ pub struct DescriptorPin {
     ///The parameter block of the capability; empty when it has none.
     pub parameters: ::serde_json::Map<::std::string::String, ::serde_json::Value>,
 }
+///Whether the device-dependent content of an entry has been checked on real equipment. The products are named as the radio driver's portfolio names them.
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct DeviceVerification {
+    ///The products or families whose behaviour the entry follows from their API as the driver models it, until checked on hardware.
+    #[serde(rename = "provisionalOn")]
+    pub provisional_on: ::std::vec::Vec<DeviceVerificationProvisionalOnItem>,
+    ///verified when every product the entry applies to has been checked; provisional otherwise.
+    pub status: DeviceVerificationStatus,
+    ///The products checked against the entry on real equipment.
+    #[serde(rename = "verifiedOn")]
+    pub verified_on: ::std::vec::Vec<DeviceVerificationVerifiedOnItem>,
+}
+///`DeviceVerificationProvisionalOnItem`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct DeviceVerificationProvisionalOnItem(::std::string::String);
+impl ::std::ops::Deref for DeviceVerificationProvisionalOnItem {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<DeviceVerificationProvisionalOnItem>
+for ::std::string::String {
+    fn from(value: DeviceVerificationProvisionalOnItem) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for DeviceVerificationProvisionalOnItem {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for DeviceVerificationProvisionalOnItem {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String>
+for DeviceVerificationProvisionalOnItem {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for DeviceVerificationProvisionalOnItem {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///verified when every product the entry applies to has been checked; provisional otherwise.
+#[derive(
+    ::serde::Deserialize,
+    ::serde::Serialize,
+    Clone,
+    Copy,
+    Debug,
+    Eq,
+    Hash,
+    Ord,
+    PartialEq,
+    PartialOrd
+)]
+pub enum DeviceVerificationStatus {
+    #[serde(rename = "verified")]
+    Verified,
+    #[serde(rename = "provisional")]
+    Provisional,
+}
+impl ::std::fmt::Display for DeviceVerificationStatus {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        match *self {
+            Self::Verified => f.write_str("verified"),
+            Self::Provisional => f.write_str("provisional"),
+        }
+    }
+}
+impl ::std::str::FromStr for DeviceVerificationStatus {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        match value {
+            "verified" => Ok(Self::Verified),
+            "provisional" => Ok(Self::Provisional),
+            _ => Err("invalid value".into()),
+        }
+    }
+}
+impl ::std::convert::TryFrom<&str> for DeviceVerificationStatus {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        value.parse()
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for DeviceVerificationStatus {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        value.parse()
+    }
+}
+///`DeviceVerificationVerifiedOnItem`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct DeviceVerificationVerifiedOnItem(::std::string::String);
+impl ::std::ops::Deref for DeviceVerificationVerifiedOnItem {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<DeviceVerificationVerifiedOnItem> for ::std::string::String {
+    fn from(value: DeviceVerificationVerifiedOnItem) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for DeviceVerificationVerifiedOnItem {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for DeviceVerificationVerifiedOnItem {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String>
+for DeviceVerificationVerifiedOnItem {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for DeviceVerificationVerifiedOnItem {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
 ///A SHA-256 digest, over the canonical JSON form of RFC 8785 where the object is a JSON document.
 #[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 #[serde(transparent)]
@@ -2830,6 +3031,242 @@ pub struct FallbackSpec {
     pub declared: bool,
     #[serde(skip_serializing_if = "::std::option::Option::is_none")]
     pub name: ::std::option::Option<Name>,
+}
+///What a control parameter acts on in one product family, through the driver.
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct FamilyRealization {
+    ///The API flavour of the family as the driver's portfolio names it: siklu_tg, siklu_eh or ceraos.
+    #[serde(rename = "apiFlavor")]
+    pub api_flavor: FamilyRealizationApiFlavor,
+    ///What setting the parameter does on that family.
+    pub behaviour: FamilyRealizationBehaviour,
+    ///The node of the device's own model the driver writes, as module:node; none when the family has no equivalent.
+    #[serde(rename = "deviceNode")]
+    pub device_node: FamilyRealizationDeviceNode,
+    ///The values the family's device accepts for the parameter, as the driver passes them, where they differ from the catalog's values.
+    #[serde(default, skip_serializing_if = "::std::vec::Vec::is_empty")]
+    pub values: ::std::vec::Vec<FamilyRealizationValuesItem>,
+}
+///The API flavour of the family as the driver's portfolio names it: siklu_tg, siklu_eh or ceraos.
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct FamilyRealizationApiFlavor(::std::string::String);
+impl ::std::ops::Deref for FamilyRealizationApiFlavor {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<FamilyRealizationApiFlavor> for ::std::string::String {
+    fn from(value: FamilyRealizationApiFlavor) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for FamilyRealizationApiFlavor {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for FamilyRealizationApiFlavor {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for FamilyRealizationApiFlavor {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for FamilyRealizationApiFlavor {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///What setting the parameter does on that family.
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct FamilyRealizationBehaviour(::std::string::String);
+impl ::std::ops::Deref for FamilyRealizationBehaviour {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<FamilyRealizationBehaviour> for ::std::string::String {
+    fn from(value: FamilyRealizationBehaviour) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for FamilyRealizationBehaviour {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for FamilyRealizationBehaviour {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for FamilyRealizationBehaviour {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for FamilyRealizationBehaviour {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///The node of the device's own model the driver writes, as module:node; none when the family has no equivalent.
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct FamilyRealizationDeviceNode(::std::string::String);
+impl ::std::ops::Deref for FamilyRealizationDeviceNode {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<FamilyRealizationDeviceNode> for ::std::string::String {
+    fn from(value: FamilyRealizationDeviceNode) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for FamilyRealizationDeviceNode {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for FamilyRealizationDeviceNode {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for FamilyRealizationDeviceNode {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for FamilyRealizationDeviceNode {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///`FamilyRealizationValuesItem`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct FamilyRealizationValuesItem(::std::string::String);
+impl ::std::ops::Deref for FamilyRealizationValuesItem {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<FamilyRealizationValuesItem> for ::std::string::String {
+    fn from(value: FamilyRealizationValuesItem) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for FamilyRealizationValuesItem {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for FamilyRealizationValuesItem {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for FamilyRealizationValuesItem {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for FamilyRealizationValuesItem {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
 }
 ///A feature service of the feature store and its version.
 #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
@@ -3445,6 +3882,8 @@ pub struct InsightTypeEntry {
     pub owner: Name,
     ///The JSON Schema of the payload of an insight of this type.
     pub payload: ::serde_json::Map<::std::string::String, ::serde_json::Value>,
+    ///Where the entry's content comes from.
+    pub provenance: ::std::vec::Vec<Provenance>,
     pub version: SemVer,
 }
 ///`InsightTypeEntryDescription`
@@ -3922,14 +4361,23 @@ pub struct MetricEntry {
     ///A deprecated entry stays resolvable; admission warns new descriptors.
     pub deprecated: bool,
     pub description: MetricEntryDescription,
+    #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+    pub hardware: ::std::option::Option<DeviceVerification>,
     pub id: CatalogId,
     pub kind: ::std::string::String,
     #[serde(rename = "objectClass")]
     pub object_class: Name,
     ///The owner of the entry: the domain owner, framework or kpi-definitions.
     pub owner: Name,
+    ///Where the entry's content comes from.
+    pub provenance: ::std::vec::Vec<Provenance>,
     ///The source kinds that supply the metric.
     pub sources: ::std::vec::Vec<KindPathRef>,
+    ///The standard's name for the quantity, as RFC 8561 actual-received-level.
+    #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+    pub standard: ::std::option::Option<MetricEntryStandard>,
+    #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+    pub teraflowsdn: ::std::option::Option<TfsKpi>,
     ///How the metric behaves over time.
     #[serde(rename = "type")]
     pub type_: MetricEntryType,
@@ -4034,6 +4482,61 @@ impl ::std::convert::TryFrom<::std::string::String> for MetricEntryDescription {
     }
 }
 impl<'de> ::serde::Deserialize<'de> for MetricEntryDescription {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///The standard's name for the quantity, as RFC 8561 actual-received-level.
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct MetricEntryStandard(::std::string::String);
+impl ::std::ops::Deref for MetricEntryStandard {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<MetricEntryStandard> for ::std::string::String {
+    fn from(value: MetricEntryStandard) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for MetricEntryStandard {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for MetricEntryStandard {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for MetricEntryStandard {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for MetricEntryStandard {
     fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
     where
         D: ::serde::Deserializer<'de>,
@@ -4711,6 +5214,8 @@ pub struct ObjectiveKpiEntry {
     pub methodology: ObjectiveKpiEntryMethodology,
     ///The owner of the entry: the domain owner, framework or kpi-definitions.
     pub owner: Name,
+    ///Where the entry's content comes from.
+    pub provenance: ::std::vec::Vec<Provenance>,
     pub unit: ObjectiveKpiEntryUnit,
     ///The UNITY-6G KPI the objective KPI serves.
     #[serde(rename = "unity6gKpi")]
@@ -5731,6 +6236,150 @@ pub struct PriorityBandRequest {
     )]
     pub urgency_levels: ::std::option::Option<::std::num::NonZeroU64>,
 }
+///Where part of an entry comes from, exactly enough to find it again.
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct Provenance {
+    ///The place within the source: a repository at a commit with a path and a symbol, a module@revision with a node, an RFC or Recommendation with a section, a section of [FW] or of the guide.
+    #[serde(rename = "ref")]
+    pub ref_: ProvenanceRef,
+    ///The kind of source: the TeraFlowSDN code at a commit, a YANG module at a revision, a standard, the API of a device as a driver reads it, the framework or the implementation guide.
+    pub source: ProvenanceSource,
+}
+///The place within the source: a repository at a commit with a path and a symbol, a module@revision with a node, an RFC or Recommendation with a section, a section of [FW] or of the guide.
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct ProvenanceRef(::std::string::String);
+impl ::std::ops::Deref for ProvenanceRef {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<ProvenanceRef> for ::std::string::String {
+    fn from(value: ProvenanceRef) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for ProvenanceRef {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for ProvenanceRef {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for ProvenanceRef {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for ProvenanceRef {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///The kind of source: the TeraFlowSDN code at a commit, a YANG module at a revision, a standard, the API of a device as a driver reads it, the framework or the implementation guide.
+#[derive(
+    ::serde::Deserialize,
+    ::serde::Serialize,
+    Clone,
+    Copy,
+    Debug,
+    Eq,
+    Hash,
+    Ord,
+    PartialEq,
+    PartialOrd
+)]
+pub enum ProvenanceSource {
+    #[serde(rename = "teraflowsdn")]
+    Teraflowsdn,
+    #[serde(rename = "yang")]
+    Yang,
+    #[serde(rename = "ietf")]
+    Ietf,
+    #[serde(rename = "itu-t")]
+    ItuT,
+    #[serde(rename = "ieee")]
+    Ieee,
+    #[serde(rename = "device-api")]
+    DeviceApi,
+    #[serde(rename = "framework")]
+    Framework,
+    #[serde(rename = "guide")]
+    Guide,
+}
+impl ::std::fmt::Display for ProvenanceSource {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        match *self {
+            Self::Teraflowsdn => f.write_str("teraflowsdn"),
+            Self::Yang => f.write_str("yang"),
+            Self::Ietf => f.write_str("ietf"),
+            Self::ItuT => f.write_str("itu-t"),
+            Self::Ieee => f.write_str("ieee"),
+            Self::DeviceApi => f.write_str("device-api"),
+            Self::Framework => f.write_str("framework"),
+            Self::Guide => f.write_str("guide"),
+        }
+    }
+}
+impl ::std::str::FromStr for ProvenanceSource {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        match value {
+            "teraflowsdn" => Ok(Self::Teraflowsdn),
+            "yang" => Ok(Self::Yang),
+            "ietf" => Ok(Self::Ietf),
+            "itu-t" => Ok(Self::ItuT),
+            "ieee" => Ok(Self::Ieee),
+            "device-api" => Ok(Self::DeviceApi),
+            "framework" => Ok(Self::Framework),
+            "guide" => Ok(Self::Guide),
+            _ => Err("invalid value".into()),
+        }
+    }
+}
+impl ::std::convert::TryFrom<&str> for ProvenanceSource {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        value.parse()
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for ProvenanceSource {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        value.parse()
+    }
+}
 ///For a delegated capability: the provider, its pinned interface and the accepted range of its versions.
 #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
 #[serde(deny_unknown_fields)]
@@ -6040,6 +6689,8 @@ pub struct ReasonCodeEntry {
     pub meaning: ReasonCodeEntryMeaning,
     ///The owner of the entry: the domain owner, framework or kpi-definitions.
     pub owner: Name,
+    ///Where the entry's content comes from.
+    pub provenance: ::std::vec::Vec<Provenance>,
     #[serde(rename = "raisedBy")]
     pub raised_by: ReasonCodeEntryRaisedBy,
     pub version: SemVer,
@@ -6573,6 +7224,8 @@ pub struct ServiceContractEntry {
     pub kind: ::std::string::String,
     ///The owner of the entry: the domain owner, framework or kpi-definitions.
     pub owner: Name,
+    ///Where the entry's content comes from.
+    pub provenance: ::std::vec::Vec<Provenance>,
     pub provider: ServiceContractEntryProvider,
     pub version: SemVer,
 }
@@ -6956,6 +7609,8 @@ pub struct SourceKindEntry {
     ///periodicStream, poll, onChange or event.
     pub patterns: ::std::vec::Vec<CamelName>,
     pub protocol: SourceKindEntryProtocol,
+    ///Where the entry's content comes from.
+    pub provenance: ::std::vec::Vec<Provenance>,
     #[serde(rename = "readOnly")]
     pub read_only: bool,
     pub version: SemVer,
@@ -7353,6 +8008,1964 @@ impl<'de> ::serde::Deserialize<'de> for TelemetryEndpoint {
             })
     }
 }
+///How a TeraFlowSDN driver sets a control parameter: the resource key of a config rule and the field of its value.
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct TfsConfigRule {
+    #[serde(rename = "deviceDriver")]
+    pub device_driver: TfsConfigRuleDeviceDriver,
+    pub field: TfsConfigRuleField,
+    ///The key, with <placeholders> for its parts, as /interface[name=<if>]/acm.
+    #[serde(rename = "resourceKey")]
+    pub resource_key: TfsConfigRuleResourceKey,
+}
+///`TfsConfigRuleDeviceDriver`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct TfsConfigRuleDeviceDriver(::std::string::String);
+impl ::std::ops::Deref for TfsConfigRuleDeviceDriver {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<TfsConfigRuleDeviceDriver> for ::std::string::String {
+    fn from(value: TfsConfigRuleDeviceDriver) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for TfsConfigRuleDeviceDriver {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for TfsConfigRuleDeviceDriver {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        static PATTERN: ::std::sync::LazyLock<::regress::Regex> = ::std::sync::LazyLock::new(||
+        { ::regress::Regex::with_flags("^DEVICEDRIVER_[A-Z0-9_]+$", "u").unwrap() });
+        if PATTERN.find(value).is_none() {
+            return Err("doesn't match pattern \"^DEVICEDRIVER_[A-Z0-9_]+$\"".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for TfsConfigRuleDeviceDriver {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for TfsConfigRuleDeviceDriver {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///`TfsConfigRuleField`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct TfsConfigRuleField(::std::string::String);
+impl ::std::ops::Deref for TfsConfigRuleField {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<TfsConfigRuleField> for ::std::string::String {
+    fn from(value: TfsConfigRuleField) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for TfsConfigRuleField {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for TfsConfigRuleField {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for TfsConfigRuleField {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for TfsConfigRuleField {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///The key, with <placeholders> for its parts, as /interface[name=<if>]/acm.
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct TfsConfigRuleResourceKey(::std::string::String);
+impl ::std::ops::Deref for TfsConfigRuleResourceKey {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<TfsConfigRuleResourceKey> for ::std::string::String {
+    fn from(value: TfsConfigRuleResourceKey) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for TfsConfigRuleResourceKey {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for TfsConfigRuleResourceKey {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for TfsConfigRuleResourceKey {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for TfsConfigRuleResourceKey {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///How TeraFlowSDN delivers a metric: a KPI sample type, collected for one kind of entity of a KPI descriptor.
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct TfsKpi {
+    #[serde(rename = "kpiSampleType")]
+    pub kpi_sample_type: TfsKpiKpiSampleType,
+    ///The factor from the KPI's value to the metric's unit: 1000 turns Gbps into Mbps.
+    pub scale: f64,
+    ///The entity of the KPI descriptor the samples describe.
+    pub scope: TfsKpiScope,
+}
+///`TfsKpiKpiSampleType`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct TfsKpiKpiSampleType(::std::string::String);
+impl ::std::ops::Deref for TfsKpiKpiSampleType {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<TfsKpiKpiSampleType> for ::std::string::String {
+    fn from(value: TfsKpiKpiSampleType) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for TfsKpiKpiSampleType {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for TfsKpiKpiSampleType {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        static PATTERN: ::std::sync::LazyLock<::regress::Regex> = ::std::sync::LazyLock::new(||
+        { ::regress::Regex::with_flags("^KPISAMPLETYPE_[A-Z0-9_]+$", "u").unwrap() });
+        if PATTERN.find(value).is_none() {
+            return Err("doesn't match pattern \"^KPISAMPLETYPE_[A-Z0-9_]+$\"".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for TfsKpiKpiSampleType {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for TfsKpiKpiSampleType {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///The entity of the KPI descriptor the samples describe.
+#[derive(
+    ::serde::Deserialize,
+    ::serde::Serialize,
+    Clone,
+    Copy,
+    Debug,
+    Eq,
+    Hash,
+    Ord,
+    PartialEq,
+    PartialOrd
+)]
+pub enum TfsKpiScope {
+    #[serde(rename = "device")]
+    Device,
+    #[serde(rename = "endpoint")]
+    Endpoint,
+    #[serde(rename = "link")]
+    Link,
+    #[serde(rename = "service")]
+    Service,
+    #[serde(rename = "slice")]
+    Slice,
+    #[serde(rename = "connection")]
+    Connection,
+}
+impl ::std::fmt::Display for TfsKpiScope {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        match *self {
+            Self::Device => f.write_str("device"),
+            Self::Endpoint => f.write_str("endpoint"),
+            Self::Link => f.write_str("link"),
+            Self::Service => f.write_str("service"),
+            Self::Slice => f.write_str("slice"),
+            Self::Connection => f.write_str("connection"),
+        }
+    }
+}
+impl ::std::str::FromStr for TfsKpiScope {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        match value {
+            "device" => Ok(Self::Device),
+            "endpoint" => Ok(Self::Endpoint),
+            "link" => Ok(Self::Link),
+            "service" => Ok(Self::Service),
+            "slice" => Ok(Self::Slice),
+            "connection" => Ok(Self::Connection),
+            _ => Err("invalid value".into()),
+        }
+    }
+}
+impl ::std::convert::TryFrom<&str> for TfsKpiScope {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        value.parse()
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for TfsKpiScope {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        value.parse()
+    }
+}
+///The declarations of a TeraFlowSDN source tree at one commit (u6g_catalog.tfs).
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct TfsModel {
+    #[serde(rename = "ceragonPortfolio")]
+    pub ceragon_portfolio: ::std::vec::Vec<TfsModelCeragonPortfolioItem>,
+    #[serde(rename = "deviceDrivers")]
+    pub device_drivers: ::std::vec::Vec<TfsModelDeviceDriversItem>,
+    #[serde(rename = "deviceTypes")]
+    pub device_types: ::std::vec::Vec<TfsModelDeviceTypesItem>,
+    pub drivers: ::std::vec::Vec<TfsModelDriversItem>,
+    #[serde(rename = "kpiSampleTypes")]
+    pub kpi_sample_types: ::std::vec::Vec<TfsModelKpiSampleTypesItem>,
+    pub northbound: ::std::vec::Vec<TfsModelNorthboundItem>,
+    #[serde(rename = "serviceHandlers")]
+    pub service_handlers: ::std::vec::Vec<TfsModelServiceHandlersItem>,
+    #[serde(rename = "serviceTypes")]
+    pub service_types: ::std::vec::Vec<TfsModelServiceTypesItem>,
+    #[serde(rename = "sloMetricTypes")]
+    pub slo_metric_types: TfsModelSloMetricTypes,
+    ///The repository and commit read, as owner/repo@commit.
+    pub source: TfsModelSource,
+}
+///`TfsModelCeragonPortfolioItem`
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct TfsModelCeragonPortfolioItem {
+    #[serde(rename = "apiFlavor")]
+    pub api_flavor: TfsModelCeragonPortfolioItemApiFlavor,
+    #[serde(rename = "apiVerified")]
+    pub api_verified: bool,
+    pub family: TfsModelCeragonPortfolioItemFamily,
+    pub model: TfsModelCeragonPortfolioItemModel,
+}
+///`TfsModelCeragonPortfolioItemApiFlavor`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct TfsModelCeragonPortfolioItemApiFlavor(::std::string::String);
+impl ::std::ops::Deref for TfsModelCeragonPortfolioItemApiFlavor {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<TfsModelCeragonPortfolioItemApiFlavor>
+for ::std::string::String {
+    fn from(value: TfsModelCeragonPortfolioItemApiFlavor) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for TfsModelCeragonPortfolioItemApiFlavor {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for TfsModelCeragonPortfolioItemApiFlavor {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String>
+for TfsModelCeragonPortfolioItemApiFlavor {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for TfsModelCeragonPortfolioItemApiFlavor {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///`TfsModelCeragonPortfolioItemFamily`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct TfsModelCeragonPortfolioItemFamily(::std::string::String);
+impl ::std::ops::Deref for TfsModelCeragonPortfolioItemFamily {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<TfsModelCeragonPortfolioItemFamily> for ::std::string::String {
+    fn from(value: TfsModelCeragonPortfolioItemFamily) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for TfsModelCeragonPortfolioItemFamily {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for TfsModelCeragonPortfolioItemFamily {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String>
+for TfsModelCeragonPortfolioItemFamily {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for TfsModelCeragonPortfolioItemFamily {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///`TfsModelCeragonPortfolioItemModel`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct TfsModelCeragonPortfolioItemModel(::std::string::String);
+impl ::std::ops::Deref for TfsModelCeragonPortfolioItemModel {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<TfsModelCeragonPortfolioItemModel> for ::std::string::String {
+    fn from(value: TfsModelCeragonPortfolioItemModel) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for TfsModelCeragonPortfolioItemModel {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for TfsModelCeragonPortfolioItemModel {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String>
+for TfsModelCeragonPortfolioItemModel {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for TfsModelCeragonPortfolioItemModel {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///`TfsModelDeviceDriversItem`
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct TfsModelDeviceDriversItem {
+    #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+    pub comment: ::std::option::Option<TfsModelDeviceDriversItemComment>,
+    pub name: TfsModelDeviceDriversItemName,
+    pub value: i64,
+}
+///`TfsModelDeviceDriversItemComment`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct TfsModelDeviceDriversItemComment(::std::string::String);
+impl ::std::ops::Deref for TfsModelDeviceDriversItemComment {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<TfsModelDeviceDriversItemComment> for ::std::string::String {
+    fn from(value: TfsModelDeviceDriversItemComment) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for TfsModelDeviceDriversItemComment {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for TfsModelDeviceDriversItemComment {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String>
+for TfsModelDeviceDriversItemComment {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for TfsModelDeviceDriversItemComment {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///`TfsModelDeviceDriversItemName`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct TfsModelDeviceDriversItemName(::std::string::String);
+impl ::std::ops::Deref for TfsModelDeviceDriversItemName {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<TfsModelDeviceDriversItemName> for ::std::string::String {
+    fn from(value: TfsModelDeviceDriversItemName) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for TfsModelDeviceDriversItemName {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for TfsModelDeviceDriversItemName {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for TfsModelDeviceDriversItemName {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for TfsModelDeviceDriversItemName {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///`TfsModelDeviceTypesItem`
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct TfsModelDeviceTypesItem {
+    pub name: TfsModelDeviceTypesItemName,
+    pub value: TfsModelDeviceTypesItemValue,
+}
+///`TfsModelDeviceTypesItemName`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct TfsModelDeviceTypesItemName(::std::string::String);
+impl ::std::ops::Deref for TfsModelDeviceTypesItemName {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<TfsModelDeviceTypesItemName> for ::std::string::String {
+    fn from(value: TfsModelDeviceTypesItemName) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for TfsModelDeviceTypesItemName {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for TfsModelDeviceTypesItemName {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for TfsModelDeviceTypesItemName {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for TfsModelDeviceTypesItemName {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///`TfsModelDeviceTypesItemValue`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct TfsModelDeviceTypesItemValue(::std::string::String);
+impl ::std::ops::Deref for TfsModelDeviceTypesItemValue {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<TfsModelDeviceTypesItemValue> for ::std::string::String {
+    fn from(value: TfsModelDeviceTypesItemValue) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for TfsModelDeviceTypesItemValue {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for TfsModelDeviceTypesItemValue {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for TfsModelDeviceTypesItemValue {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for TfsModelDeviceTypesItemValue {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///`TfsModelDriversItem`
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct TfsModelDriversItem {
+    #[serde(rename = "deviceTypes")]
+    pub device_types: ::std::vec::Vec<TfsModelDriversItemDeviceTypesItem>,
+    #[serde(rename = "driverClass")]
+    pub driver_class: TfsModelDriversItemDriverClass,
+    pub drivers: ::std::vec::Vec<TfsModelDriversItemDriversItem>,
+}
+///`TfsModelDriversItemDeviceTypesItem`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct TfsModelDriversItemDeviceTypesItem(::std::string::String);
+impl ::std::ops::Deref for TfsModelDriversItemDeviceTypesItem {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<TfsModelDriversItemDeviceTypesItem> for ::std::string::String {
+    fn from(value: TfsModelDriversItemDeviceTypesItem) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for TfsModelDriversItemDeviceTypesItem {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for TfsModelDriversItemDeviceTypesItem {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String>
+for TfsModelDriversItemDeviceTypesItem {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for TfsModelDriversItemDeviceTypesItem {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///`TfsModelDriversItemDriverClass`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct TfsModelDriversItemDriverClass(::std::string::String);
+impl ::std::ops::Deref for TfsModelDriversItemDriverClass {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<TfsModelDriversItemDriverClass> for ::std::string::String {
+    fn from(value: TfsModelDriversItemDriverClass) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for TfsModelDriversItemDriverClass {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for TfsModelDriversItemDriverClass {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for TfsModelDriversItemDriverClass {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for TfsModelDriversItemDriverClass {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///`TfsModelDriversItemDriversItem`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct TfsModelDriversItemDriversItem(::std::string::String);
+impl ::std::ops::Deref for TfsModelDriversItemDriversItem {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<TfsModelDriversItemDriversItem> for ::std::string::String {
+    fn from(value: TfsModelDriversItemDriversItem) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for TfsModelDriversItemDriversItem {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for TfsModelDriversItemDriversItem {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for TfsModelDriversItemDriversItem {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for TfsModelDriversItemDriversItem {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///`TfsModelKpiSampleTypesItem`
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct TfsModelKpiSampleTypesItem {
+    #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+    pub comment: ::std::option::Option<TfsModelKpiSampleTypesItemComment>,
+    pub name: TfsModelKpiSampleTypesItemName,
+    pub value: i64,
+}
+///`TfsModelKpiSampleTypesItemComment`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct TfsModelKpiSampleTypesItemComment(::std::string::String);
+impl ::std::ops::Deref for TfsModelKpiSampleTypesItemComment {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<TfsModelKpiSampleTypesItemComment> for ::std::string::String {
+    fn from(value: TfsModelKpiSampleTypesItemComment) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for TfsModelKpiSampleTypesItemComment {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for TfsModelKpiSampleTypesItemComment {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String>
+for TfsModelKpiSampleTypesItemComment {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for TfsModelKpiSampleTypesItemComment {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///`TfsModelKpiSampleTypesItemName`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct TfsModelKpiSampleTypesItemName(::std::string::String);
+impl ::std::ops::Deref for TfsModelKpiSampleTypesItemName {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<TfsModelKpiSampleTypesItemName> for ::std::string::String {
+    fn from(value: TfsModelKpiSampleTypesItemName) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for TfsModelKpiSampleTypesItemName {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for TfsModelKpiSampleTypesItemName {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for TfsModelKpiSampleTypesItemName {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for TfsModelKpiSampleTypesItemName {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///`TfsModelNorthboundItem`
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct TfsModelNorthboundItem {
+    pub interface: TfsModelNorthboundItemInterface,
+    pub yang: ::std::vec::Vec<TfsModelNorthboundItemYangItem>,
+}
+///`TfsModelNorthboundItemInterface`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct TfsModelNorthboundItemInterface(::std::string::String);
+impl ::std::ops::Deref for TfsModelNorthboundItemInterface {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<TfsModelNorthboundItemInterface> for ::std::string::String {
+    fn from(value: TfsModelNorthboundItemInterface) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for TfsModelNorthboundItemInterface {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for TfsModelNorthboundItemInterface {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for TfsModelNorthboundItemInterface {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for TfsModelNorthboundItemInterface {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///`TfsModelNorthboundItemYangItem`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct TfsModelNorthboundItemYangItem(::std::string::String);
+impl ::std::ops::Deref for TfsModelNorthboundItemYangItem {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<TfsModelNorthboundItemYangItem> for ::std::string::String {
+    fn from(value: TfsModelNorthboundItemYangItem) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for TfsModelNorthboundItemYangItem {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for TfsModelNorthboundItemYangItem {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for TfsModelNorthboundItemYangItem {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for TfsModelNorthboundItemYangItem {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///`TfsModelServiceHandlersItem`
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct TfsModelServiceHandlersItem {
+    pub drivers: ::std::vec::Vec<TfsModelServiceHandlersItemDriversItem>,
+    #[serde(rename = "handlerClass")]
+    pub handler_class: TfsModelServiceHandlersItemHandlerClass,
+    #[serde(rename = "serviceTypes")]
+    pub service_types: ::std::vec::Vec<TfsModelServiceHandlersItemServiceTypesItem>,
+}
+///`TfsModelServiceHandlersItemDriversItem`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct TfsModelServiceHandlersItemDriversItem(::std::string::String);
+impl ::std::ops::Deref for TfsModelServiceHandlersItemDriversItem {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<TfsModelServiceHandlersItemDriversItem>
+for ::std::string::String {
+    fn from(value: TfsModelServiceHandlersItemDriversItem) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for TfsModelServiceHandlersItemDriversItem {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for TfsModelServiceHandlersItemDriversItem {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String>
+for TfsModelServiceHandlersItemDriversItem {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for TfsModelServiceHandlersItemDriversItem {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///`TfsModelServiceHandlersItemHandlerClass`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct TfsModelServiceHandlersItemHandlerClass(::std::string::String);
+impl ::std::ops::Deref for TfsModelServiceHandlersItemHandlerClass {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<TfsModelServiceHandlersItemHandlerClass>
+for ::std::string::String {
+    fn from(value: TfsModelServiceHandlersItemHandlerClass) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for TfsModelServiceHandlersItemHandlerClass {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for TfsModelServiceHandlersItemHandlerClass {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String>
+for TfsModelServiceHandlersItemHandlerClass {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for TfsModelServiceHandlersItemHandlerClass {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///`TfsModelServiceHandlersItemServiceTypesItem`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct TfsModelServiceHandlersItemServiceTypesItem(::std::string::String);
+impl ::std::ops::Deref for TfsModelServiceHandlersItemServiceTypesItem {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<TfsModelServiceHandlersItemServiceTypesItem>
+for ::std::string::String {
+    fn from(value: TfsModelServiceHandlersItemServiceTypesItem) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for TfsModelServiceHandlersItemServiceTypesItem {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for TfsModelServiceHandlersItemServiceTypesItem {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String>
+for TfsModelServiceHandlersItemServiceTypesItem {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for TfsModelServiceHandlersItemServiceTypesItem {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///`TfsModelServiceTypesItem`
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct TfsModelServiceTypesItem {
+    #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+    pub comment: ::std::option::Option<TfsModelServiceTypesItemComment>,
+    pub name: TfsModelServiceTypesItemName,
+    pub value: i64,
+}
+///`TfsModelServiceTypesItemComment`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct TfsModelServiceTypesItemComment(::std::string::String);
+impl ::std::ops::Deref for TfsModelServiceTypesItemComment {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<TfsModelServiceTypesItemComment> for ::std::string::String {
+    fn from(value: TfsModelServiceTypesItemComment) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for TfsModelServiceTypesItemComment {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for TfsModelServiceTypesItemComment {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for TfsModelServiceTypesItemComment {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for TfsModelServiceTypesItemComment {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///`TfsModelServiceTypesItemName`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct TfsModelServiceTypesItemName(::std::string::String);
+impl ::std::ops::Deref for TfsModelServiceTypesItemName {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<TfsModelServiceTypesItemName> for ::std::string::String {
+    fn from(value: TfsModelServiceTypesItemName) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for TfsModelServiceTypesItemName {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for TfsModelServiceTypesItemName {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for TfsModelServiceTypesItemName {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for TfsModelServiceTypesItemName {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///`TfsModelSloMetricTypes`
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct TfsModelSloMetricTypes {
+    pub identities: ::std::vec::Vec<TfsModelSloMetricTypesIdentitiesItem>,
+    pub module: TfsModelSloMetricTypesModule,
+}
+///`TfsModelSloMetricTypesIdentitiesItem`
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct TfsModelSloMetricTypesIdentitiesItem {
+    #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+    pub description: ::std::option::Option<
+        TfsModelSloMetricTypesIdentitiesItemDescription,
+    >,
+    pub identity: TfsModelSloMetricTypesIdentitiesItemIdentity,
+    #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+    pub reference: ::std::option::Option<TfsModelSloMetricTypesIdentitiesItemReference>,
+}
+///`TfsModelSloMetricTypesIdentitiesItemDescription`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct TfsModelSloMetricTypesIdentitiesItemDescription(::std::string::String);
+impl ::std::ops::Deref for TfsModelSloMetricTypesIdentitiesItemDescription {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<TfsModelSloMetricTypesIdentitiesItemDescription>
+for ::std::string::String {
+    fn from(value: TfsModelSloMetricTypesIdentitiesItemDescription) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for TfsModelSloMetricTypesIdentitiesItemDescription {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for TfsModelSloMetricTypesIdentitiesItemDescription {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String>
+for TfsModelSloMetricTypesIdentitiesItemDescription {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for TfsModelSloMetricTypesIdentitiesItemDescription {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///`TfsModelSloMetricTypesIdentitiesItemIdentity`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct TfsModelSloMetricTypesIdentitiesItemIdentity(::std::string::String);
+impl ::std::ops::Deref for TfsModelSloMetricTypesIdentitiesItemIdentity {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<TfsModelSloMetricTypesIdentitiesItemIdentity>
+for ::std::string::String {
+    fn from(value: TfsModelSloMetricTypesIdentitiesItemIdentity) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for TfsModelSloMetricTypesIdentitiesItemIdentity {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for TfsModelSloMetricTypesIdentitiesItemIdentity {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String>
+for TfsModelSloMetricTypesIdentitiesItemIdentity {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for TfsModelSloMetricTypesIdentitiesItemIdentity {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///`TfsModelSloMetricTypesIdentitiesItemReference`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct TfsModelSloMetricTypesIdentitiesItemReference(::std::string::String);
+impl ::std::ops::Deref for TfsModelSloMetricTypesIdentitiesItemReference {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<TfsModelSloMetricTypesIdentitiesItemReference>
+for ::std::string::String {
+    fn from(value: TfsModelSloMetricTypesIdentitiesItemReference) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for TfsModelSloMetricTypesIdentitiesItemReference {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for TfsModelSloMetricTypesIdentitiesItemReference {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String>
+for TfsModelSloMetricTypesIdentitiesItemReference {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for TfsModelSloMetricTypesIdentitiesItemReference {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///`TfsModelSloMetricTypesModule`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct TfsModelSloMetricTypesModule(::std::string::String);
+impl ::std::ops::Deref for TfsModelSloMetricTypesModule {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<TfsModelSloMetricTypesModule> for ::std::string::String {
+    fn from(value: TfsModelSloMetricTypesModule) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for TfsModelSloMetricTypesModule {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for TfsModelSloMetricTypesModule {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for TfsModelSloMetricTypesModule {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for TfsModelSloMetricTypesModule {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///The repository and commit read, as owner/repo@commit.
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct TfsModelSource(::std::string::String);
+impl ::std::ops::Deref for TfsModelSource {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<TfsModelSource> for ::std::string::String {
+    fn from(value: TfsModelSource) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for TfsModelSource {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for TfsModelSource {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for TfsModelSource {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for TfsModelSource {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///How an action type reaches the network through TeraFlowSDN.
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct TfsOperation {
+    #[serde(
+        rename = "configRule",
+        skip_serializing_if = "::std::option::Option::is_none"
+    )]
+    pub config_rule: ::std::option::Option<TfsOperationConfigRule>,
+    ///device.config.set writes config rules to a device; service.update and slice.update change a service or a slice of the context.
+    pub operation: TfsOperationOperation,
+    #[serde(
+        rename = "serviceType",
+        skip_serializing_if = "::std::option::Option::is_none"
+    )]
+    pub service_type: ::std::option::Option<TfsOperationServiceType>,
+}
+///`TfsOperationConfigRule`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct TfsOperationConfigRule(::std::string::String);
+impl ::std::ops::Deref for TfsOperationConfigRule {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<TfsOperationConfigRule> for ::std::string::String {
+    fn from(value: TfsOperationConfigRule) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for TfsOperationConfigRule {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for TfsOperationConfigRule {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        if value.chars().count() < 1usize {
+            return Err("shorter than 1 characters".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for TfsOperationConfigRule {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for TfsOperationConfigRule {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
+///device.config.set writes config rules to a device; service.update and slice.update change a service or a slice of the context.
+#[derive(
+    ::serde::Deserialize,
+    ::serde::Serialize,
+    Clone,
+    Copy,
+    Debug,
+    Eq,
+    Hash,
+    Ord,
+    PartialEq,
+    PartialOrd
+)]
+pub enum TfsOperationOperation {
+    #[serde(rename = "device.config.set")]
+    DeviceConfigSet,
+    #[serde(rename = "service.update")]
+    ServiceUpdate,
+    #[serde(rename = "slice.update")]
+    SliceUpdate,
+}
+impl ::std::fmt::Display for TfsOperationOperation {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        match *self {
+            Self::DeviceConfigSet => f.write_str("device.config.set"),
+            Self::ServiceUpdate => f.write_str("service.update"),
+            Self::SliceUpdate => f.write_str("slice.update"),
+        }
+    }
+}
+impl ::std::str::FromStr for TfsOperationOperation {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        match value {
+            "device.config.set" => Ok(Self::DeviceConfigSet),
+            "service.update" => Ok(Self::ServiceUpdate),
+            "slice.update" => Ok(Self::SliceUpdate),
+            _ => Err("invalid value".into()),
+        }
+    }
+}
+impl ::std::convert::TryFrom<&str> for TfsOperationOperation {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        value.parse()
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for TfsOperationOperation {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        value.parse()
+    }
+}
+///`TfsOperationServiceType`
+#[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[serde(transparent)]
+pub struct TfsOperationServiceType(::std::string::String);
+impl ::std::ops::Deref for TfsOperationServiceType {
+    type Target = ::std::string::String;
+    fn deref(&self) -> &::std::string::String {
+        &self.0
+    }
+}
+impl ::std::convert::From<TfsOperationServiceType> for ::std::string::String {
+    fn from(value: TfsOperationServiceType) -> Self {
+        value.0
+    }
+}
+impl ::std::str::FromStr for TfsOperationServiceType {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value)
+    }
+}
+impl ::std::convert::TryFrom<&str> for TfsOperationServiceType {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        static PATTERN: ::std::sync::LazyLock<::regress::Regex> = ::std::sync::LazyLock::new(||
+        { ::regress::Regex::with_flags("^SERVICETYPE_[A-Z0-9_]+$", "u").unwrap() });
+        if PATTERN.find(value).is_none() {
+            return Err("doesn't match pattern \"^SERVICETYPE_[A-Z0-9_]+$\"".into());
+        }
+        Ok(Self(value.to_string()))
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for TfsOperationServiceType {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        ::std::convert::TryFrom::try_from(value.as_str())
+    }
+}
+impl<'de> ::serde::Deserialize<'de> for TfsOperationServiceType {
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        ::std::convert::TryFrom::try_from(
+                ::std::string::String::deserialize(deserializer)?,
+            )
+            .map_err(|e: self::error::ConversionError| {
+                <D::Error as ::serde::de::Error>::custom(e.to_string())
+            })
+    }
+}
 ///An instant in UTC, in the RFC 3339 form.
 #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
 #[serde(transparent)]
@@ -7674,6 +10287,8 @@ pub struct VerificationMethodEntry {
     pub method: CamelName,
     ///The owner of the entry: the domain owner, framework or kpi-definitions.
     pub owner: Name,
+    ///Where the entry's content comes from.
+    pub provenance: ::std::vec::Vec<Provenance>,
     #[serde(rename = "readBack")]
     pub read_back: VerificationMethodEntryReadBack,
     #[serde(rename = "typicalLatency")]

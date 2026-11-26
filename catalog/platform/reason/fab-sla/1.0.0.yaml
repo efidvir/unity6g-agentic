@@ -8,3 +8,8 @@ code: FAB-SLA
 category: mediation
 meaning: Decided to protect a service level objective
 raisedBy: The mediator of the conflict fabric
+provenance:
+- source: guide
+  ref: Implementation guide v1.2, Annex F.10
+- source: framework
+  ref: '[FW] Section 3.6, the kinds of catalog entry'

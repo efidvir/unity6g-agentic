@@ -39,3 +39,7 @@ class ObjectiveKpiEntry(BaseModel):
     """
     The UNITY-6G KPI the objective KPI serves.
     """
+    provenance: Annotated[list[common_schema.Provenance], Field(min_length=1)]
+    """
+    Where the entry's content comes from.
+    """

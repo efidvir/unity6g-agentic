@@ -36,3 +36,7 @@ class ReasonCodeEntry(BaseModel):
     category: Literal['decision', 'mediation', 'actuation', 'lifecycle']
     meaning: Annotated[str, Field(min_length=1)]
     raised_by: Annotated[str, Field(alias='raisedBy', min_length=1)]
+    provenance: Annotated[list[common_schema.Provenance], Field(min_length=1)]
+    """
+    Where the entry's content comes from.
+    """

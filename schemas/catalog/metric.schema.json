@@ -17,7 +17,8 @@
     "value",
     "type",
     "aggregation",
-    "sources"
+    "sources",
+    "provenance"
   ],
   "properties": {
     "kind": {
@@ -73,6 +74,25 @@
         "$ref": "../common/defs.schema.json#/$defs/KindPathRef"
       },
       "minItems": 1
+    },
+    "provenance": {
+      "description": "Where the entry's content comes from.",
+      "type": "array",
+      "items": {
+        "$ref": "common.schema.json#/$defs/Provenance"
+      },
+      "minItems": 1
+    },
+    "teraflowsdn": {
+      "$ref": "common.schema.json#/$defs/TfsKpi"
+    },
+    "standard": {
+      "description": "The standard's name for the quantity, as RFC 8561 actual-received-level.",
+      "type": "string",
+      "minLength": 1
+    },
+    "hardware": {
+      "$ref": "common.schema.json#/$defs/DeviceVerification"
     }
   }
 }

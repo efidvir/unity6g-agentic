@@ -1,0 +1,34 @@
+kind: Metric
+id: transport/metric/xpi
+version: 1.0.0
+owner: transport-domain
+description: Cross-polarization interference
+deprecated: false
+objectClass: mw-link
+definition: The cross-polarization interference of the near-end carrier, in dB, as CeraOS reports it on carriers
+  with XPIC (xpi-db). TeraFlowSDN carries it as the KPI RADIO_XPI_DB.
+value:
+  type: number
+  unit: dB
+type: gauge
+aggregation: mean
+sources:
+- transport/source/sdn-telemetry@1.0.0
+teraflowsdn:
+  kpiSampleType: KPISAMPLETYPE_RADIO_XPI_DB
+  scope: endpoint
+  scale: 1
+standard: RFC 8561 actual-xpi
+hardware:
+  status: provisional
+  verifiedOn: []
+  provisionalOn:
+  - IP-20
+  - IP-50
+  - IP-100
+provenance:
+- source: teraflowsdn
+  ref: 'efidvir/teraflowsdn@ddd4aaf: proto/kpi_sample_types.proto KPISAMPLETYPE_RADIO_XPI_DB; src/device/service/drivers/ceragon/Tools.py
+    radio_figure and FAMILY_RADIO_FIGURES'
+- source: ietf
+  ref: RFC 8561, module ietf-microwave-radio-link, leaf actual-xpi

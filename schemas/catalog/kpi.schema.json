@@ -15,7 +15,8 @@
     "definition",
     "unit",
     "methodology",
-    "unity6gKpi"
+    "unity6gKpi",
+    "provenance"
   ],
   "properties": {
     "kind": {
@@ -56,6 +57,14 @@
       "description": "The UNITY-6G KPI the objective KPI serves.",
       "type": "string",
       "minLength": 1
+    },
+    "provenance": {
+      "description": "Where the entry's content comes from.",
+      "type": "array",
+      "items": {
+        "$ref": "common.schema.json#/$defs/Provenance"
+      },
+      "minItems": 1
     }
   }
 }

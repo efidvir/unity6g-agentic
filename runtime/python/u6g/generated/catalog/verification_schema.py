@@ -40,3 +40,7 @@ class VerificationMethodEntry(BaseModel):
         Literal['monitoringSystem', 'controllerQuery'], Field(alias='readBack')
     ]
     typical_latency: Annotated[defs_schema.Duration, Field(alias='typicalLatency')]
+    provenance: Annotated[list[common_schema.Provenance], Field(min_length=1)]
+    """
+    Where the entry's content comes from.
+    """

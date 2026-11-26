@@ -5,12 +5,35 @@ owner: transport-domain
 description: Received signal level
 deprecated: false
 objectClass: mw-link
-definition: The level of the received signal at the near end of the radio link, as the radio reports it.
+definition: 'The level of the received signal at the near end of the radio link, in dBm, as the radio reports it:
+  the RSSI of the active link on MultiHaul TG, rssi-dbm on EtherHaul, the carrier''s rsl-dbm on CeraOS. TeraFlowSDN
+  carries it as the KPI RADIO_RX_LEVEL_DBM of the radio endpoint.'
 value:
   type: number
   unit: dBm
 type: gauge
 aggregation: mean
 sources:
-- transport/source/radio-counters@1.3.0
 - transport/source/sdn-telemetry@1.0.0
+teraflowsdn:
+  kpiSampleType: KPISAMPLETYPE_RADIO_RX_LEVEL_DBM
+  scope: endpoint
+  scale: 1
+standard: RFC 8561 actual-received-level
+hardware:
+  status: provisional
+  verifiedOn: []
+  provisionalOn:
+  - MultiHaul TG
+  - EtherHaul
+  - IP-20
+  - IP-50
+  - IP-100
+provenance:
+- source: teraflowsdn
+  ref: 'efidvir/teraflowsdn@ddd4aaf: proto/kpi_sample_types.proto KPISAMPLETYPE_RADIO_RX_LEVEL_DBM; src/device/service/drivers/ceragon/Tools.py
+    radio_figure and FAMILY_RADIO_FIGURES'
+- source: ietf
+  ref: RFC 8561, module ietf-microwave-radio-link, leaf actual-received-level
+- source: guide
+  ref: Implementation guide v1.2, Section 17.1 and Table 17-1

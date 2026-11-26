@@ -21,3 +21,836 @@ operations:
 adapter: u6g_adapters_southbound.tfs:TfsAdapter
 stateReflectsDevice: false
 rollbackRoute: readOnly
+provenance:
+- source: teraflowsdn
+  ref: 'efidvir/teraflowsdn@ddd4aaf: the model below, read by u6g-catalog import-tfs'
+- source: guide
+  ref: Implementation guide v1.2, Section 17.1 and Table 17-1
+model:
+  source: efidvir/teraflowsdn@ddd4aaf
+  deviceTypes:
+  - name: NETWORK
+    value: network
+  - name: EMULATED_CLIENT
+    value: emu-client
+  - name: EMULATED_COMPUTER
+    value: emu-computer
+  - name: EMULATED_DATACENTER
+    value: emu-datacenter
+  - name: EMULATED_VIRTUAL_MACHINE
+    value: emu-virtual-machine
+  - name: EMULATED_IP_SDN_CONTROLLER
+    value: emu-ip-sdn-controller
+  - name: EMULATED_MICROWAVE_RADIO_SYSTEM
+    value: emu-microwave-radio-system
+  - name: EMULATED_OPEN_LINE_SYSTEM
+    value: emu-open-line-system
+  - name: EMULATED_OPTICAL_ROADM
+    value: emu-optical-roadm
+  - name: EMULATED_OPTICAL_TRANSPONDER
+    value: emu-optical-transponder
+  - name: EMULATED_OPEN_ROADM
+    value: emu-optical-openroadm
+  - name: EMULATED_OPTICAL_SPLITTER
+    value: emu-optical-splitter
+  - name: EMULATED_P4_SWITCH
+    value: emu-p4-switch
+  - name: EMULATED_PACKET_FIREWALL
+    value: emu-packet-firewall
+  - name: EMULATED_PACKET_RADIO_ROUTER
+    value: emu-packet-radio-router
+  - name: EMULATED_PACKET_ROUTER
+    value: emu-packet-router
+  - name: EMULATED_PACKET_SWITCH
+    value: emu-packet-switch
+  - name: EMULATED_XR_CONSTELLATION
+    value: emu-xr-constellation
+  - name: EMULATED_ORAN_DU
+    value: oran-du
+  - name: EMULATED_ORAN_CU
+    value: oran-cu
+  - name: EMULATED_ORAN_CN
+    value: oran-cn
+  - name: CLIENT
+    value: client
+  - name: DATACENTER
+    value: datacenter
+  - name: IP_SDN_CONTROLLER
+    value: ip-sdn-controller
+  - name: NCE
+    value: nce
+  - name: MICROWAVE_RADIO_SYSTEM
+    value: microwave-radio-system
+  - name: OPEN_LINE_SYSTEM
+    value: open-line-system
+  - name: OPTICAL_OLT
+    value: optical-olt
+  - name: OPTICAL_ONT
+    value: optical-ont
+  - name: OPTICAL_FGOTN
+    value: optical-fgotn
+  - name: OPTICAL_ROADM
+    value: optical-roadm
+  - name: OPTICAL_TRANSPONDER
+    value: optical-transponder
+  - name: P4_SWITCH
+    value: p4-switch
+  - name: PACKET_FIREWALL
+    value: packet-firewall
+  - name: PACKET_POP
+    value: packet-pop
+  - name: PACKET_RADIO_ROUTER
+    value: packet-radio-router
+  - name: PACKET_ROUTER
+    value: packet-router
+  - name: PACKET_SWITCH
+    value: packet-switch
+  - name: XR_CONSTELLATION
+    value: xr-constellation
+  - name: SMARTNIC
+    value: smartnic
+  - name: QKD_NODE
+    value: qkd-node
+  - name: OPEN_ROADM
+    value: openroadm
+  - name: MORPHEUS
+    value: morpheus
+  - name: OPENFLOW_RYU_CONTROLLER
+    value: openflow-ryu-controller
+  - name: DSCM_NODE
+    value: dscm
+  - name: CERAGON_WIRELESS
+    value: ceragon-wireless
+  - name: TERAFLOWSDN_CONTROLLER
+    value: teraflowsdn
+  - name: IETF_SLICE
+    value: ietf-slice
+  deviceDrivers:
+  - name: DEVICEDRIVER_UNDEFINED
+    value: 0
+    comment: also used for emulated
+  - name: DEVICEDRIVER_OPENCONFIG
+    value: 1
+  - name: DEVICEDRIVER_TRANSPORT_API
+    value: 2
+  - name: DEVICEDRIVER_P4
+    value: 3
+  - name: DEVICEDRIVER_IETF_NETWORK_TOPOLOGY
+    value: 4
+  - name: DEVICEDRIVER_ONF_TR_532
+    value: 5
+  - name: DEVICEDRIVER_XR
+    value: 6
+  - name: DEVICEDRIVER_IETF_L2VPN
+    value: 7
+  - name: DEVICEDRIVER_GNMI_OPENCONFIG
+    value: 8
+  - name: DEVICEDRIVER_OPTICAL_TFS
+    value: 9
+  - name: DEVICEDRIVER_IETF_ACTN
+    value: 10
+  - name: DEVICEDRIVER_OC
+    value: 11
+  - name: DEVICEDRIVER_QKD
+    value: 12
+  - name: DEVICEDRIVER_IETF_L3VPN
+    value: 13
+  - name: DEVICEDRIVER_IETF_SLICE
+    value: 14
+  - name: DEVICEDRIVER_NCE
+    value: 15
+  - name: DEVICEDRIVER_SMARTNIC
+    value: 16
+  - name: DEVICEDRIVER_MORPHEUS
+    value: 17
+  - name: DEVICEDRIVER_RYU
+    value: 18
+  - name: DEVICEDRIVER_GNMI_NOKIA_SRLINUX
+    value: 19
+  - name: DEVICEDRIVER_OPENROADM
+    value: 20
+  - name: DEVICEDRIVER_RESTCONF_OPENCONFIG
+    value: 21
+  - name: DEVICEDRIVER_CERAGON
+    value: 22
+  serviceTypes:
+  - name: SERVICETYPE_UNKNOWN
+    value: 0
+  - name: SERVICETYPE_L3NM
+    value: 1
+  - name: SERVICETYPE_L2NM
+    value: 2
+  - name: SERVICETYPE_TAPI_CONNECTIVITY_SERVICE
+    value: 3
+  - name: SERVICETYPE_TE
+    value: 4
+  - name: SERVICETYPE_E2E
+    value: 5
+  - name: SERVICETYPE_OPTICAL_CONNECTIVITY
+    value: 6
+  - name: SERVICETYPE_QKD
+    value: 7
+  - name: SERVICETYPE_L1NM
+    value: 8
+  - name: SERVICETYPE_INT
+    value: 9
+  - name: SERVICETYPE_ACL
+    value: 10
+  - name: SERVICETYPE_IP_LINK
+    value: 11
+  - name: SERVICETYPE_TAPI_LSP
+    value: 12
+  - name: SERVICETYPE_IPOWDM
+    value: 13
+  - name: SERVICETYPE_UPF
+    value: 14
+  kpiSampleTypes:
+  - name: KPISAMPLETYPE_UNKNOWN
+    value: 0
+  - name: KPISAMPLETYPE_PACKETS_TRANSMITTED
+    value: 101
+  - name: KPISAMPLETYPE_PACKETS_RECEIVED
+    value: 102
+  - name: KPISAMPLETYPE_PACKETS_DROPPED
+    value: 103
+  - name: KPISAMPLETYPE_BYTES_TRANSMITTED
+    value: 201
+  - name: KPISAMPLETYPE_BYTES_RECEIVED
+    value: 202
+  - name: KPISAMPLETYPE_BYTES_DROPPED
+    value: 203
+  - name: KPISAMPLETYPE_LINK_TOTAL_CAPACITY_GBPS
+    value: 301
+  - name: KPISAMPLETYPE_LINK_USED_CAPACITY_GBPS
+    value: 302
+  - name: KPISAMPLETYPE_ML_CONFIDENCE
+    value: 401
+    comment: can be used by both optical and L3 without any issue
+  - name: KPISAMPLETYPE_OPTICAL_SECURITY_STATUS
+    value: 501
+    comment: can be used by both optical and L3 without any issue
+  - name: KPISAMPLETYPE_OPTICAL_TOTAL_INPUT_POWER
+    value: 503
+  - name: KPISAMPLETYPE_L3_UNIQUE_ATTACK_CONNS
+    value: 601
+  - name: KPISAMPLETYPE_L3_TOTAL_DROPPED_PACKTS
+    value: 602
+  - name: KPISAMPLETYPE_L3_UNIQUE_ATTACKERS
+    value: 603
+  - name: KPISAMPLETYPE_L3_UNIQUE_COMPROMISED_CLIENTS
+    value: 604
+  - name: KPISAMPLETYPE_L3_SECURITY_STATUS_CRYPTO
+    value: 605
+  - name: KPISAMPLETYPE_SERVICE_LATENCY_MS
+    value: 701
+  - name: KPISAMPLETYPE_RADIO_RX_LEVEL_DBM
+    value: 801
+    comment: received signal level
+  - name: KPISAMPLETYPE_RADIO_TX_LEVEL_DBM
+    value: 802
+    comment: transmitted signal level
+  - name: KPISAMPLETYPE_RADIO_SNIR_DB
+    value: 803
+    comment: signal to noise plus interference ratio
+  - name: KPISAMPLETYPE_RADIO_MSE_DB
+    value: 804
+    comment: modem mean square error
+  - name: KPISAMPLETYPE_RADIO_XPI_DB
+    value: 805
+    comment: cross-polarization interference
+  - name: KPISAMPLETYPE_RADIO_TX_MODULATION_ORDER
+    value: 806
+    comment: 'constellation size in use: 4 for QPSK, 256 for 256-QAM'
+  - name: KPISAMPLETYPE_RADIO_TX_MCS_INDEX
+    value: 807
+    comment: on radios that report an MCS, e.g. IEEE 802.11ad/ay
+  - name: KPISAMPLETYPE_RADIO_RX_MCS_INDEX
+    value: 808
+  - name: KPISAMPLETYPE_RADIO_TX_PER_PERCENT
+    value: 809
+    comment: packet error rate
+  - name: KPISAMPLETYPE_RADIO_RX_PER_PERCENT
+    value: 810
+  - name: KPISAMPLETYPE_RADIO_ERRORED_SECONDS
+    value: 811
+  - name: KPISAMPLETYPE_RADIO_SEVERELY_ERRORED_SECONDS
+    value: 812
+  - name: KPISAMPLETYPE_RADIO_UNAVAILABLE_SECONDS
+    value: 813
+  - name: KPISAMPLETYPE_RADIO_BACKGROUND_BLOCK_ERRORS
+    value: 814
+  - name: KPISAMPLETYPE_PACKETS_TRANSMITTED_AGG_OUTPUT
+    value: 1101
+  - name: KPISAMPLETYPE_PACKETS_RECEIVED_AGG_OUTPUT
+    value: 1102
+  - name: KPISAMPLETYPE_PACKETS_DROPPED_AGG_OUTPUT
+    value: 1103
+  - name: KPISAMPLETYPE_BYTES_TRANSMITTED_AGG_OUTPUT
+    value: 1201
+  - name: KPISAMPLETYPE_BYTES_RECEIVED_AGG_OUTPUT
+    value: 1202
+  - name: KPISAMPLETYPE_BYTES_DROPPED_AGG_OUTPUT
+    value: 1203
+  - name: KPISAMPLETYPE_SERVICE_LATENCY_MS_AGG_OUTPUT
+    value: 1701
+  - name: KPISAMPLETYPE_INT_SEQ_NUM
+    value: 2001
+  - name: KPISAMPLETYPE_INT_TS_ING
+    value: 2002
+  - name: KPISAMPLETYPE_INT_TS_EGR
+    value: 2003
+  - name: KPISAMPLETYPE_INT_HOP_LAT
+    value: 2004
+  - name: KPISAMPLETYPE_INT_PORT_ID_ING
+    value: 2005
+  - name: KPISAMPLETYPE_INT_PORT_ID_EGR
+    value: 2006
+  - name: KPISAMPLETYPE_INT_QUEUE_OCCUP
+    value: 2007
+  - name: KPISAMPLETYPE_INT_QUEUE_ID
+    value: 2008
+  - name: KPISAMPLETYPE_INT_HOP_LAT_SW01
+    value: 2101
+  - name: KPISAMPLETYPE_INT_HOP_LAT_SW02
+    value: 2102
+  - name: KPISAMPLETYPE_INT_HOP_LAT_SW03
+    value: 2103
+  - name: KPISAMPLETYPE_INT_HOP_LAT_SW04
+    value: 2104
+  - name: KPISAMPLETYPE_INT_HOP_LAT_SW05
+    value: 2105
+  - name: KPISAMPLETYPE_INT_HOP_LAT_SW06
+    value: 2106
+  - name: KPISAMPLETYPE_INT_HOP_LAT_SW07
+    value: 2107
+  - name: KPISAMPLETYPE_INT_HOP_LAT_SW08
+    value: 2108
+  - name: KPISAMPLETYPE_INT_HOP_LAT_SW09
+    value: 2109
+  - name: KPISAMPLETYPE_INT_HOP_LAT_SW10
+    value: 2110
+  - name: KPISAMPLETYPE_INT_LAT_ON_TOTAL
+    value: 2120
+  - name: KPISAMPLETYPE_INT_IS_DROP
+    value: 2201
+  - name: KPISAMPLETYPE_INT_DROP_REASON
+    value: 2202
+  drivers:
+  - driverClass: EmulatedDriver
+    deviceTypes: []
+    drivers:
+    - DEVICEDRIVER_UNDEFINED
+  - driverClass: IetfL2VpnDriver
+    deviceTypes:
+    - TERAFLOWSDN_CONTROLLER
+    drivers:
+    - DEVICEDRIVER_IETF_L2VPN
+  - driverClass: IetfL3VpnDriver
+    deviceTypes:
+    - TERAFLOWSDN_CONTROLLER
+    drivers:
+    - DEVICEDRIVER_IETF_L3VPN
+  - driverClass: IetfActnDriver
+    deviceTypes:
+    - OPEN_LINE_SYSTEM
+    - NCE
+    drivers:
+    - DEVICEDRIVER_IETF_ACTN
+  - driverClass: IetfSliceDriver
+    deviceTypes:
+    - TERAFLOWSDN_CONTROLLER
+    drivers:
+    - DEVICEDRIVER_IETF_SLICE
+  - driverClass: NCEDriver
+    deviceTypes:
+    - NCE
+    drivers:
+    - DEVICEDRIVER_NCE
+  - driverClass: OpenConfigDriver
+    deviceTypes:
+    - PACKET_POP
+    - PACKET_ROUTER
+    drivers:
+    - DEVICEDRIVER_OPENCONFIG
+  - driverClass: GnmiOpenConfigDriver
+    deviceTypes:
+    - PACKET_POP
+    - PACKET_ROUTER
+    drivers:
+    - DEVICEDRIVER_GNMI_OPENCONFIG
+  - driverClass: GnmiNokiaSrLinuxDriver
+    deviceTypes:
+    - PACKET_ROUTER
+    drivers:
+    - DEVICEDRIVER_GNMI_NOKIA_SRLINUX
+  - driverClass: TransportApiDriver
+    deviceTypes:
+    - OPEN_LINE_SYSTEM
+    drivers:
+    - DEVICEDRIVER_TRANSPORT_API
+  - driverClass: P4Driver
+    deviceTypes:
+    - P4_SWITCH
+    drivers:
+    - DEVICEDRIVER_P4
+  - driverClass: SmartnicDriver
+    deviceTypes:
+    - SMARTNIC
+    drivers:
+    - DEVICEDRIVER_SMARTNIC
+  - driverClass: MorpheusApiDriver
+    deviceTypes:
+    - MORPHEUS
+    drivers:
+    - DEVICEDRIVER_MORPHEUS
+  - driverClass: IETFApiDriver
+    deviceTypes:
+    - MICROWAVE_RADIO_SYSTEM
+    drivers:
+    - DEVICEDRIVER_IETF_NETWORK_TOPOLOGY
+  - driverClass: RyuDriver
+    deviceTypes:
+    - OPENFLOW_RYU_CONTROLLER
+    drivers:
+    - DEVICEDRIVER_RYU
+  - driverClass: XrDriver
+    deviceTypes:
+    - XR_CONSTELLATION
+    drivers:
+    - DEVICEDRIVER_XR
+  - driverClass: OpticalTfsDriver
+    deviceTypes:
+    - OPEN_LINE_SYSTEM
+    - TERAFLOWSDN_CONTROLLER
+    drivers:
+    - DEVICEDRIVER_OPTICAL_TFS
+  - driverClass: OCDriver
+    deviceTypes:
+    - OPTICAL_ROADM
+    - OPTICAL_TRANSPONDER
+    drivers:
+    - DEVICEDRIVER_OC
+  - driverClass: OpenROADMDriver
+    deviceTypes:
+    - OPEN_ROADM
+    drivers:
+    - DEVICEDRIVER_OPENROADM
+  - driverClass: QKDDriver
+    deviceTypes:
+    - QKD_NODE
+    drivers:
+    - DEVICEDRIVER_QKD
+  - driverClass: RestConfOpenConfigDriver
+    deviceTypes:
+    - CLIENT
+    - DATACENTER
+    - EMULATED_CLIENT
+    - EMULATED_COMPUTER
+    - EMULATED_DATACENTER
+    - EMULATED_PACKET_FIREWALL
+    - EMULATED_VIRTUAL_MACHINE
+    - NETWORK
+    - PACKET_FIREWALL
+    drivers:
+    - DEVICEDRIVER_RESTCONF_OPENCONFIG
+  - driverClass: CeragonDriver
+    deviceTypes:
+    - MICROWAVE_RADIO_SYSTEM
+    - CERAGON_WIRELESS
+    - PACKET_RADIO_ROUTER
+    drivers:
+    - DEVICEDRIVER_CERAGON
+  serviceHandlers:
+  - handlerClass: L2NMEmulatedServiceHandler
+    serviceTypes:
+    - SERVICETYPE_L2NM
+    drivers:
+    - DEVICEDRIVER_UNDEFINED
+  - handlerClass: L2NMOpenConfigServiceHandler
+    serviceTypes:
+    - SERVICETYPE_L2NM
+    drivers:
+    - DEVICEDRIVER_OPENCONFIG
+  - handlerClass: L2NMGnmiOpenConfigServiceHandler
+    serviceTypes:
+    - SERVICETYPE_L2NM
+    drivers:
+    - DEVICEDRIVER_GNMI_OPENCONFIG
+  - handlerClass: L3NMEmulatedServiceHandler
+    serviceTypes:
+    - SERVICETYPE_L3NM
+    drivers:
+    - DEVICEDRIVER_UNDEFINED
+  - handlerClass: L3NMOpenConfigServiceHandler
+    serviceTypes:
+    - SERVICETYPE_L3NM
+    drivers:
+    - DEVICEDRIVER_OPENCONFIG
+  - handlerClass: L3NMGnmiOpenConfigServiceHandler
+    serviceTypes:
+    - SERVICETYPE_L3NM
+    drivers:
+    - DEVICEDRIVER_GNMI_OPENCONFIG
+  - handlerClass: L3NM_IETFACTN_ServiceHandler
+    serviceTypes:
+    - SERVICETYPE_L3NM
+    drivers:
+    - DEVICEDRIVER_IETF_ACTN
+  - handlerClass: L3NM_IETFL3VPN_ServiceHandler
+    serviceTypes:
+    - SERVICETYPE_L3NM
+    drivers:
+    - DEVICEDRIVER_IETF_L3VPN
+  - handlerClass: L3NM_NCEFAN_ServiceHandler
+    serviceTypes:
+    - SERVICETYPE_L3NM
+    drivers:
+    - DEVICEDRIVER_NCE
+  - handlerClass: L3NM_IETFSlice_ServiceHandler
+    serviceTypes:
+    - SERVICETYPE_L3NM
+    drivers:
+    - DEVICEDRIVER_IETF_SLICE
+  - handlerClass: TapiServiceHandler
+    serviceTypes:
+    - SERVICETYPE_TAPI_CONNECTIVITY_SERVICE
+    drivers:
+    - DEVICEDRIVER_TRANSPORT_API
+    - DEVICEDRIVER_UNDEFINED
+  - handlerClass: TapiXrServiceHandler
+    serviceTypes:
+    - SERVICETYPE_TAPI_CONNECTIVITY_SERVICE
+    drivers:
+    - DEVICEDRIVER_XR
+  - handlerClass: MicrowaveServiceHandler
+    serviceTypes:
+    - SERVICETYPE_L2NM
+    drivers:
+    - DEVICEDRIVER_IETF_NETWORK_TOPOLOGY
+    - DEVICEDRIVER_ONF_TR_532
+  - handlerClass: CeragonTransportServiceHandler
+    serviceTypes:
+    - SERVICETYPE_L2NM
+    - SERVICETYPE_L3NM
+    drivers:
+    - DEVICEDRIVER_CERAGON
+  - handlerClass: P4DummyL1ServiceHandler
+    serviceTypes:
+    - SERVICETYPE_L1NM
+    drivers:
+    - DEVICEDRIVER_P4
+  - handlerClass: P4FabricINTServiceHandler
+    serviceTypes:
+    - SERVICETYPE_INT
+    drivers:
+    - DEVICEDRIVER_P4
+  - handlerClass: P4FabricL2SimpleServiceHandler
+    serviceTypes:
+    - SERVICETYPE_L2NM
+    drivers:
+    - DEVICEDRIVER_P4
+  - handlerClass: P4FabricL3ServiceHandler
+    serviceTypes:
+    - SERVICETYPE_L3NM
+    drivers:
+    - DEVICEDRIVER_P4
+  - handlerClass: P4FabricACLServiceHandler
+    serviceTypes:
+    - SERVICETYPE_ACL
+    drivers:
+    - DEVICEDRIVER_P4
+  - handlerClass: P4FabricUPFServiceHandler
+    serviceTypes:
+    - SERVICETYPE_UPF
+    drivers:
+    - DEVICEDRIVER_P4
+  - handlerClass: L2NM_IETFL2VPN_ServiceHandler
+    serviceTypes:
+    - SERVICETYPE_L2NM
+    drivers:
+    - DEVICEDRIVER_IETF_L2VPN
+  - handlerClass: OpticalTfsServiceHandler
+    serviceTypes:
+    - SERVICETYPE_OPTICAL_CONNECTIVITY
+    drivers:
+    - DEVICEDRIVER_OPTICAL_TFS
+  - handlerClass: OCServiceHandler
+    serviceTypes:
+    - SERVICETYPE_OPTICAL_CONNECTIVITY
+    drivers:
+    - DEVICEDRIVER_OC
+    - DEVICEDRIVER_OPENROADM
+    - DEVICEDRIVER_UNDEFINED
+  - handlerClass: IP_LinkServiceHandler
+    serviceTypes:
+    - SERVICETYPE_IP_LINK
+    drivers:
+    - DEVICEDRIVER_OPENCONFIG
+    - DEVICEDRIVER_OC
+  - handlerClass: QKDServiceHandler
+    serviceTypes:
+    - SERVICETYPE_QKD
+    drivers:
+    - DEVICEDRIVER_QKD
+  - handlerClass: L3NMRyuServiceHandler
+    serviceTypes:
+    - SERVICETYPE_L3NM
+    drivers:
+    - DEVICEDRIVER_RYU
+  - handlerClass: IpowdmServiceHandler
+    serviceTypes:
+    - SERVICETYPE_IPOWDM
+    drivers:
+    - DEVICEDRIVER_IETF_L3VPN
+  - handlerClass: Tapi_LSPServiceHandler
+    serviceTypes:
+    - SERVICETYPE_TAPI_LSP
+    drivers:
+    - DEVICEDRIVER_TRANSPORT_API
+  northbound:
+  - interface: ietf_acl
+    yang:
+    - iana-if-type@2014-05-08
+    - ietf-access-control-list@2019-03-04
+    - ietf-ethertypes@2019-03-04
+    - ietf-inet-types@2013-07-15
+    - ietf-interfaces@2018-02-20
+    - ietf-packet-fields@2019-03-04
+    - ietf-yang-types@2013-07-15
+  - interface: ietf_hardware
+    yang:
+    - iana-hardware@2018-03-13
+    - ietf-hardware@2018-03-13
+    - ietf-inet-types@2013-07-15
+    - ietf-network-hardware-inventory@2023-03-09
+    - ietf-yang-types@2013-07-15
+  - interface: ietf_l2vpn
+    yang:
+    - ietf-inet-types@2013-07-15
+    - ietf-l2vpn-svc@2018-10-09
+    - ietf-netconf-acm@2018-02-14
+    - ietf-yang-types@2013-07-15
+  - interface: ietf_l3vpn
+    yang:
+    - ietf-inet-types@2013-07-15
+    - ietf-l3vpn-svc@2018-01-19
+    - ietf-netconf-acm@2018-02-14
+    - ietf-yang-types@2013-07-15
+  - interface: ietf_network
+    yang:
+    - iana-routing-types@2025-02-18
+    - ietf-eth-te-topology@2023-09-28
+    - ietf-eth-tran-service@2024-01-11
+    - ietf-eth-tran-types@2024-01-11
+    - ietf-inet-types@2025-06-23
+    - ietf-isis@2022-10-19
+    - ietf-l3-te-topology@2024-07-08
+    - ietf-l3-unicast-topology@2018-02-26
+    - ietf-layer1-types@2024-02-22
+    - ietf-network-topology@2018-02-26
+    - ietf-network@2018-02-26
+    - ietf-otn-topology@2024-06-21
+    - ietf-routing-types@2017-12-04
+    - ietf-routing@2018-03-13
+    - ietf-segment-routing-common@2021-05-26
+    - ietf-segment-routing-mpls@2021-05-26
+    - ietf-te-packet-types@2026-01-15
+    - ietf-te-topology-packet@2024-06-08
+    - ietf-te-topology@2020-08-06
+    - ietf-te-types@2026-01-23
+    - ietf-trans-client-service@2024-01-11
+    - ietf-trans-client-svc-types@2024-01-11
+    - ietf-yang-types@2025-12-22
+  - interface: ietf_network_slice
+    yang:
+    - ietf-ac-common@2023-11-13
+    - ietf-ac-svc@2024-08-06
+    - ietf-ethertypes@2019-03-04
+    - ietf-geo-location@2022-02-11
+    - ietf-inet-types@2024-10-21
+    - ietf-key-chain@2017-06-15
+    - ietf-netconf-acm@2018-02-14
+    - ietf-network-slice-service@2024-08-28
+    - ietf-network-slice@2022-03-04
+    - ietf-network-topology@2018-02-26
+    - ietf-network@2018-02-26
+    - ietf-packet-fields@2019-03-04
+    - ietf-routing-types@2017-12-04
+    - ietf-te-packet-types@2024-10-30
+    - ietf-te-types@2024-10-30
+    - ietf-vpn-common@2021-09-10
+  sloMetricTypes:
+    module: ietf-network-slice-service@2024-08-28
+    identities:
+    - identity: one-way-bandwidth
+      description: SLO bandwidth metric. Minimum guaranteed bandwidth between two SDPs at any time and is measured
+        unidirectionally.
+    - identity: two-way-bandwidth
+      description: SLO bandwidth metric. Minimum guaranteed bandwidth between two SDPs at any time.
+    - identity: shared-bandwidth
+      description: The shared SLO bandwidth bound. It is the limit on the bandwidth that can be shared amongst a
+        group of connectivity constructs of a Slice Service.
+    - identity: one-way-delay-maximum
+      description: The SLO objective of this metric is the upper bound of network delay when transmitting between
+        two SDPs.
+      reference: 'RFC 7679: A One-Way Delay Metric for IP Performance Metrics (IPPM)'
+    - identity: one-way-delay-percentile
+      description: The SLO objective of this metric is percentile objective of network delay when transmitting between
+        two SDPs. The metric is defined in RFC7679.
+      reference: 'RFC 7679: A One-Way Delay Metric for IP Performance Metrics (IPPM)'
+    - identity: two-way-delay-maximum
+      description: SLO two-way delay is the upper bound of network delay when transmitting between two SDPs
+      reference: 'RFC 2681: A Round-trip Delay Metric for IPPM'
+    - identity: two-way-delay-percentile
+      description: The SLO objective of this metric is the percentile objective of network delay when the traffic
+        transmitting between two SDPs.
+      reference: 'RFC 2681: A Round-trip Delay Metric for IPPM'
+    - identity: one-way-delay-variation-maximum
+      description: The SLO objective of this metric is maximum bound of the difference in the one-way delay between
+        sequential packets between two SDPs.
+      reference: 'RFC 3393: IP Packet Delay Variation Metric for IP Performance Metrics (IPPM)'
+    - identity: one-way-delay-variation-percentile
+      description: The SLO objective of this metric is the percentile objective in the one-way delay between sequential
+        packets between two SDPs.
+      reference: 'RFC 3393: IP Packet Delay Variation Metric for IP Performance Metrics (IPPM)'
+    - identity: two-way-delay-variation-maximum
+      description: SLO two-way delay variation is the difference in the round-trip delay between sequential packets
+        between two SDPs.
+      reference: 'RFC 5481: Packet Delay Variation Applicability Statement'
+    - identity: two-way-delay-variation-percentile
+      description: The SLO objective of this metric is the percentile objective in the round-trip delay between
+        sequential packets between two SDPs.
+      reference: 'RFC 5481: Packet Delay Variation Applicability Statement'
+    - identity: one-way-packet-loss
+      description: This metric type refers to the ratio of packets dropped to packets transmitted between two SDPs
+        in one-way.
+      reference: 'RFC 7680: A One-Way Loss Metric for IP Performance Metrics (IPPM)'
+    - identity: two-way-packet-loss
+      description: This metric type refers to the ratio of packets dropped to packets transmitted between two SDPs
+        in two-way.
+      reference: 'RFC 7680: A One-Way Loss Metric for IP Performance Metrics (IPPM)'
+  ceragonPortfolio:
+  - model: IP-100E
+    family: IP-100
+    apiFlavor: ceraos
+    apiVerified: false
+  - model: IP-20A
+    family: IP-20
+    apiFlavor: ceraos
+    apiVerified: false
+  - model: IP-20A-LH
+    family: IP-20
+    apiFlavor: ceraos
+    apiVerified: false
+  - model: IP-20C
+    family: IP-20
+    apiFlavor: ceraos
+    apiVerified: false
+  - model: IP-20C-HP
+    family: IP-20
+    apiFlavor: ceraos
+    apiVerified: false
+  - model: IP-20E
+    family: IP-20
+    apiFlavor: ceraos
+    apiVerified: false
+  - model: IP-20G
+    family: IP-20
+    apiFlavor: ceraos
+    apiVerified: false
+  - model: IP-20GX
+    family: IP-20
+    apiFlavor: ceraos
+    apiVerified: false
+  - model: IP-20N
+    family: IP-20
+    apiFlavor: ceraos
+    apiVerified: false
+  - model: IP-20S
+    family: IP-20
+    apiFlavor: ceraos
+    apiVerified: false
+  - model: IP-20V
+    family: IP-20
+    apiFlavor: ceraos
+    apiVerified: false
+  - model: IP-50C
+    family: IP-50
+    apiFlavor: ceraos
+    apiVerified: false
+  - model: IP-50CX
+    family: IP-50
+    apiFlavor: ceraos
+    apiVerified: false
+  - model: IP-50E
+    family: IP-50
+    apiFlavor: ceraos
+    apiVerified: false
+  - model: IP-50EX
+    family: IP-50
+    apiFlavor: ceraos
+    apiVerified: false
+  - model: IP-50EXA
+    family: IP-50
+    apiFlavor: ceraos
+    apiVerified: false
+  - model: IP-50FX
+    family: IP-50
+    apiFlavor: ceraos
+    apiVerified: false
+  - model: EH-1200FX
+    family: EtherHaul
+    apiFlavor: siklu_eh
+    apiVerified: false
+  - model: EH-1200TX
+    family: EtherHaul
+    apiFlavor: siklu_eh
+    apiVerified: false
+  - model: EH-2500FX
+    family: EtherHaul
+    apiFlavor: siklu_eh
+    apiVerified: false
+  - model: EH-614TX
+    family: EtherHaul
+    apiFlavor: siklu_eh
+    apiVerified: false
+  - model: EH-710TX
+    family: EtherHaul
+    apiFlavor: siklu_eh
+    apiVerified: false
+  - model: EH-8010FX
+    family: EtherHaul
+    apiFlavor: siklu_eh
+    apiVerified: false
+  - model: EH-8020FX
+    family: EtherHaul
+    apiFlavor: siklu_eh
+    apiVerified: false
+  - model: MH-N265
+    family: MultiHaul TG
+    apiFlavor: siklu_tg
+    apiVerified: false
+  - model: MH-N366
+    family: MultiHaul TG
+    apiFlavor: siklu_tg
+    apiVerified: false
+  - model: MH-N367
+    family: MultiHaul TG
+    apiFlavor: siklu_tg
+    apiVerified: false
+  - model: MH-T260
+    family: MultiHaul TG
+    apiFlavor: siklu_tg
+    apiVerified: false
+  - model: MH-T261
+    family: MultiHaul TG
+    apiFlavor: siklu_tg
+    apiVerified: true
+  - model: MH-T265
+    family: MultiHaul TG
+    apiFlavor: siklu_tg
+    apiVerified: false
+  - model: MH-T280
+    family: MultiHaul TG
+    apiFlavor: siklu_tg
+    apiVerified: false

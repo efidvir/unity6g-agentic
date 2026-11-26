@@ -9,3 +9,8 @@ readOnly: true
 patterns:
 - poll
 adapter: u6g_adapters_sources.snmp:SnmpSource
+provenance:
+- source: guide
+  ref: Implementation guide v1.2, Section 17.1 and Table 17-1
+- source: framework
+  ref: '[FW] Section 3.6, the kinds of catalog entry'

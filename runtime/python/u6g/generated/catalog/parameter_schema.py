@@ -54,3 +54,15 @@ class ControlParameterEntry(BaseModel):
     The controller bindings that set the parameter.
     """
     read_back: Annotated[ParameterReadBack, Field(alias='readBack')]
+    provenance: Annotated[list[common_schema.Provenance], Field(min_length=1)]
+    """
+    Where the entry's content comes from.
+    """
+    teraflowsdn: common_schema.TfsConfigRule | None = None
+    families: Annotated[
+        list[common_schema.FamilyRealization] | None, Field(min_length=1)
+    ] = None
+    """
+    What the parameter acts on in each product family the driver supports.
+    """
+    hardware: common_schema.DeviceVerification | None = None

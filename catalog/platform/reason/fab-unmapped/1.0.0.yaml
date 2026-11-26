@@ -8,3 +8,8 @@ code: FAB-UNMAPPED
 category: mediation
 meaning: The action type has no mapping in the fabric's model of resources
 raisedBy: The mediator of the conflict fabric
+provenance:
+- source: guide
+  ref: Implementation guide v1.2, Annex F.10
+- source: framework
+  ref: '[FW] Section 3.6, the kinds of catalog entry'

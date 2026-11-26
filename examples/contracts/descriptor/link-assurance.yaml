@@ -51,7 +51,7 @@ scope:
 actionSpace:
   - actionType: catalog://transport/action/set-modulation-profile@1.1.0
     targets: { objectClass: mw-link }
-    bounds: { profile: { enum: [QPSK, 16QAM, 64QAM, 256QAM, 1024QAM] } }
+    bounds: { profile: { enum: [qpsk, qam-16, qam-64, qam-256, qam-1024] } }
     rateLimit: { max: 4, per: PT1H }
     stability: { minInterval: PT5M, minHoldBeforeReverse: PT15M, maxStep: 1 }
     preconditions: [ { all: [ { metric: link-state, eq: up } ] } ]

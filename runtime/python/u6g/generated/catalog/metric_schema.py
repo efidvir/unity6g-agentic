@@ -47,3 +47,13 @@ class MetricEntry(BaseModel):
     """
     The source kinds that supply the metric.
     """
+    provenance: Annotated[list[common_schema.Provenance], Field(min_length=1)]
+    """
+    Where the entry's content comes from.
+    """
+    teraflowsdn: common_schema.TfsKpi | None = None
+    standard: Annotated[str | None, Field(min_length=1)] = None
+    """
+    The standard's name for the quantity, as RFC 8561 actual-received-level.
+    """
+    hardware: common_schema.DeviceVerification | None = None

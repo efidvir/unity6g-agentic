@@ -1,0 +1,37 @@
+kind: Metric
+id: transport/metric/snir
+version: 1.0.0
+owner: transport-domain
+description: Signal to noise plus interference ratio
+deprecated: false
+objectClass: mw-link
+definition: 'The ratio of the received signal to noise plus interference at the near end, in dB, as the radio reports
+  it: the SNR of the active link on MultiHaul TG, cinr-db on EtherHaul, the carrier''s snr-db on CeraOS where the
+  carrier reports it. TeraFlowSDN carries it as the KPI RADIO_SNIR_DB.'
+value:
+  type: number
+  unit: dB
+type: gauge
+aggregation: mean
+sources:
+- transport/source/sdn-telemetry@1.0.0
+teraflowsdn:
+  kpiSampleType: KPISAMPLETYPE_RADIO_SNIR_DB
+  scope: endpoint
+  scale: 1
+standard: RFC 8561 actual-snir
+hardware:
+  status: provisional
+  verifiedOn: []
+  provisionalOn:
+  - MultiHaul TG
+  - EtherHaul
+  - IP-20
+  - IP-50
+  - IP-100
+provenance:
+- source: teraflowsdn
+  ref: 'efidvir/teraflowsdn@ddd4aaf: proto/kpi_sample_types.proto KPISAMPLETYPE_RADIO_SNIR_DB; src/device/service/drivers/ceragon/Tools.py
+    radio_figure and FAMILY_RADIO_FIGURES'
+- source: ietf
+  ref: RFC 8561, module ietf-microwave-radio-link, leaf actual-snir
