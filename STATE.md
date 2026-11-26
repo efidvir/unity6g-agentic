@@ -57,6 +57,17 @@
   the ten kinds present, Table 17-1 resolving, every reference and reason code of the examples
   resolving, eleven breaches each reported under its rule, the snapshot reproducible and its signature
   refusing a changed snapshot, another key and a forged signature, the REST service -> make check exit 0
+- 2026-11-26, the catalog restacked on item-0.3-cond (the mock controller's commit dropped; httpx moved to the
+  dev group for the catalog service's tests) -> make check exit 0, pytest 483 passed
+- 2026-11-26, the exact catalog: python -m u6g_catalog import-tfs on the fork's feat/radio-kpis at ddd4aaf ->
+  48 device types, 23 kinds of driver, 15 service types, 60 KPI sample types, 22 driver and 28 handler
+  registrations, 6 northbound interfaces with YANG, 31 radio products (MH-T261 checked); build -> 86 entries,
+  no findings; 12 new tests (the reader on a small tree, import and its drift check, the binding against the
+  fork, provenance everywhere, seven new breaches) -> pre-commit, mypy strict (51 files), pytest 495 passed,
+  cargo test, make gen with no drift
+- 2026-11-26, the fork efidvir/teraflowsdn, branch feat/radio-kpis (pull request #2): device/tests/
+  test_driver_ceragon.py -> 29 passed (6 new); kpi_sample_types.proto compiled with grpcio-tools, the
+  driver's 20 KPI constants equal to the enum
 
 ## Documents delivered
 - UNITY6G_Agentic_Implementation_Guide_v1.2.docx, version 1.2, 2026-11-25: the real, emulated and simulated
