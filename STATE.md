@@ -1,11 +1,17 @@
 # STATE.md
 
 ## Now
-- Date, session author: 2026-11-25, Claude (AI agent), for the owner of the framework
-- Working on: the rework the owner asked for on 2026-11-26. Work item 0.7 becomes the path to the real
-  TeraFlowSDN on the lab server cersrv-029, with a proxy that injects the failure behaviors; work item 0.4
-  becomes exact, generated from TeraFlowSDN's sources and YANG; the radio KPIs go into the TeraFlowSDN fork
-- Next: the route into cersrv-029, then the TeraFlowSDN adapter, and aerOS beside the controller
+- Date, session author: 2026-11-26, Claude (AI agent), for the owner of the framework
+- Working on: the rework the owner asked for on 2026-11-26. Work item 0.7 becomes the path to our own
+  TeraFlowSDN, built from the fork, on the lab server cersrv-029, with a proxy that injects the failure
+  behaviors; work item 0.4 becomes exact, generated from TeraFlowSDN's sources and YANG; the radio KPIs go into
+  the TeraFlowSDN fork
+- Two sessions: this one writes the code and keeps this file and the guide; a Claude Code session on the
+  owner's laptop does the work on cersrv-029. They exchange messages through the folder u6g-handover in the
+  laptop's Downloads (its README.md sets the form; HANDOVER.md is the laptop session's brief)
+- Next: the laptop session's report and plan (kubectl access, the inventory, where our TeraFlowSDN, aerOS and
+  the SRS RAN domain run); meanwhile the fault proxy and the TeraFlowSDN adapter; the guide's next version
+  takes the lab's own TeraFlowSDN (Sections 19.6 and 19.9)
 
 ## Items
 | ID | Status (open, in progress, done, blocked) | Evidence or blocker | Updated |
@@ -13,7 +19,7 @@
 | 0.1 | done | make setup and make check pass locally (Checks below) and in the pipeline: runs 45612680111 (push) and 45612688927 (pull request #1), both success | 2026-11-25 |
 | 0.2 | in progress | the tuple's contracts are done and checked, provisional until [IMPL] 3.2 (pull request #2): make check passes locally (Checks below) and in the pipeline: runs 45619948464 (push) and 45619959912 (pull request #2), both success; the rest of Table 26-1 comes with the items that use it | 2026-11-25 |
 | 0.3 | done | make check passes locally (Checks below) and in the pipeline: runs 45620156774 (push) and 45620208026 (pull request #3), both success; 26 tests, 8 of them property tests over generated condition trees: structure, declared operands, depth limit, results | 2026-11-25 |
-| 0.7 | in progress | reworked by the owner's ruling of 2026-11-26: the controller is the real TeraFlowSDN on cersrv-029, and a proxy in front of its northbound interface injects the five failure behaviors; the mock of pull request #4 is withdrawn; blocked on the route into the server | 2026-11-26 |
+| 0.7 | in progress | reworked by the owner's rulings of 2026-11-26: the controller is our own TeraFlowSDN, built from the fork, on cersrv-029, and a proxy in front of its northbound interface injects the five failure behaviors; the mock of pull request #4 is withdrawn; the server is reached from the owner's laptop, whose Claude Code session does the work there (first probe: SSH works, the microk8s command fails in non-interactive sessions) | 2026-11-26 |
 | 0.4 | in progress | reworked by the owner's ruling of 2026-11-26 (pull request #5, now on #3): the controller binding holds the model u6g-catalog import-tfs reads from the TeraFlowSDN fork at ddd4aaf (48 device types, 23 kinds of driver, 15 service types, 60 KPI sample types, the driver and handler registries, the YANG of the northbound interfaces, the SLO metric types, the radio portfolio); every entry has its provenance; the radio metrics, parameters and actions name their KPI types, config rules and per-family behaviour, each provisional on hardware; the build checks them against the model; 86 entries; the guide's Table 17-1 and examples follow in its next version | 2026-11-26 |
 | 1.1 | open | | 2026-11-25 |
 | 1.2 | open | | 2026-11-25 |
@@ -103,8 +109,9 @@
 - 2026-11-26 The route into cersrv-029, whose SSH key is on the owner's laptop: a GitHub Actions runner on the
   server tied to a private repository, or work through the laptop -> the laptop, the owner's choice; taking
   over a computer leaves terminals click-only, so the owner runs a read-only probe
-  (Downloads/cersrv029_probe.sh) and the output comes back through the Downloads folder; the runner stays the
-  lasting route for deploying and testing on the server -> open
+  (Downloads/cersrv029_probe.sh) and the output comes back through the Downloads folder -> answered
+  2026-11-26: a Claude Code session on the laptop does the work on the server, and the two sessions exchange
+  messages through Downloads/u6g-handover
 - 2026-11-26 [IMPL] version 3.2, for Annex B, whose fields the exact catalog follows -> open; the owner is
   looking for the file
 - 2026-11-26 Which features of the radio driver were exercised on the MultiHaul MH-T261: the portfolio marks the
@@ -194,6 +201,20 @@
   (RFC 8561); a family's own values, as CeraOS's mrmc profiles, are listed with that family (source: finding)
 - 2026-11-26 Work item 0.4 goes on top of 0.3: the catalog needs no controller, so pull request #5 no longer
   stacks on the withdrawn #4 (source: finding)
+- 2026-11-26 The work on cersrv-029 is done by a Claude Code session on the owner's laptop, which reaches the
+  server over SSH with the owner's key. It and this session exchange messages through the folder u6g-handover
+  in the laptop's Downloads: one file per message, numbered in each direction, with a header naming the
+  message it answers; the laptop session keeps STATUS.md and server-changes.md there, this session keeps
+  STATE.md and the guide (source: owner, the form of the messages a finding)
+- 2026-11-26 Our own TeraFlowSDN, built from the fork efidvir/teraflowsdn, runs under the owner's account on
+  cersrv-029, independent of the instance another account installed there, so the fork's changes can be
+  deployed and tested at will; the existing instance stays as it is (source: owner) [replaces: the
+  TeraFlowSDN already on cersrv-029 as the controller of work item 0.7]
+- 2026-11-26 aerOS and the SRS RAN domain go on cersrv-029 now; the load the first probe saw is temporary, an
+  ML model in training (source: owner)
+- 2026-11-26 cersrv-029 is cersrv-029.ceragon.com: Ubuntu 24.04.1, 32 cores, 62 GB of memory, no swap, 41 GB
+  of its 208 GB disk free; from a non-interactive SSH session the microk8s command fails because snap cannot
+  start its transient scope, so the laptop session finds another way to run kubectl (source: finding)
 
 ## Provisional contracts
 - schemas/common/defs.schema.json, schemas/descriptor/descriptor.schema.json and
